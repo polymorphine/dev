@@ -43,7 +43,7 @@ EOF;
         'concat_space'                          => ['spacing' => 'one'],
         'escape_implicit_backslashes'           => true,
         'explicit_indirect_variable'            => true,
-        'explicit_string_variable'              => true,
+        'explicit_string_variable'              => false,
         'final_internal_class'                  => true,
         'function_to_constant'                  => true,
         'header_comment'                        => ['commentType' => 'comment'],

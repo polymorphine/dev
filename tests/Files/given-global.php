@@ -14,6 +14,8 @@ else
     //Try something else (indentation unfixed)
 }
 
+echo "string with evaluated $x variable and $argv[0] variable";
+
 function doSomething($x=3,$a=10)
 {
     return $x+$a;
