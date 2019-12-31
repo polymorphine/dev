@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\FixerFactory;
 
 
+/**
+ * @group integrated
+ */
 class FileFixerTest extends TestCase
 {
     private $runner;
