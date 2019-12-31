@@ -12,20 +12,29 @@
 namespace Polymorphine\CodeStandards\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\FixerFactory;
 
 
 class FileFixerTest extends TestCase
 {
+    private $runner;
+
+    protected function setUp(): void
+    {
+        $config = FixerFactory::createFor('Polymorphine/CodeStandards', __DIR__);
+        $this->runner = Fixtures\TestRunner::withConfig($config);
+    }
+
     /**
      * @dataProvider fileList
      *
-     * @param $expected
-     * @param $given
+     * @param string $fileExpected
+     * @param string $fileGiven
      */
-    public function testFixedFiles_MatchExpectations($expected, $given)
+    public function testFixedFiles_MatchExpectations($fileExpected, $fileGiven)
     {
-        $result = $this->fixFile($given);
-        $this->assertSame(file_get_contents($expected), $result);
+        $sourceCode = file_get_contents($fileGiven);
+        $this->assertSame(file_get_contents($fileExpected), $this->runner->fix($sourceCode));
     }
 
     public function fileList()
@@ -39,20 +48,5 @@ class FileFixerTest extends TestCase
         }
 
         return $files;
-    }
-
-    private function fixFile($file)
-    {
-        $tmpFilename = substr(basename($file), strpos(basename($file), '-') + 1);
-        $tmpFile     = dirname(__DIR__) . '/temp/' . $tmpFilename;
-        copy($file, $tmpFile);
-        $executable = dirname(__DIR__) . '/vendor/friendsofphp/php-cs-fixer/php-cs-fixer';
-        $config     = dirname(__DIR__) . '/cs-fixer.php.dist';
-        $command    = 'fix -v --config=' . $config . ' --using-cache=no --path-mode=intersection "' . $tmpFile . '"';
-        echo shell_exec('php ' . $executable . ' ' . $command);
-        $fixed = file_get_contents($tmpFile);
-        unlink($tmpFile);
-
-        return $fixed;
     }
 }
