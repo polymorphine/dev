@@ -13,16 +13,15 @@ namespace Polymorphine\CodeStandards\Tests\Fixer;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Fixer\AlignedArrayValuesFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
 class AlignedArrayValuesFixerTest extends TestCase
 {
-    private $runner;
+    use FixerTestMethods;
 
     protected function setUp(): void
     {
-        $this->runner = new TestRunner([new AlignedArrayValuesFixer()]);
+        $this->setRunner(new AlignedArrayValuesFixer());
     }
 
     public function testNonAssociativeArraysAreNotChanged()
@@ -65,10 +64,5 @@ class AlignedArrayValuesFixerTest extends TestCase
             ];
             PHP);
         $this->assertSame($expected, $this->runner->fix($code));
-    }
-
-    private function code(string $code): string
-    {
-        return '<?php' . PHP_EOL . $code;
     }
 }
