@@ -14,7 +14,7 @@ use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
  *
  * @package Vendor\Package\Name
  */
-abstract class MyClass
+abstract class ExampleClass
  implements SomeInterface {
 
     const CONSTANT = 'string';

@@ -15,7 +15,7 @@ use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
  * @package Vendor\Package\Name
  */
 
-trait MyClass {
+trait ExampleTrait {
 
 
     private function getVar() {
