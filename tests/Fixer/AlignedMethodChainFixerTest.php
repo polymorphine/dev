@@ -1,0 +1,62 @@
+<?php
+
+/*
+ * This file is part of Polymorphine/CodeStandards package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Polymorphine\CodeStandards\Tests\Fixer;
+
+use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Fixer\AlignedMethodChainFixer;
+
+
+class AlignedMethodChainFixerTest extends TestCase
+{
+    use FixerTestMethods;
+
+    protected function setUp(): void
+    {
+        $this->setRunner(new AlignedMethodChainFixer());
+    }
+
+    public function testSingleLineChainCallsAreNotChanged()
+    {
+        $code = $this->code(<<<'PHP'
+            
+            $someVar = $callable()->withSomething('string')->build();
+            return $this->value->methodA()->methodB($foo === $bar)->baz($someVar);
+
+            PHP);
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
+    public function testLineBreakChainCallsAreExpandedAndAligned()
+    {
+        $code = $this->code(<<<'PHP'
+            
+            $someVar = $callable()->withSomething('string')
+                ->build();
+            return $this->value->methodA()
+                ->methodB($foo === $bar)->baz($someVar);
+
+            PHP);
+
+        $expected = $this->code(<<<'PHP'
+            
+            $someVar = $callable()->withSomething('string')
+                                  ->build();
+            return $this->value->methodA()
+                               ->methodB($foo === $bar)
+                               ->baz($someVar);
+
+            PHP);
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+}
