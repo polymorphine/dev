@@ -11,44 +11,48 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use Polymorphine\CodeStandards\Fixer\BraceAfterFunctionFixer;
 use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Fixer\BraceAfterFunctionFixer;
+use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
 class BraceAfterFunctionFixerTest extends TestCase
 {
-    use FixerTestMethods;
+    private TestRunner $runner;
 
     protected function setUp(): void
     {
-        $this->setRunner(new BraceAfterFunctionFixer());
+        $this->runner = new TestRunner([new BraceAfterFunctionFixer()]);
     }
 
     public function testFunctionBracesFromNextLineAreMoved()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
             
             function withSomething(Test $value)
             {
                 return $value->methodA();
             }
 
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
             
             function withSomething(Test $value) {
                 return $value->methodA();
             }
 
-            PHP);
+            CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
     public function testMethodBracesFromNextLineAreMoved()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
             
             class Test {
                 public function withSomething(string $value)
@@ -57,9 +61,10 @@ class BraceAfterFunctionFixerTest extends TestCase
                 }
             }
 
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
             
             class Test {
                 public function withSomething(string $value) {
@@ -67,7 +72,7 @@ class BraceAfterFunctionFixerTest extends TestCase
                 }
             }
 
-            PHP);
+            CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
     }

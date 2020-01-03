@@ -13,40 +13,44 @@ namespace Polymorphine\CodeStandards\Tests\Fixer;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Fixer\AlignedAssignmentsFixer;
+use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
 class AlignedAssignmentsFixerTest extends TestCase
 {
-    use FixerTestMethods;
+    private TestRunner $runner;
 
     protected function setUp(): void
     {
-        $this->setRunner(new AlignedAssignmentsFixer());
+        $this->runner = new TestRunner([new AlignedAssignmentsFixer()]);
     }
 
     public function testVariableAssignmentsAreAligned()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
 
             $x = 10;
             $bool = true;
             $another = 'string';
 
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
 
             $x       = 10;
             $bool    = true;
             $another = 'string';
 
-            PHP);
+            CODE;
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
     public function testMixedKindVariableAssignmentsAreAlignedSeparately()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
 
             $x = 10;
             $bool = true;
@@ -58,9 +62,10 @@ class AlignedAssignmentsFixerTest extends TestCase
             $array['key_assoc'] = true;
             $arrayWithKey['another'] = 'aligned';
 
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
 
             $x    = 10;
             $bool = true;
@@ -72,7 +77,7 @@ class AlignedAssignmentsFixerTest extends TestCase
             $array['key_assoc']      = true;
             $arrayWithKey['another'] = 'aligned';
 
-            PHP);
+            CODE;
         $this->assertSame($expected, $this->runner->fix($code));
     }
 }

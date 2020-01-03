@@ -13,20 +13,22 @@ namespace Polymorphine\CodeStandards\Tests\Fixer;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Fixer\ConstructorsFirstFixer;
+use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
 class ConstructorsFirstFixerTest extends TestCase
 {
-    use FixerTestMethods;
+    private TestRunner $runner;
 
     protected function setUp(): void
     {
-        $this->setRunner(new ConstructorsFirstFixer());
+        $this->runner = new TestRunner([new ConstructorsFirstFixer()]);
     }
 
     public function testConstructorsAreMovedToTop()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
             
             class ExampleClass
             {
@@ -48,9 +50,10 @@ class ConstructorsFirstFixerTest extends TestCase
                 }
             }
 
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
             
             class ExampleClass
             {
@@ -72,7 +75,7 @@ class ConstructorsFirstFixerTest extends TestCase
             
                 }
 
-            PHP);
+            CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
     }

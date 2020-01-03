@@ -13,41 +13,45 @@ namespace Polymorphine\CodeStandards\Tests\Fixer;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Fixer\AlignedMethodChainFixer;
+use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
 class AlignedMethodChainFixerTest extends TestCase
 {
-    use FixerTestMethods;
+    private TestRunner $runner;
 
     protected function setUp(): void
     {
-        $this->setRunner(new AlignedMethodChainFixer());
+        $this->runner = new TestRunner([new AlignedMethodChainFixer()]);
     }
 
     public function testSingleLineChainCallsAreNotChanged()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
             
             $someVar = $callable()->withSomething('string')->build();
             return $this->value->methodA()->methodB($foo === $bar)->baz($someVar);
 
-            PHP);
+            CODE;
 
         $this->assertSame($code, $this->runner->fix($code));
     }
 
     public function testLineBreakChainCallsAreExpandedAndAligned()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
             
             $someVar = $callable()->withSomething('string')
                 ->build();
             return $this->value->methodA()
                 ->methodB($foo === $bar)->baz($someVar);
 
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
             
             $someVar = $callable()->withSomething('string')
                                   ->build();
@@ -55,7 +59,7 @@ class AlignedMethodChainFixerTest extends TestCase
                                ->methodB($foo === $bar)
                                ->baz($someVar);
 
-            PHP);
+            CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
     }

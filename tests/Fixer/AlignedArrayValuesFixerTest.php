@@ -13,56 +13,65 @@ namespace Polymorphine\CodeStandards\Tests\Fixer;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Fixer\AlignedArrayValuesFixer;
+use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
 class AlignedArrayValuesFixerTest extends TestCase
 {
-    use FixerTestMethods;
+    private TestRunner $runner;
 
     protected function setUp(): void
     {
-        $this->setRunner(new AlignedArrayValuesFixer());
+        $this->runner = new TestRunner([new AlignedArrayValuesFixer()]);
     }
 
     public function testNonAssociativeArraysAreNotChanged()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
+            
             $x = [
                 'a', 'abc',
                 'def'
             ];
-            PHP);
+            CODE;
         $this->assertSame($code, $this->runner->fix($code));
     }
 
     public function testSingleLineArraysAreNotChanged()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
+            
             $x = ['a' => 10, 'abc' => 20];
 
-            PHP);
+            CODE;
         $this->assertSame($code, $this->runner->fix($code));
     }
 
     public function testMultilineArraysAreAligned()
     {
-        $code = $this->code(<<<'PHP'
+        $code = <<<'CODE'
+            <?php
+            
             $x = [
                 'a' => 10,
                 'abc' => ['foo' => $x, 'bar' => $y],
                 'foo-bar' => 12,
                 'baz' => 1
             ];
-            PHP);
+            CODE;
 
-        $expected = $this->code(<<<'PHP'
+        $expected = <<<'CODE'
+            <?php
+            
             $x = [
                 'a'       => 10,
                 'abc'     => ['foo' => $x, 'bar' => $y],
                 'foo-bar' => 12,
                 'baz'     => 1
             ];
-            PHP);
+            CODE;
         $this->assertSame($expected, $this->runner->fix($code));
     }
 }
