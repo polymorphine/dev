@@ -18,7 +18,7 @@ use Polymorphine\CodeStandards\FixerFactory;
 /**
  * @group integrated
  */
-class FileFixerTest extends TestCase
+class CompoundFixerTest extends TestCase
 {
     private $runner;
 
