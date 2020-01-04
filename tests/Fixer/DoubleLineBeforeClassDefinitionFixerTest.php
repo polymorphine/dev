@@ -17,13 +17,18 @@ use Polymorphine\CodeStandards\Fixer\DoubleLineBeforeClassDefinitionFixer;
 
 class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
 {
-    public function testTwoEmptyLinesAreInsertedBeforeClassDefinition()
+    public function testWhitespaceIsExpandedIntoTwoEmptyLinesBeforeClassDefinition()
     {
+        //TODO: Fix removing line after phpDoc
         $code = <<<'CODE'
             <?php
             
             namespace Some\Package;
-            class ExampleClass
+            /**
+             * class description
+             */
+            
+            final class ExampleClass
             {
                 private $self;
             
@@ -40,8 +45,12 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             
             namespace Some\Package;
             
+
+            /**
+             * class description
+             */
             
-            class ExampleClass
+            final class ExampleClass
             {
                 private $self;
             
@@ -49,6 +58,36 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
                 {
                     $this->self = $self;
                 }
+            }
+
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testTwoEmptyLinesAreInsertedBeforeClassDefinition()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            namespace Some\Package;//comment
+            interface ExampleInterface
+            {
+                private function doSomething(): void;
+            }
+
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            namespace Some\Package;
+            
+            
+            //comment
+            interface ExampleInterface
+            {
+                private function doSomething(): void;
             }
 
             CODE;
