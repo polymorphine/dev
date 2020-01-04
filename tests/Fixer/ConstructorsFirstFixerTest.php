@@ -31,11 +31,20 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code...
                 }
             
+                public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /**
+                 * Static constructor with phpDoc
+                 */
                 public static function fromData(array $data): self
                 {
                     //return new self()
                 }
             
+                /** Main Constructor */
                 public function __construct(ExampleClass $self)
                 {
                     $this->self = $self;
@@ -51,11 +60,20 @@ class ConstructorsFirstFixerTest extends FixerTest
             {
                 private $self;
             
+                /** Main Constructor */
                 public function __construct(ExampleClass $self)
                 {
                     $this->self = $self;
                 }
-            public static function fromData(array $data): self
+            public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /**
+                 * Static constructor with phpDoc
+                 */
+                public static function fromData(array $data): self
                 {
                     //return new self()
                 }
