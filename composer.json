@@ -23,6 +23,11 @@
             "Polymorphine\\CodeStandards\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Polymorphine\\CodeStandards\\Tests\\": "tests/"
+        }
+    },
     "bin": [
         "polymorphine-cs"
     ]
