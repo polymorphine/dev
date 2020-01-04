@@ -11,20 +11,13 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\AlignedArrayValuesFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
+use PhpCsFixer\Fixer\FixerInterface;
 
 
-class AlignedArrayValuesFixerTest extends TestCase
+class AlignedArrayValuesFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new AlignedArrayValuesFixer()]);
-    }
-
     public function testNonAssociativeArraysAreNotChanged()
     {
         $code = <<<'CODE'
@@ -73,5 +66,15 @@ class AlignedArrayValuesFixerTest extends TestCase
             ];
             CODE;
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): FixerInterface
+    {
+        return new AlignedArrayValuesFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/aligned_array_values', 'priority' => -40];
     }
 }

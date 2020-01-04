@@ -11,20 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\DoubleLineBeforeClassDefinitionFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
-class DoubleLineBeforeClassDefinitionFixerTest extends TestCase
+class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new DoubleLineBeforeClassDefinitionFixer()]);
-    }
-
     public function testTwoEmptyLinesAreInsertedBeforeClassDefinition()
     {
         $code = <<<'CODE'
@@ -62,5 +54,15 @@ class DoubleLineBeforeClassDefinitionFixerTest extends TestCase
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): DoubleLineBeforeClassDefinitionFixer
+    {
+        return new DoubleLineBeforeClassDefinitionFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/double_line_before_class_definition', 'priority' => -40];
     }
 }

@@ -11,20 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\AlignedMethodChainFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
-class AlignedMethodChainFixerTest extends TestCase
+class AlignedMethodChainFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new AlignedMethodChainFixer()]);
-    }
-
     public function testSingleLineChainCallsAreNotChanged()
     {
         $code = <<<'CODE'
@@ -62,5 +54,15 @@ class AlignedMethodChainFixerTest extends TestCase
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): AlignedMethodChainFixer
+    {
+        return new AlignedMethodChainFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/aligned_method_chain', 'priority' => -40];
     }
 }

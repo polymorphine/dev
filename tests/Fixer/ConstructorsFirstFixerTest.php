@@ -11,20 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\ConstructorsFirstFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
-class ConstructorsFirstFixerTest extends TestCase
+class ConstructorsFirstFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new ConstructorsFirstFixer()]);
-    }
-
     public function testConstructorsAreMovedToTop()
     {
         $code = <<<'CODE'
@@ -78,5 +70,15 @@ class ConstructorsFirstFixerTest extends TestCase
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): ConstructorsFirstFixer
+    {
+        return new ConstructorsFirstFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/constructors_first', 'priority' => -40];
     }
 }

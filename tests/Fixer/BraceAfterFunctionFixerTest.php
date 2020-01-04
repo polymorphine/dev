@@ -11,20 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\BraceAfterFunctionFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
-class BraceAfterFunctionFixerTest extends TestCase
+class BraceAfterFunctionFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new BraceAfterFunctionFixer()]);
-    }
-
     public function testFunctionBracesFromNextLineAreMoved()
     {
         $code = <<<'CODE'
@@ -75,5 +67,15 @@ class BraceAfterFunctionFixerTest extends TestCase
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): BraceAfterFunctionFixer
+    {
+        return new BraceAfterFunctionFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/brace_after_method', 'priority' => -40];
     }
 }

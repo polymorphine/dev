@@ -11,20 +11,13 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\AlignedAssignmentsFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
+use PhpCsFixer\Fixer\FixerInterface;
 
 
-class AlignedAssignmentsFixerTest extends TestCase
+class AlignedAssignmentsFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new AlignedAssignmentsFixer()]);
-    }
-
     public function testVariableAssignmentsAreAligned()
     {
         $code = <<<'CODE'
@@ -79,5 +72,15 @@ class AlignedAssignmentsFixerTest extends TestCase
 
             CODE;
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): FixerInterface
+    {
+        return new AlignedAssignmentsFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/aligned_assignments', 'priority' => -40];
     }
 }

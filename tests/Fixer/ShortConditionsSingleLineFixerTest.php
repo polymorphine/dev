@@ -11,20 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\ShortConditionsSingleLineFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
-class ShortConditionsSingleLineFixerTest extends TestCase
+class ShortConditionsSingleLineFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new ShortConditionsSingleLineFixer()]);
-    }
-
     public function testShortConditionsAreTurnedIntoSingleLine()
     {
         $code = <<<'CODE'
@@ -58,5 +50,15 @@ class ShortConditionsSingleLineFixerTest extends TestCase
             CODE;
 
         $this->assertSame($code, $this->runner->fix($code));
+    }
+
+    protected function fixer(): ShortConditionsSingleLineFixer
+    {
+        return new ShortConditionsSingleLineFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/short_conditions_single_line', 'priority' => -40];
     }
 }

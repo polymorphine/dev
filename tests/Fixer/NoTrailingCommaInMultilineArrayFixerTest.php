@@ -11,20 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Tests\Fixer;
 
-use PHPUnit\Framework\TestCase;
+use Polymorphine\CodeStandards\Tests\FixerTest;
 use Polymorphine\CodeStandards\Fixer\NoTrailingCommaInMultilineArrayFixer;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 
 
-class NoTrailingCommaInMultilineArrayFixerTest extends TestCase
+class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
 {
-    private TestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $this->runner = new TestRunner([new NoTrailingCommaInMultilineArrayFixer()]);
-    }
-
     public function testTrailingCommaIsRemovedFromMultilineArray()
     {
         $code = <<<'CODE'
@@ -48,5 +40,15 @@ class NoTrailingCommaInMultilineArrayFixerTest extends TestCase
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    protected function fixer(): NoTrailingCommaInMultilineArrayFixer
+    {
+        return new NoTrailingCommaInMultilineArrayFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/no_trailing_comma_after_multiline_array', 'priority' => -40];
     }
 }
