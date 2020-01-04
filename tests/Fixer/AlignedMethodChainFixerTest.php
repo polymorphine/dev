@@ -56,6 +56,45 @@ class AlignedMethodChainFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
+    public function testNestedMultilineChainsAreAligned()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $call->withSomething(function () {
+                $this->doSomething()
+                ->andMore();
+            })
+            ->build();
+
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            $call->withSomething(function () {
+                     $this->doSomething()
+                          ->andMore();
+                 })
+                 ->build();
+
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testCodeWithoutObjectOperatorIsSkipped()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $someVar = function_call();
+
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
     protected function fixer(): AlignedMethodChainFixer
     {
         return new AlignedMethodChainFixer();
