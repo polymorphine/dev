@@ -26,6 +26,10 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
                 'one' => 1,
                 'two' => 2,
             ];
+            
+            $oldArray = array(
+                'one' => 'last',
+            );
 
             CODE;
 
@@ -36,6 +40,10 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
                 'one' => 1,
                 'two' => 2
             ];
+            
+            $oldArray = array(
+                'one' => 'last'
+            );
 
             CODE;
 
