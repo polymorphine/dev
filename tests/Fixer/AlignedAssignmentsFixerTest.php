@@ -74,6 +74,22 @@ class AlignedAssignmentsFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
+    public function testMultilineAssignmentIsNotAligned()
+    {
+        $code = <<<'CODE'
+            <?php
+
+            $x = 10;
+            $func = function (int $val) {
+                return $val + 1;
+            };
+            $another = 'string';
+
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
     protected function fixer(): FixerInterface
     {
         return new AlignedAssignmentsFixer();
