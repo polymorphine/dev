@@ -40,11 +40,26 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
 
     public function testLongConditionsAreNotChanged()
     {
+        //TODO: Last one should be string not method name
         $code = <<<'CODE'
             <?php
             
             if ($variable !== CONSTANT_VALUE) {
                 return $expression + $secondExpression;
+            }
+            
+            if ($true) {
+                return true;
+            } else {
+                return false;
+            }
+            
+            if ($veryLongVariableThatWillCauseLineLimitExceed) {
+                return 'string with spaces';
+            }
+            
+            if ($variable) {
+                $object->callVeryLongMethodName();
             }
 
             CODE;
