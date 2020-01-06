@@ -94,6 +94,13 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
         $beginBlock = $tokens->getNextTokenOfKind($idx, ['{']);
         $endBlock   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock) + 1;
 
+        if ($this->isLastMethod($endBlock, $tokens)) {
+            $previousBreak = $tokens->getPrevMeaningfulToken($idx) + 1;
+            $break         = $tokens[$previousBreak];
+            $tokens[$previousBreak] = $tokens[$endBlock];
+            $tokens[$endBlock]      = $break;
+        }
+
         while ($idx <= $endBlock) {
             $this->constructors[] = $tokens[$idx];
             $tokens->clearAt($idx);
@@ -124,5 +131,11 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
         $sequence = $tokens->findSequence($sequence, $idx);
 
         return ($sequence) ? array_keys($sequence)[0] : null;
+    }
+
+    private function isLastMethod($whitespaceIdx, Tokens $tokens): bool
+    {
+        $next = $tokens->getNextMeaningfulToken($whitespaceIdx);
+        return $tokens[$next]->getContent() === '}';
     }
 }
