@@ -19,7 +19,6 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
 {
     public function testWhitespaceIsExpandedIntoTwoEmptyLinesBeforeClassDefinition()
     {
-        //TODO: Fix removing line after phpDoc
         $code = <<<'CODE'
             <?php
             
@@ -49,7 +48,6 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             /**
              * class description
              */
-            
             final class ExampleClass
             {
                 private $self;

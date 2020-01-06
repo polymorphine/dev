@@ -76,9 +76,8 @@ final class DoubleLineBeforeClassDefinitionFixer implements DefinedFixerInterfac
         }
 
         while ($idx++ < $definition) {
-            $token = &$tokens[$idx];
-            if ($token->isWhitespace() && $token->getContent() !== "\n") {
-                $token = new Token([T_WHITESPACE, "\n"]);
+            if ($tokens[$idx]->isWhitespace() && $tokens[$idx]->getContent() !== "\n") {
+                $tokens[$idx] = new Token([T_WHITESPACE, "\n"]);
             }
         }
     }
