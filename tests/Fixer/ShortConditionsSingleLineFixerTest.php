@@ -40,7 +40,6 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
 
     public function testLongConditionsAreNotChanged()
     {
-        //TODO: Last one should be string not method name
         $code = <<<'CODE'
             <?php
             
@@ -59,7 +58,7 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
             }
             
             if ($variable) {
-                $object->callVeryLongMethodName();
+                return 'String 19+ chars...';
             }
 
             CODE;
