@@ -32,7 +32,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code...
                 }
             
-                public static function staticConstructor(array $data): self
+                final public static function staticConstructor(array $data): self
                 {
                     //return new self()
                 }
@@ -67,7 +67,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     $this->self = $self;
                 }
             
-                public static function staticConstructor(array $data): self
+                final public static function staticConstructor(array $data): self
                 {
                     //return new self()
                 }

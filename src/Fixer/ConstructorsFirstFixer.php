@@ -72,7 +72,7 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
 
         $idx = 0;
         while ($definition = $this->getSequenceStartId([[T_PUBLIC], [T_STATIC], [T_FUNCTION]], $tokens, $idx)) {
-            $start = $this->includePhpDoc($definition, $tokens);
+            $start = $this->methodBeginIdx($definition, $tokens);
             $this->extractMethod($start, $tokens);
             $idx = $start + 5;
         }
@@ -109,7 +109,7 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
             return $this->getConstructorIdx($tokens, $start + 5);
         }
 
-        return $this->includePhpDoc($start, $tokens);
+        return $this->methodBeginIdx($start, $tokens);
     }
 
     private function getSequenceStartId(array $sequence, Tokens $tokens, $idx = 0)
@@ -126,13 +126,16 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
             $this->getSequenceStartId([[T_PUBLIC], [T_ABSTRACT], [T_FUNCTION]], $tokens)
         ]) + [0]);
 
-        return $idx ? $this->includePhpDoc($idx, $tokens) : 0;
+        return $idx ? $this->methodBeginIdx($idx, $tokens) : 0;
     }
 
-    private function includePhpDoc($definition, Tokens $tokens): int
+    private function methodBeginIdx($definition, Tokens $tokens): int
     {
         $previous = $tokens->getPrevNonWhitespace($definition);
-        return $tokens[$previous]->isComment() ? $previous : $definition;
+        if ($tokens[$previous]->isComment()) { return $previous; }
+        return $tokens[$previous]->isGivenKind([T_FINAL])
+            ? $this->methodBeginIdx($previous, $tokens)
+            : $definition;
     }
 
     private function isLastMethod($whitespaceIdx, Tokens $tokens): bool
