@@ -26,6 +26,7 @@ class ConstructorsFirstFixerTest extends FixerTest
             {
                 private $self;
             
+                /** someMethod phpDoc */
                 public function someMethod()
                 {
                     //code...
@@ -79,6 +80,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //return new self()
                 }
             
+                /** someMethod phpDoc */
                 public function someMethod()
                 {
                     //code...
