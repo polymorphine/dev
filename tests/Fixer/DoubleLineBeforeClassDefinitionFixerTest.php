@@ -68,7 +68,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
         $code = <<<'CODE'
             <?php
             
-            namespace Some\Package;//comment
+            namespace Some\Package; //comment
             interface ExampleInterface
             {
                 private function doSomething(): void;
@@ -79,10 +79,9 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
         $expected = <<<'CODE'
             <?php
             
-            namespace Some\Package;
+            namespace Some\Package; //comment
             
             
-            //comment
             interface ExampleInterface
             {
                 private function doSomething(): void;
