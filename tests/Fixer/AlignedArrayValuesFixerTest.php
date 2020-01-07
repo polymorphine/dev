@@ -51,7 +51,7 @@ class AlignedArrayValuesFixerTest extends FixerTest
                 'a' => 10,
                 'abc' => ['foo' => $x, 'bar' => $y],
                 'foo-bar' => 12,
-                'baz' => 1
+                'baz' => ['one' => 1]
             ];
             CODE;
 
@@ -62,10 +62,25 @@ class AlignedArrayValuesFixerTest extends FixerTest
                 'a'       => 10,
                 'abc'     => ['foo' => $x, 'bar' => $y],
                 'foo-bar' => 12,
-                'baz'     => 1
+                'baz'     => ['one' => 1]
             ];
             CODE;
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testNotExclusivelyMultilineArraysAreNotChanged()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a' => ['foo' => $x, 'bar' => $y],
+                'abc' => $x, 'bar' => $y,
+                'foo-bar' => 12,
+                'baz' => ['one' => 1]
+            ];
+            CODE;
+        $this->assertSame($code, $this->runner->fix($code));
     }
 
     protected function fixer(): FixerInterface

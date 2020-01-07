@@ -90,12 +90,29 @@ class ArrayContext
         }
     }
 
-    private function isMultiline(int $idx)
+    private function isMultiline(int $idx): bool
     {
-        $lineEnd = $this->nextLineBreak($idx);
-        $assign  = $this->tokens->getNextTokenOfKind($idx, [[self::ARROW_OPERATOR], [self::CLOSE_ARRAY]]);
+        $arrayEnd = $this->findLast($idx);
+        $nested   = $this->findNested($idx, $arrayEnd);
+        $idx      = $this->tokens->getNextTokenOfKind($idx, [[self::ARROW_OPERATOR]]);
+        if (!$idx) { return false; }
 
-        return !$assign || $lineEnd < $assign;
+        while ($idx < $arrayEnd) {
+            $lineEnd = $this->nextLineBreak($idx);
+            $idx     = $this->tokens->getNextTokenOfKind($idx, [[self::ARROW_OPERATOR]]);
+            if (!$idx) { break; }
+            if ($nested && $nested < min($lineEnd, $idx)) {
+                $idx    = $this->findLast($nested);
+                $nested = $this->findNested($idx, $arrayEnd);
+                $idx    = $this->tokens->getNextTokenOfKind($idx, [[self::ARROW_OPERATOR]]);
+                if (!$idx) { break; }
+                continue;
+            }
+
+            if ($idx < $lineEnd) { return false; }
+        }
+
+        return true;
     }
 
     private function multilineAssign()
@@ -108,5 +125,11 @@ class ArrayContext
     private function findLast(int $idx)
     {
         return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $idx);
+    }
+
+    private function findNested(int $idx, int $maxIdx): ?int
+    {
+        $nested = $this->tokens->getNextTokenOfKind($idx, [[self::OPEN_ARRAY]]);
+        return $nested > $maxIdx ? null : $nested;
     }
 }
