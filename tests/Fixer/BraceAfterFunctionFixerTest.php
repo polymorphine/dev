@@ -26,7 +26,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
             {
                 return $value->methodA();
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -35,7 +35,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
             function withSomething(Test $value) {
                 return $value->methodA();
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -52,7 +52,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
                     return $this->value->methodA();
                 }
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -63,7 +63,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
                     return $this->value->methodA();
                 }
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));

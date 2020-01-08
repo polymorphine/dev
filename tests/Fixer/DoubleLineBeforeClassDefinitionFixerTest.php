@@ -36,7 +36,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
                     $this->self = $self;
                 }
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -44,7 +44,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             
             namespace Some\Package;
             
-
+            
             /**
              * class description
              */
@@ -57,7 +57,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
                     $this->self = $self;
                 }
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -73,7 +73,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             {
                 private function doSomething(): void;
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -86,7 +86,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             {
                 private function doSomething(): void;
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));

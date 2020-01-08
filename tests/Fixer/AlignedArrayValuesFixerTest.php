@@ -27,7 +27,9 @@ class AlignedArrayValuesFixerTest extends FixerTest
                 'a', 'abc',
                 'def'
             ];
+            
             CODE;
+
         $this->assertSame($code, $this->runner->fix($code));
     }
 
@@ -37,8 +39,9 @@ class AlignedArrayValuesFixerTest extends FixerTest
             <?php
             
             $x = ['a' => 10, 'abc' => 20];
-
+            
             CODE;
+
         $this->assertSame($code, $this->runner->fix($code));
     }
 
@@ -53,6 +56,7 @@ class AlignedArrayValuesFixerTest extends FixerTest
                 'foo-bar' => 12,
                 'baz' => ['one' => 1]
             ];
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -64,7 +68,9 @@ class AlignedArrayValuesFixerTest extends FixerTest
                 'foo-bar' => 12,
                 'baz'     => ['one' => 1]
             ];
+            
             CODE;
+
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
@@ -79,7 +85,9 @@ class AlignedArrayValuesFixerTest extends FixerTest
                 'foo-bar' => 12,
                 'baz' => ['one' => 1]
             ];
+            
             CODE;
+
         $this->assertSame($code, $this->runner->fix($code));
     }
 

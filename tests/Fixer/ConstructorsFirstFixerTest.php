@@ -51,7 +51,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     $this->self = $self;
                 }
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -86,7 +86,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code...
                 }
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));

@@ -30,7 +30,7 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
             $oldArray = array(
                 'one' => 'last',
             );
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -44,7 +44,7 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
             $oldArray = array(
                 'one' => 'last'
             );
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
