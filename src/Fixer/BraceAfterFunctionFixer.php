@@ -61,9 +61,16 @@ final class BraceAfterFunctionFixer implements DefinedFixerInterface
         foreach ($tokens as $index => $token) {
             if (!$token->isGivenKind(T_FUNCTION)) { continue; }
 
-            $newlineIndex = $tokens->getNextTokenOfKind($index, ['{']) - 1;
+            $braceIdx      = $tokens->getNextTokenOfKind($index, ['{']);
+            $definitionEnd = $tokens->getPrevMeaningfulToken($braceIdx);
 
-            $tokens[$newlineIndex] = new Token([T_WHITESPACE, ' ']);
+            $spaceToken = new Token([T_WHITESPACE, ' ']);
+            if ($braceIdx - $definitionEnd === 1) {
+                $tokens->insertAt($braceIdx, $spaceToken);
+                continue;
+            }
+
+            $tokens[$definitionEnd + 1] = $spaceToken;
         }
     }
 }
