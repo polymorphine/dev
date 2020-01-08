@@ -39,7 +39,7 @@ class AlignedMethodChainFixerTest extends FixerTest
                 ->build();
             return $this->value->methodA()
                 ->methodB($foo === $bar)->baz($someVar);
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -50,7 +50,7 @@ class AlignedMethodChainFixerTest extends FixerTest
             return $this->value->methodA()
                                ->methodB($foo === $bar)
                                ->baz($someVar);
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -66,7 +66,7 @@ class AlignedMethodChainFixerTest extends FixerTest
                 ->andMore();
             })
             ->build();
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -77,7 +77,7 @@ class AlignedMethodChainFixerTest extends FixerTest
                           ->andMore();
                  })
                  ->build();
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -89,7 +89,7 @@ class AlignedMethodChainFixerTest extends FixerTest
             <?php
             
             $someVar = function_call();
-
+            
             CODE;
 
         $this->assertSame($code, $this->runner->fix($code));

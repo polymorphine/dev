@@ -26,12 +26,13 @@ class ConstructorsFirstFixerTest extends FixerTest
             {
                 private $self;
             
+                /** someMethod phpDoc */
                 public function someMethod()
                 {
                     //code...
                 }
             
-                public static function staticConstructor(array $data): self
+                final public static function staticConstructor(array $data): self
                 {
                     //return new self()
                 }
@@ -50,7 +51,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     $this->self = $self;
                 }
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -65,7 +66,8 @@ class ConstructorsFirstFixerTest extends FixerTest
                 {
                     $this->self = $self;
                 }
-            public static function staticConstructor(array $data): self
+            
+                final public static function staticConstructor(array $data): self
                 {
                     //return new self()
                 }
@@ -78,13 +80,13 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //return new self()
                 }
             
+                /** someMethod phpDoc */
                 public function someMethod()
                 {
                     //code...
                 }
+            }
             
-                }
-
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));

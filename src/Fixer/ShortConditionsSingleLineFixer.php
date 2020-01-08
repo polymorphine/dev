@@ -119,7 +119,7 @@ class ShortConditionsSingleLineFixer implements DefinedFixerInterface
                     $maxSpaces--;
                 } elseif ($tokens[$inBody]->getContent() === ';') {
                     $maxCommands--;
-                } elseif ($tokens[$inBody]->isGivenKind(T_STRING)) {
+                } elseif ($tokens[$inBody]->isGivenKind(T_CONSTANT_ENCAPSED_STRING)) {
                     $string = $tokens[$inBody]->getContent();
                     if (strlen($string) > 20 || strpos($string, "\n") !== false) {
                         break;

@@ -25,14 +25,14 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
             if ($variable !== CONSTANT_VALUE) {
                 return;
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
             <?php
             
             if ($variable !== CONSTANT_VALUE) { return; }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -40,7 +40,6 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
 
     public function testLongConditionsAreNotChanged()
     {
-        //TODO: Last one should be string not method name
         $code = <<<'CODE'
             <?php
             
@@ -59,9 +58,9 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
             }
             
             if ($variable) {
-                $object->callVeryLongMethodName();
+                return 'String 19+ chars...';
             }
-
+            
             CODE;
 
         $this->assertSame($code, $this->runner->fix($code));

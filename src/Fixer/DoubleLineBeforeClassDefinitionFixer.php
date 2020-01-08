@@ -67,19 +67,23 @@ final class DoubleLineBeforeClassDefinitionFixer implements DefinedFixerInterfac
             $idx        = $tokens->getPrevMeaningfulToken($idx);
         }
 
-        $idx++;
         $doubleBlank = new Token([T_WHITESPACE, "\n\n\n"]);
-        if ($tokens[$idx]->isWhitespace()) {
-            $tokens[$idx] = $doubleBlank;
-        } else {
-            $tokens->insertAt($idx, $doubleBlank);
+        while ($idx++ < $definition) {
+            if ($this->hasLineBreak($tokens[$idx])) {
+                $tokens[$idx] = $doubleBlank;
+                break;
+            }
         }
 
         while ($idx++ < $definition) {
-            $token = &$tokens[$idx];
-            if ($token->isWhitespace() && $token->getContent() !== "\n") {
-                $token = new Token([T_WHITESPACE, "\n"]);
+            if ($tokens[$idx]->isWhitespace() && $tokens[$idx]->getContent() !== "\n") {
+                $tokens[$idx] = new Token([T_WHITESPACE, "\n"]);
             }
         }
+    }
+
+    private function hasLineBreak(Token $token): bool
+    {
+        return $token->isWhitespace() && strpos($token->getContent(), "\n") !== false;
     }
 }

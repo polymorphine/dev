@@ -64,26 +64,17 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
     public function fix(SplFileInfo $file, Tokens $tokens)
     {
         $this->constructors = [];
-
-        $firstMethod = min(array_filter([
-            $this->getSequenceStartId([[T_PUBLIC], [T_FUNCTION]], $tokens),
-            $this->getSequenceStartId([[T_PUBLIC], [T_ABSTRACT], [T_FUNCTION]], $tokens)
-        ]) + [0]);
-
-        if (!$firstMethod) { return; }
+        if (!$firstMethod = $this->getFirstMethodIdx($tokens)) { return; }
 
         if ($mainConstructor = $this->getConstructorIdx($tokens)) {
             $this->extractMethod($mainConstructor, $tokens);
         }
 
         $idx = 0;
-        while ($staticIdx = $this->getSequenceStartId([[T_PUBLIC], [T_STATIC], [T_FUNCTION]], $tokens, $idx)) {
-            $previous = $tokens->getPrevNonWhitespace($staticIdx);
-            if ($tokens[$previous]->isComment()) {
-                $staticIdx = $previous;
-            }
-            $this->extractMethod($staticIdx, $tokens);
-            $idx = $staticIdx + 5;
+        while ($definition = $this->getSequenceStartId([[T_PUBLIC], [T_STATIC], [T_FUNCTION]], $tokens, $idx)) {
+            $start = $this->methodBeginIdx($definition, $tokens);
+            $this->extractMethod($start, $tokens);
+            $idx = $start + 5;
         }
 
         $tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
@@ -93,6 +84,13 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
     {
         $beginBlock = $tokens->getNextTokenOfKind($idx, ['{']);
         $endBlock   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock) + 1;
+
+        if ($this->isLastMethod($endBlock, $tokens)) {
+            $previousBreak = $tokens->getPrevMeaningfulToken($idx) + 1;
+            $break         = $tokens[$previousBreak];
+            $tokens[$previousBreak] = $tokens[$endBlock];
+            $tokens[$endBlock]      = $break;
+        }
 
         while ($idx <= $endBlock) {
             $this->constructors[] = $tokens[$idx];
@@ -111,12 +109,7 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
             return $this->getConstructorIdx($tokens, $start + 5);
         }
 
-        $previous = $tokens->getPrevNonWhitespace($start);
-        if ($tokens[$previous]->isComment()) {
-            $start = $previous;
-        }
-
-        return $start;
+        return $this->methodBeginIdx($start, $tokens);
     }
 
     private function getSequenceStartId(array $sequence, Tokens $tokens, $idx = 0)
@@ -124,5 +117,30 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
         $sequence = $tokens->findSequence($sequence, $idx);
 
         return ($sequence) ? array_keys($sequence)[0] : null;
+    }
+
+    private function getFirstMethodIdx(Tokens $tokens): int
+    {
+        $idx = min(array_filter([
+            $this->getSequenceStartId([[T_PUBLIC], [T_FUNCTION]], $tokens),
+            $this->getSequenceStartId([[T_PUBLIC], [T_ABSTRACT], [T_FUNCTION]], $tokens)
+        ]) + [0]);
+
+        return $idx ? $this->methodBeginIdx($idx, $tokens) : 0;
+    }
+
+    private function methodBeginIdx($definition, Tokens $tokens): int
+    {
+        $previous = $tokens->getPrevNonWhitespace($definition);
+        if ($tokens[$previous]->isComment()) { return $previous; }
+        return $tokens[$previous]->isGivenKind([T_FINAL])
+            ? $this->methodBeginIdx($previous, $tokens)
+            : $definition;
+    }
+
+    private function isLastMethod($whitespaceIdx, Tokens $tokens): bool
+    {
+        $next = $tokens->getNextMeaningfulToken($whitespaceIdx);
+        return $tokens[$next]->getContent() === '}';
     }
 }

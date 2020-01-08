@@ -22,21 +22,22 @@ class AlignedAssignmentsFixerTest extends FixerTest
     {
         $code = <<<'CODE'
             <?php
-
+            
             $x = 10;
             $bool = true;
             $another = 'string';
-
+            
             CODE;
 
         $expected = <<<'CODE'
             <?php
-
+            
             $x       = 10;
             $bool    = true;
             $another = 'string';
-
+            
             CODE;
+
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
@@ -44,7 +45,7 @@ class AlignedAssignmentsFixerTest extends FixerTest
     {
         $code = <<<'CODE'
             <?php
-
+            
             $x = 10;
             $bool = true;
             $array['key_assoc'] = true;
@@ -54,12 +55,12 @@ class AlignedAssignmentsFixerTest extends FixerTest
             Another::$foo = 'bar';
             $array['key_assoc'] = true;
             $arrayWithKey['another'] = 'aligned';
-
+            
             CODE;
 
         $expected = <<<'CODE'
             <?php
-
+            
             $x    = 10;
             $bool = true;
             $array['key_assoc'] = true;
@@ -69,8 +70,9 @@ class AlignedAssignmentsFixerTest extends FixerTest
             Another::$foo   = 'bar';
             $array['key_assoc']      = true;
             $arrayWithKey['another'] = 'aligned';
-
+            
             CODE;
+
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
@@ -78,13 +80,13 @@ class AlignedAssignmentsFixerTest extends FixerTest
     {
         $code = <<<'CODE'
             <?php
-
+            
             $x = 10;
             $func = function (int $val) {
                 return $val + 1;
             };
             $another = 'string';
-
+            
             CODE;
 
         $this->assertSame($code, $this->runner->fix($code));

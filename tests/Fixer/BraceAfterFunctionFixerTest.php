@@ -26,7 +26,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
             {
                 return $value->methodA();
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -35,7 +35,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
             function withSomething(Test $value) {
                 return $value->methodA();
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -47,12 +47,44 @@ class BraceAfterFunctionFixerTest extends FixerTest
             <?php
             
             class Test {
-                public function withSomething(string $value)
+                public function withSomething(string $value): Type
                 {
                     return $this->value->methodA();
                 }
             }
+            
+            CODE;
 
+        $expected = <<<'CODE'
+            <?php
+            
+            class Test {
+                public function withSomething(string $value): Type {
+                    return $this->value->methodA();
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testUnusualMethodFormattingIsFixed()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class Test {
+                public function withSomething(string $value){
+                    return $this->value->methodA();
+                }
+            
+                public function GetType(string $value):Type
+                                    {
+                    return $this->value->methodA();
+                }
+            }
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -62,8 +94,12 @@ class BraceAfterFunctionFixerTest extends FixerTest
                 public function withSomething(string $value) {
                     return $this->value->methodA();
                 }
+            
+                public function GetType(string $value):Type {
+                    return $this->value->methodA();
+                }
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));

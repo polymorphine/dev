@@ -19,7 +19,6 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
 {
     public function testWhitespaceIsExpandedIntoTwoEmptyLinesBeforeClassDefinition()
     {
-        //TODO: Fix removing line after phpDoc
         $code = <<<'CODE'
             <?php
             
@@ -37,7 +36,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
                     $this->self = $self;
                 }
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
@@ -45,11 +44,10 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             
             namespace Some\Package;
             
-
+            
             /**
              * class description
              */
-            
             final class ExampleClass
             {
                 private $self;
@@ -59,7 +57,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
                     $this->self = $self;
                 }
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
@@ -70,26 +68,25 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
         $code = <<<'CODE'
             <?php
             
-            namespace Some\Package;//comment
+            namespace Some\Package; //comment
             interface ExampleInterface
             {
                 private function doSomething(): void;
             }
-
+            
             CODE;
 
         $expected = <<<'CODE'
             <?php
             
-            namespace Some\Package;
+            namespace Some\Package; //comment
             
             
-            //comment
             interface ExampleInterface
             {
                 private function doSomething(): void;
             }
-
+            
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
