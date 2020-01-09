@@ -41,7 +41,6 @@ class ShortConditionsSingleLineFixer implements FixerInterface
 
     public function getPriority(): int
     {
-        //assume body in next line
         return -40;
     }
 

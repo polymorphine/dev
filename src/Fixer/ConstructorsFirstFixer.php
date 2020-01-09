@@ -27,7 +27,6 @@ final class ConstructorsFirstFixer implements FixerInterface
 
     public function getPriority()
     {
-        //assumed one line method spacing
         return -40;
     }
 
