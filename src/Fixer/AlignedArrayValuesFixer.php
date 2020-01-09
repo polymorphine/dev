@@ -11,14 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class AlignedArrayValuesFixer implements DefinedFixerInterface
+class AlignedArrayValuesFixer implements FixerInterface
 {
     use FixerMethods;
 
@@ -48,11 +46,6 @@ class AlignedArrayValuesFixer implements DefinedFixerInterface
     public function getPriority(): int
     {
         return -40;
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition('', [new CodeSample('')]);
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens)

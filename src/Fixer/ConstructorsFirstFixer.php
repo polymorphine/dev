@@ -11,14 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-final class ConstructorsFirstFixer implements DefinedFixerInterface
+final class ConstructorsFirstFixer implements FixerInterface
 {
     private $constructors = [];
 
@@ -31,19 +29,6 @@ final class ConstructorsFirstFixer implements DefinedFixerInterface
     {
         //assumed one line method spacing
         return -40;
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'Constructors should be placed before other methods.',
-            [
-                new CodeSample("<?php\nclass MyClass\n{\n    private \$property;\n\n
-    public function doSomething() {\n    }\n\n    public function __construct() {\n    }"),
-                new CodeSample("<?php\nclass MyClass\n{\n    public function __construct() {\n    }\n\n
-    public function doSomething() {\n    }\n\n    public static function createWithArray() {\n    }\n}")
-            ]
-        );
     }
 
     public function isRisky()

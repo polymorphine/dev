@@ -11,15 +11,13 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-final class DoubleLineBeforeClassDefinitionFixer implements DefinedFixerInterface
+final class DoubleLineBeforeClassDefinitionFixer implements FixerInterface
 {
     public function getName()
     {
@@ -29,18 +27,6 @@ final class DoubleLineBeforeClassDefinitionFixer implements DefinedFixerInterfac
     public function isCandidate(Tokens $tokens)
     {
         return $tokens->isAnyTokenKindsFound([T_TRAIT, T_INTERFACE, T_CLASS]);
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'There MUST be exactly two blank lines before class, interface or trait definition (or preceding comment).',
-            [
-                new CodeSample("<?php\nnamespace Foo;\n\nuse Bar;\nuse Baz;\nfinal class Example\n{\n}\n"),
-                new CodeSample("<?php\nnamespace Foo;\n\nuse Bar;\nuse Baz;\n\nfinal class Example\n{\n}\n"),
-                new CodeSample("<?php\nnamespace Foo;\n\nuse Bar;\nuse Baz;\n\n\n\nfinal class Example\n{\n}\n")
-            ]
-        );
     }
 
     public function isRisky(): bool

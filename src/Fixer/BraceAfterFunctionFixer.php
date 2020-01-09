@@ -11,15 +11,13 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-final class BraceAfterFunctionFixer implements DefinedFixerInterface
+final class BraceAfterFunctionFixer implements FixerInterface
 {
     public function getName()
     {
@@ -29,16 +27,6 @@ final class BraceAfterFunctionFixer implements DefinedFixerInterface
     public function isCandidate(Tokens $tokens)
     {
         return $tokens->isTokenKindFound(T_FUNCTION);
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'Method definition opening brace MUST go on same line.',
-            [
-                new CodeSample("<?php\n\nfinal class Example\n{\n    public function example()\n    {\n    }\n}")
-            ]
-        );
     }
 
     public function isRisky(): bool

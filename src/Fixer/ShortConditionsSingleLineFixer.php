@@ -11,15 +11,13 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class ShortConditionsSingleLineFixer implements DefinedFixerInterface
+class ShortConditionsSingleLineFixer implements FixerInterface
 {
     public function getName()
     {
@@ -47,18 +45,7 @@ class ShortConditionsSingleLineFixer implements DefinedFixerInterface
         return -40;
     }
 
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'Single line if statement for short commands. Will be shortened if single line length is 80 or less ' .
-            'and single command in body has max one whitespace',
-            [
-                new CodeSample("<?php\nif (\$nothing) {\n    return \$object->command();\n}")
-            ]
-        );
-    }
-
-    public function fix(\SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens)
     {
         foreach ($this->possibleFixes($tokens) as $idx => [$begin, $end]) {
             if ($this->singleLineLength($tokens, $idx, $begin, $end) > 80) {

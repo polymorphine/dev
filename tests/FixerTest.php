@@ -14,7 +14,6 @@ namespace Polymorphine\CodeStandards\Tests;
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
 use PhpCsFixer\Fixer\FixerInterface;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
 use SplFileInfo;
 
 
@@ -33,7 +32,6 @@ abstract class FixerTest extends TestCase
         $fixer = $this->fixer();
         $this->assertFalse($fixer->isRisky());
         $this->assertTrue($fixer->supports(new SplFileInfo(__FILE__)));
-        $this->assertInstanceOf(FixerDefinition::class, $fixer->getDefinition());
 
         $properties = $this->properties();
         $this->assertSame($properties['name'], $fixer->getName());

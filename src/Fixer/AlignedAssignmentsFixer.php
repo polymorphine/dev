@@ -11,14 +11,12 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class AlignedAssignmentsFixer implements DefinedFixerInterface
+class AlignedAssignmentsFixer implements FixerInterface
 {
     use FixerMethods;
 
@@ -50,20 +48,6 @@ class AlignedAssignmentsFixer implements DefinedFixerInterface
     public function getPriority(): int
     {
         return -40;
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'Assignments of same type variables (variable, array key, property) in consecutive lines will be aligned.' .
-            'Only single line assignments are aligned.',
-            [
-                new CodeSample(
-                    "<?php\n\$object->property = 'value';\n\$object->anotherProperty = 1;\n" .
-                    "\$arr['test'] = true;\n\$array['something'] = function () { return 'Hello'; };\n"
-                )
-            ]
-        );
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens)

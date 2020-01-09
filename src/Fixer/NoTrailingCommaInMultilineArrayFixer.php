@@ -11,27 +11,18 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\TokensAnalyzer;
+use SplFileInfo;
 
 
-final class NoTrailingCommaInMultilineArrayFixer implements DefinedFixerInterface
+final class NoTrailingCommaInMultilineArrayFixer implements FixerInterface
 {
     public function getName()
     {
         return 'Polymorphine/no_trailing_comma_after_multiline_array';
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'PHP multi-line arrays should not have a trailing comma.',
-            [new CodeSample("<?php\narray(\n1,\n2,\n);\n")]
-        );
     }
 
     public function isRisky()
@@ -44,7 +35,7 @@ final class NoTrailingCommaInMultilineArrayFixer implements DefinedFixerInterfac
         return -40;
     }
 
-    public function supports(\SplFileInfo $file)
+    public function supports(SplFileInfo $file)
     {
         return true;
     }
@@ -54,7 +45,7 @@ final class NoTrailingCommaInMultilineArrayFixer implements DefinedFixerInterfac
         return $tokens->isAnyTokenKindsFound([T_ARRAY, CT::T_ARRAY_SQUARE_BRACE_OPEN]);
     }
 
-    public function fix(\SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens)
     {
         $tokensAnalyzer = new TokensAnalyzer($tokens);
 

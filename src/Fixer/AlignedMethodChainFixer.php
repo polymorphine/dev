@@ -11,15 +11,13 @@
 
 namespace Polymorphine\CodeStandards\Fixer;
 
-use PhpCsFixer\Fixer\DefinedFixerInterface;
-use PhpCsFixer\FixerDefinition\CodeSample;
-use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class AlignedMethodChainFixer implements DefinedFixerInterface
+class AlignedMethodChainFixer implements FixerInterface
 {
     use FixerMethods;
 
@@ -58,16 +56,6 @@ class AlignedMethodChainFixer implements DefinedFixerInterface
     public function getPriority(): int
     {
         return -40;
-    }
-
-    public function getDefinition()
-    {
-        return new FixerDefinition(
-            'Multiline method chains must be aligned to object operator (arrow) of first method call.',
-            [
-                new CodeSample("<?php\n\$object->property->method()\n    ->anotherMethod();")
-            ]
-        );
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens)
