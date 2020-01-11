@@ -82,17 +82,22 @@ class AlignedTypedPropertiesFixer implements FixerInterface
     private function findGroups($idx, $sequence, $maxRange): array
     {
         $groups = [];
-        $group  = [$this->groupData($idx)];
-        while ($idx = $this->nextSequence($idx + 1, $sequence, $maxRange)) {
-            $inGroup = $this->tokens[$idx - 1]->isWhitespace() && $this->isNextLine($idx - 1);
-            if (!$inGroup) {
-                if (count($group) > 1) {
-                    $groups[] = $group;
-                }
-                $group = [$this->groupData($idx)];
+        $item   = $this->groupData($idx);
+        $group  = [$item];
+        $idx    = $item[0];
+        while ($next = $this->nextSequence($idx, $sequence, $maxRange)) {
+            $inGroup = ($next - 3 === $idx) && $this->isNextLine($next - 1);
+            $item    = $this->groupData($next);
+            $idx     = $item[0];
+            if ($inGroup) {
+                $group[] = $item;
                 continue;
             }
-            $group[] = $this->groupData($idx);
+
+            if (count($group) > 1) {
+                $groups[] = $group;
+            }
+            $group = [$item];
         }
 
         if (count($group) > 1) {

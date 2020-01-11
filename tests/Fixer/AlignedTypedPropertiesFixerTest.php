@@ -30,6 +30,7 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 public Typed $variable;
                 protected static TypedProperty $x;
                 protected static ShortType $longVariable;
+                private SomeInterface $baz;
             
                 protected static Foo $var1;
                 protected static FooX $var2;
@@ -53,6 +54,7 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 public Typed $variable;
                 protected static TypedProperty $x;
                 protected static ShortType     $longVariable;
+                private SomeInterface $baz;
             
                 protected static Foo  $var1;
                 protected static FooX $var2;
