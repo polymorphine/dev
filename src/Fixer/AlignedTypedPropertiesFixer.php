@@ -64,40 +64,30 @@ class AlignedTypedPropertiesFixer implements FixerInterface
             [[T_PUBLIC], [T_STATIC], [T_STRING], [T_VARIABLE]]
         ];
 
-        $groups = [];
-        foreach ($sequences as $type => $sequence) {
-            $start   = $this->nextSequence($classBody, $sequence, $maxRange);
-            $grouped = $this->findGroups($start, $sequence, $maxRange);
-            if (!$grouped) { continue; }
-            $groups[$type] = $grouped;
-        }
-
-        foreach ($groups as $type => $typeGroup) {
-            foreach ($typeGroup as $group) {
+        foreach ($sequences as $sequence) {
+            $groups = $this->findGroups($sequence, $classBody, $maxRange);
+            foreach ($groups as $group) {
                 $this->fixGroupIndentation($group);
             }
         }
     }
 
-    private function findGroups($idx, $sequence, $maxRange): array
+    private function findGroups(array $sequence, $idx, $maxRange): array
     {
         $groups = [];
-        $item   = $this->groupData($idx);
-        $group  = [$item];
-        $idx    = $item[0];
+        $group  = [];
         while ($next = $this->nextSequence($idx, $sequence, $maxRange)) {
-            $inGroup = ($next - 3 === $idx) && $this->isNextLine($next - 1);
-            $item    = $this->groupData($next);
-            $idx     = $item[0];
-            if ($inGroup) {
-                $group[] = $item;
-                continue;
+            $newGroup = $group && ($next !== $idx + 3 || !$this->isNextLine($next - 1));
+            if ($newGroup) {
+                if (count($group) > 1) {
+                    $groups[] = $group;
+                }
+                $group = [];
             }
 
-            if (count($group) > 1) {
-                $groups[] = $group;
-            }
-            $group = [$item];
+            $item = $this->groupData($next);
+            $idx  = $item[0];
+            $group[] = $item;
         }
 
         if (count($group) > 1) {
