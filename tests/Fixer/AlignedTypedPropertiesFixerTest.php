@@ -37,9 +37,9 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
             
                 public callable $test;
                 public object $object;
-                public int $number;
                 public SomeTypeLongest $varTyped;
-                public array $another;
+                public int $number    = 1000;
+                public array $another = ['a', 'b'];
             
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)
@@ -67,9 +67,9 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
             
                 public callable        $test;
                 public object          $object;
-                public int             $number;
                 public SomeTypeLongest $varTyped;
-                public array           $another;
+                public int             $number    = 1000;
+                public array           $another = ['a', 'b'];
             
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)
@@ -90,6 +90,6 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/aligned_properties', 'priority' => -40];
+        return ['name' => 'Polymorphine/aligned_properties', 'priority' => -39];
     }
 }
