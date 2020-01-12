@@ -49,45 +49,28 @@ class AlignedTypedPropertiesFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $idx       = $this->tokens->getNextTokenOfKind(0, [[T_CLASS], [T_TRAIT]]);
-        $classBody = $this->tokens->getNextTokenOfKind($idx, ['{']);
-
-        $idx      = $this->tokens->getNextTokenOfKind($classBody, [[T_FUNCTION]]);
-        $maxRange = $this->tokens->getPrevTokenOfKind($idx, [[T_PRIVATE], [T_PROTECTED], [T_PUBLIC]]);
-
-        $sequences = [
-            [[T_PRIVATE], [T_STRING], [T_VARIABLE]],
-            [[T_PROTECTED], [T_STRING], [T_VARIABLE]],
-            [[T_PUBLIC], [T_STRING], [T_VARIABLE]],
-            [[T_PRIVATE], [T_STATIC], [T_STRING], [T_VARIABLE]],
-            [[T_PROTECTED], [T_STATIC], [T_STRING], [T_VARIABLE]],
-            [[T_PUBLIC], [T_STATIC], [T_STRING], [T_VARIABLE]]
-        ];
-
-        foreach ($sequences as $sequence) {
-            $groups = $this->findGroups($sequence, $classBody, $maxRange);
-            foreach ($groups as $group) {
-                $this->fixGroupIndentation($group);
-            }
+        $idx    = $this->tokens->getNextTokenOfKind(0, [[T_CLASS], [T_TRAIT]]);
+        $groups = $this->findGroups($this->tokens->getNextTokenOfKind($idx, ['{']));
+        foreach ($groups as $group) {
+            $this->fixGroupIndentation($group);
         }
     }
 
-    private function findGroups(array $sequence, $idx, $maxRange): array
+    private function findGroups($idx): array
     {
         $groups = [];
         $group  = [];
-        while ($next = $this->nextSequence($idx, $sequence, $maxRange)) {
-            $newGroup = $group && ($next !== $idx + 3 || !$this->isNextLine($next - 1));
-            if ($newGroup) {
+        $prev   = new Sequence($this->tokens, $idx);
+        while ($next = $this->nextSequence($prev->idx)) {
+            if (!$prev->sameGroup($next)) {
                 if (count($group) > 1) {
                     $groups[] = $group;
                 }
                 $group = [];
             }
 
-            $item = $this->groupData($next);
-            $idx  = $item[0];
-            $group[] = $item;
+            $group[] = $this->alignIndex($next->idx);
+            $prev = $next;
         }
 
         if (count($group) > 1) {
@@ -97,17 +80,33 @@ class AlignedTypedPropertiesFixer implements FixerInterface
         return $groups;
     }
 
-    private function nextSequence(int $idx, array $sequence, int $maxRange): ?int
+    private function nextSequence(int $idx): ?Sequence
     {
-        if ($idx >= $maxRange) { return null; }
-        $seq = $this->tokens->findSequence($sequence, $idx, $maxRange);
-        if (!$seq) { return null; }
-        return array_keys($seq)[0];
+        $idx = $this->tokens->getNextTokenOfKind($idx, [[T_PRIVATE], [T_PROTECTED], [T_PUBLIC]]);
+        if (!$idx) { return null; }
+        $end = $this->tokens->getNextTokenOfKind($idx, [[T_VARIABLE], [T_FUNCTION], [T_CONST]]);
+        if (!$this->tokens[$end]->isGivenKind(T_VARIABLE)) {
+            return $this->nextSequence($end);
+        }
+
+        $definition = [T_PUBLIC, T_PROTECTED, T_PRIVATE, T_STATIC];
+        $typed      = false;
+        $tokenIds   = [];
+        while ($idx < $end) {
+            $tokenId = $this->tokens[$idx]->getId();
+            if (!in_array($tokenId, $definition, true)) {
+                $typed   = true;
+                $tokenId = T_STRING;
+            }
+            $tokenIds[] = $tokenId;
+            $idx = $this->tokens->getNextMeaningfulToken($idx);
+        }
+
+        return $typed ? new Sequence($this->tokens, $end, $tokenIds) : $this->nextSequence($end);
     }
 
-    private function groupData($idx): array
+    private function alignIndex($idx): array
     {
-        $idx = $this->tokens->getNextTokenOfKind($idx, [[T_VARIABLE]]);
         return [$idx, strlen($this->tokens[$idx - 2]->getContent())];
     }
 }

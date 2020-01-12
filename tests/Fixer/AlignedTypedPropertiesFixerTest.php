@@ -35,6 +35,12 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 protected static Foo $var1;
                 protected static FooX $var2;
             
+                public callable $test;
+                public object $object;
+                public int $number;
+                public SomeTypeLongest $varTyped;
+                public array $another;
+            
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)
                 {
@@ -58,6 +64,12 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
             
                 protected static Foo  $var1;
                 protected static FooX $var2;
+            
+                public callable        $test;
+                public object          $object;
+                public int             $number;
+                public SomeTypeLongest $varTyped;
+                public array           $another;
             
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)
