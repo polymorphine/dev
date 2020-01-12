@@ -18,13 +18,13 @@ abstract class ExampleClass
  implements SomeInterface {
 
     const CONSTANT = 'string';
-    private $variable;
+    private int $variable = 2000;
 
-    public $field = array(
+    public array $field = array(
         'key' => 1,
         'other' => 'value',
     );
-    private $bool = TRUE;
+    private bool $bool = TRUE;
 
     private function getVar() {
         if (empty($this->variable)) { $this->variable = 'empty!'; }

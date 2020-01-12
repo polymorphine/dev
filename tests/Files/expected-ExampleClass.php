@@ -25,12 +25,12 @@ abstract class ExampleClass implements SomeInterface
 {
     const CONSTANT = 'string';
 
-    public $field = [
+    public array $field = [
         'key'   => 1,
         'other' => 'value'
     ];
-    private $variable;
-    private $bool = true;
+    private int  $variable = 2000;
+    private bool $bool     = true;
 
     /**
      * MyClass constructor.
