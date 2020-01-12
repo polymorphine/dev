@@ -94,6 +94,7 @@ EOF;
         self::$rules['Polymorphine/aligned_method_chain']                    = true;
         self::$rules['Polymorphine/aligned_assignments']                     = true;
         self::$rules['Polymorphine/aligned_array_values']                    = true;
+        self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/short_conditions_single_line']            = true;
 
         return PhpCsFixer\Config::create()
@@ -108,6 +109,7 @@ EOF;
                 new Fixer\AlignedMethodChainFixer(),
                 new Fixer\AlignedAssignmentsFixer(),
                 new Fixer\AlignedArrayValuesFixer(),
+                new Fixer\AlignedTypedPropertiesFixer(),
                 new Fixer\ShortConditionsSingleLineFixer()
             ]);
     }
