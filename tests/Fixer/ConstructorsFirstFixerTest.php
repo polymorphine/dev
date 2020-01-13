@@ -92,6 +92,119 @@ class ConstructorsFirstFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
+    public function testMainConstructorIsMovedToTop()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+            
+                /** someMethod phpDoc */
+                public static function someMethod()
+                {
+                    //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+
+                /**
+                 * Static constructor with phpDoc
+                 */
+                public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            }
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+            
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /** someMethod phpDoc */
+                public static function someMethod()
+                {
+                    //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /**
+                 * Static constructor with phpDoc
+                 */
+                public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testFirstMainConstructorIsNotMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
+    public function testFirstStaticConstructorIsNotMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+                private $self;
+            
+                /** Static Constructor */
+                public static function constructor(ExampleClass $self): self
+                {
+                    $this->self = $self;
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
     protected function fixer(): ConstructorsFirstFixer
     {
         return new ConstructorsFirstFixer();
