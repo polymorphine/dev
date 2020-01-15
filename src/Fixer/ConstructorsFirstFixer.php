@@ -18,7 +18,8 @@ use SplFileInfo;
 
 final class ConstructorsFirstFixer implements FixerInterface
 {
-    private $constructors = [];
+    private Tokens $tokens;
+    private array  $constructors;
 
     public function getName()
     {
@@ -47,94 +48,80 @@ final class ConstructorsFirstFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens)
     {
+        $this->tokens       = $tokens;
         $this->constructors = [];
 
-        $firstMethod     = $this->getFirstMethodIdx($tokens);
-        $mainConstructor = $this->getMainConstructorIdx($tokens);
+        $firstMethod     = $this->getMethodIdx(0, function (int $idx) { return !$this->isConstructor($idx); });
+        $mainConstructor = $this->getMethodIdx(0, function (int $idx) { return $this->isMainConstructor($idx); });
 
         if (!$firstMethod) {
             if (!$mainConstructor) { return; }
-            $firstConstructor = $this->getNextConstructorIdx($tokens);
-            if ($firstConstructor >= $mainConstructor) { return; }
-            $this->extractMethod($mainConstructor, $tokens);
+            $firstConstructor = $this->getNextConstructorIdx();
+            if ($firstConstructor === $mainConstructor) { return; }
+            $this->extractMethod($mainConstructor);
             $tokens->insertAt($firstConstructor, Tokens::fromArray($this->constructors));
             return;
         }
 
-        if ($firstMethod < $mainConstructor) {
-            $this->extractMethod($mainConstructor, $tokens);
+        if ($mainConstructor > $firstMethod) {
+            $this->extractMethod($mainConstructor);
         }
 
         $idx = $firstMethod;
-        while ($idx = $this->getNextConstructorIdx($tokens, $idx + 10)) {
-            $this->extractMethod($idx, $tokens);
+        while ($idx = $this->getNextConstructorIdx($idx + 10)) {
+            $this->extractMethod($idx);
         }
 
         $tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
     }
 
-    private function getFirstMethodIdx(Tokens $tokens): int
+    private function isConstructor(int $idx): bool
     {
-        $idx = $tokens->getNextTokenOfKind(0, [[T_FUNCTION]]);
-        while ($idx && $this->isConstructor($idx, $tokens)) {
-            $idx = $tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
-        }
-
-        return $idx ? $this->methodBeginIdx($idx, $tokens) : 0;
+        if ($this->isMainConstructor($idx)) { return true; }
+        return $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
     }
 
-    private function getMainConstructorIdx(Tokens $tokens): int
+    private function isMainConstructor(int $idx): bool
     {
-        $idx = $tokens->getNextTokenOfKind(0, [[T_FUNCTION]]);
-        while ($idx && !$this->isMainConstructor($idx, $tokens)) {
-            $idx = $tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
-        }
-
-        return $idx ? $this->methodBeginIdx($idx, $tokens) : 0;
+        return $this->tokens[$idx + 2]->getContent() === '__construct';
     }
 
-    private function getNextConstructorIdx(Tokens $tokens, int $idx = 0): int
+    private function getNextConstructorIdx(int $start = 0): int
     {
-        $idx = $tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
-        while ($idx && !$this->isConstructor($idx, $tokens)) {
-            $idx = $tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
-        }
-
-        return $idx ? $this->methodBeginIdx($idx, $tokens) : 0;
+        return $this->getMethodIdx($start, function (int $idx) { return $this->isConstructor($idx); });
     }
 
-    private function methodBeginIdx($idx, Tokens $tokens): int
+    private function getMethodIdx(int $start, callable $condition): int
+    {
+        $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
+        while ($idx && !$condition($idx)) {
+            $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
+        }
+
+        return $idx ? $this->methodBeginIdx($idx) : 0;
+    }
+
+    private function methodBeginIdx($idx): int
     {
         $definition = [T_PUBLIC, T_PRIVATE, T_PROTECTED, T_STATIC, T_FINAL, T_ABSTRACT, T_FUNCTION];
-        while ($tokens[$idx]->isGivenKind($definition)) {
-            $idx = $tokens->getPrevMeaningfulToken($idx);
+        while ($this->tokens[$idx]->isGivenKind($definition)) {
+            $idx = $this->tokens->getPrevMeaningfulToken($idx);
         }
         return $idx + 1;
     }
 
-    private function isConstructor(int $idx, Tokens $tokens): bool
+    private function extractMethod($idx)
     {
-        $isStaticConstructor = $tokens[$idx - 2]->isGivenKind(T_STATIC) && $tokens[$idx - 4]->isGivenKind(T_PUBLIC);
-        return $isStaticConstructor || $this->isMainConstructor($idx, $tokens);
-    }
-
-    private function isMainConstructor(int $idx, Tokens $tokens): bool
-    {
-        return $tokens[$idx + 2]->getContent() === '__construct';
-    }
-
-    private function extractMethod($idx, Tokens $tokens)
-    {
-        $beginBlock = $tokens->getNextTokenOfKind($idx, ['{']);
-        $endBlock   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock);
+        $beginBlock = $this->tokens->getNextTokenOfKind($idx, ['{']);
+        $endBlock   = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock);
 
         while ($idx <= $endBlock) {
-            if ($tokens[$idx]->getContent() === '') {
+            if ($this->tokens[$idx]->getContent() === '') {
                 $idx++;
                 continue;
             }
-            $this->constructors[] = $tokens[$idx];
-            $tokens->clearAt($idx);
+            $this->constructors[] = $this->tokens[$idx];
+            $this->tokens->clearAt($idx);
             $idx++;
         }
     }
