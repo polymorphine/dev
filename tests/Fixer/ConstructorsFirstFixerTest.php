@@ -22,7 +22,7 @@ class ConstructorsFirstFixerTest extends FixerTest
         $code = <<<'CODE'
             <?php
             
-            class ExampleClass
+            class ExampleClass extends BaseExample implements ExampleInterface
             {
                 private $self;
             
@@ -37,7 +37,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code without 'self' return type
                 }
             
-                final public static function staticConstructor(array $data): self
+                final public static function staticConstructor(array $data): BaseExample
                 {
                     //return new self()
                 }
@@ -46,6 +46,11 @@ class ConstructorsFirstFixerTest extends FixerTest
                  * Static constructor with phpDoc
                  */
                 public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            
+                public static function staticInterfaceConstructor(array $data): ExampleInterface
                 {
                     //return new self()
                 }
@@ -62,7 +67,7 @@ class ConstructorsFirstFixerTest extends FixerTest
         $expected = <<<'CODE'
             <?php
             
-            class ExampleClass
+            class ExampleClass extends BaseExample implements ExampleInterface
             {
                 private $self;
             
@@ -72,7 +77,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                     $this->self = $self;
                 }
             
-                final public static function staticConstructor(array $data): self
+                final public static function staticConstructor(array $data): BaseExample
                 {
                     //return new self()
                 }
@@ -81,6 +86,11 @@ class ConstructorsFirstFixerTest extends FixerTest
                  * Static constructor with phpDoc
                  */
                 public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            
+                public static function staticInterfaceConstructor(array $data): ExampleInterface
                 {
                     //return new self()
                 }
@@ -107,11 +117,11 @@ class ConstructorsFirstFixerTest extends FixerTest
         $code = <<<'CODE'
             <?php
             
-            class ExampleClass
+            class ExampleClass implements ExampleInterface
             {
             
                 /** someMethod phpDoc */
-                public static function someMethod(): self
+                public static function someMethod(): ExampleInterface
                 {
                     //code...
                 }
@@ -141,7 +151,7 @@ class ConstructorsFirstFixerTest extends FixerTest
         $expected = <<<'CODE'
             <?php
             
-            class ExampleClass
+            class ExampleClass implements ExampleInterface
             {
             
                 /** Main Constructor */
@@ -151,7 +161,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                 }
             
                 /** someMethod phpDoc */
-                public static function someMethod(): self
+                public static function someMethod(): ExampleInterface
                 {
                     //code...
                 }

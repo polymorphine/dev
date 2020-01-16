@@ -20,6 +20,7 @@ final class ConstructorsFirstFixer implements FixerInterface
 {
     private Tokens $tokens;
     private array  $constructors;
+    private array  $classTypes;
 
     public function getName()
     {
@@ -50,6 +51,7 @@ final class ConstructorsFirstFixer implements FixerInterface
     {
         $this->tokens       = $tokens;
         $this->constructors = [];
+        $this->classTypes   = $this->getConstructorTypes();
 
         $firstMethod      = $this->getMethodIdx(0, function (int $idx) { return !$this->isConstructor($idx); });
         $mainConstructor  = $this->getMethodIdx(0, function (int $idx) { return $this->isMainConstructor($idx); });
@@ -86,7 +88,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         $openBrace  = $this->tokens->getNextTokenOfKind($idx + 4, ['{']);
         $returnType = $this->tokens[$this->tokens->getPrevMeaningfulToken($openBrace)];
 
-        return $returnType->isGivenKind(T_STRING) && $returnType->getContent() === 'self';
+        return $returnType->isGivenKind(T_STRING) && isset($this->classTypes[$returnType->getContent()]);
     }
 
     private function isMainConstructor(int $idx): bool
@@ -124,5 +126,22 @@ final class ConstructorsFirstFixer implements FixerInterface
             $this->tokens->clearAt($idx);
             $idx++;
         }
+    }
+
+    private function getConstructorTypes(): array
+    {
+        $class      = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
+        $classTypes = ['self', $this->tokens[$class]->getContent()];
+
+        if ($this->tokens[$class + 2]->isGivenKind(T_EXTENDS)) {
+            $class = $class + 4;
+            $classTypes[] = $this->tokens[$class]->getContent();
+        }
+
+        if ($this->tokens[$class + 2]->isGivenKind(T_IMPLEMENTS)) {
+            $classTypes[] = $this->tokens[$class + 4]->getContent();
+        }
+
+        return array_flip($classTypes);
     }
 }
