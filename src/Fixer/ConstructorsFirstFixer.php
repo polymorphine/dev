@@ -51,15 +51,16 @@ final class ConstructorsFirstFixer implements FixerInterface
         $this->tokens       = $tokens;
         $this->constructors = [];
 
-        $firstMethod     = $this->getMethodIdx(0, function (int $idx) { return !$this->isConstructor($idx); });
-        $mainConstructor = $this->getMethodIdx(0, function (int $idx) { return $this->isMainConstructor($idx); });
+        $firstMethod      = $this->getMethodIdx(0, function (int $idx) { return !$this->isConstructor($idx); });
+        $mainConstructor  = $this->getMethodIdx(0, function (int $idx) { return $this->isMainConstructor($idx); });
+        $constructorCheck = function (int $idx) { return $this->isConstructor($idx); };
 
         if (!$firstMethod) {
             if (!$mainConstructor) { return; }
-            $firstConstructor = $this->getNextConstructorIdx();
+            $firstConstructor = $this->getMethodIdx(0, $constructorCheck);
             if ($firstConstructor === $mainConstructor) { return; }
             $this->extractMethod($mainConstructor);
-            $tokens->insertAt($firstConstructor, Tokens::fromArray($this->constructors));
+            $this->tokens->insertAt($firstConstructor, Tokens::fromArray($this->constructors));
             return;
         }
 
@@ -68,11 +69,11 @@ final class ConstructorsFirstFixer implements FixerInterface
         }
 
         $idx = $firstMethod;
-        while ($idx = $this->getNextConstructorIdx($idx + 10)) {
+        while ($idx = $this->getMethodIdx($idx + 10, $constructorCheck)) {
             $this->extractMethod($idx);
         }
 
-        $tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
+        $this->tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
     }
 
     private function isConstructor(int $idx): bool
@@ -86,11 +87,6 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $this->tokens[$idx + 2]->getContent() === '__construct';
     }
 
-    private function getNextConstructorIdx(int $start = 0): int
-    {
-        return $this->getMethodIdx($start, function (int $idx) { return $this->isConstructor($idx); });
-    }
-
     private function getMethodIdx(int $start, callable $condition): int
     {
         $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
@@ -98,11 +94,8 @@ final class ConstructorsFirstFixer implements FixerInterface
             $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
         }
 
-        return $idx ? $this->methodBeginIdx($idx) : 0;
-    }
+        if (!$idx) { return 0; }
 
-    private function methodBeginIdx($idx): int
-    {
         $definition = [T_PUBLIC, T_PRIVATE, T_PROTECTED, T_STATIC, T_FINAL, T_ABSTRACT, T_FUNCTION];
         while ($this->tokens[$idx]->isGivenKind($definition)) {
             $idx = $this->tokens->getPrevMeaningfulToken($idx);
