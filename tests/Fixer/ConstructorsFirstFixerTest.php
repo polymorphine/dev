@@ -32,9 +32,9 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code...
                 }
             
-                public function otherMethod()
+                public static function notConstructor(): SomeType
                 {
-                    //code...
+                    //code without 'self' return type
                 }
             
                 final public static function staticConstructor(array $data): self
@@ -91,9 +91,9 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code...
                 }
             
-                public function otherMethod()
+                public static function notConstructor(): SomeType
                 {
-                    //code...
+                    //code without 'self' return type
                 }
             }
             
@@ -111,7 +111,7 @@ class ConstructorsFirstFixerTest extends FixerTest
             {
             
                 /** someMethod phpDoc */
-                public static function someMethod()
+                public static function someMethod(): self
                 {
                     //code...
                 }
@@ -126,7 +126,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                 {
                     $this->self = $self;
                 }
-
+            
                 /**
                  * Static constructor with phpDoc
                  */
@@ -151,7 +151,7 @@ class ConstructorsFirstFixerTest extends FixerTest
                 }
             
                 /** someMethod phpDoc */
-                public static function someMethod()
+                public static function someMethod(): self
                 {
                     //code...
                 }

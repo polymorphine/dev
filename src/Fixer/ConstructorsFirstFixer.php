@@ -79,7 +79,14 @@ final class ConstructorsFirstFixer implements FixerInterface
     private function isConstructor(int $idx): bool
     {
         if ($this->isMainConstructor($idx)) { return true; }
-        return $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
+
+        $static = $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
+        if (!$static) { return false; }
+
+        $openBrace  = $this->tokens->getNextTokenOfKind($idx + 4, ['{']);
+        $returnType = $this->tokens[$this->tokens->getPrevMeaningfulToken($openBrace)];
+
+        return $returnType->isGivenKind(T_STRING) && $returnType->getContent() === 'self';
     }
 
     private function isMainConstructor(int $idx): bool
