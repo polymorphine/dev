@@ -119,7 +119,6 @@ class ConstructorsFirstFixerTest extends FixerTest
             
             class ExampleClass implements ExampleInterface
             {
-            
                 /** someMethod phpDoc */
                 public static function someMethod(): ExampleInterface
                 {
@@ -153,7 +152,6 @@ class ConstructorsFirstFixerTest extends FixerTest
             
             class ExampleClass implements ExampleInterface
             {
-            
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)
                 {

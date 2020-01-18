@@ -13,6 +13,7 @@ namespace Polymorphine\CodeStandards\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
+use PhpCsFixer\Tokenizer\Token;
 use SplFileInfo;
 
 
@@ -61,11 +62,14 @@ final class ConstructorsFirstFixer implements FixerInterface
             if (!$mainConstructor) { return; }
             $firstConstructor = $this->getMethodIdx(0, $constructorCheck);
             if ($firstConstructor === $mainConstructor) { return; }
+            $this->normalizeIndentation();
             $this->extractMethod($mainConstructor);
             $this->tokens->insertAt($firstConstructor, Tokens::fromArray($this->constructors));
+            $this->normalizeIndentation(true);
             return;
         }
 
+        $this->normalizeIndentation();
         if ($mainConstructor > $firstMethod) {
             $this->extractMethod($mainConstructor);
         }
@@ -76,6 +80,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         }
 
         $this->tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
+        $this->normalizeIndentation(true);
     }
 
     private function isConstructor(int $idx): bool
@@ -143,5 +148,18 @@ final class ConstructorsFirstFixer implements FixerInterface
         }
 
         return array_flip($classTypes);
+    }
+
+    private function normalizeIndentation(bool $afterChanges = false): void
+    {
+        $class = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]);
+        $brace = $this->tokens->getNextTokenOfKind($class, ['{']);
+
+        $firstMethod = $this->getMethodIdx($brace, function () { return true; });
+        if ($firstMethod !== $brace + 1) { return; }
+
+        $contents = $this->tokens[$firstMethod]->getContent();
+        $contents = $afterChanges ? substr($contents, 1) : "\n" . $contents;
+        $this->tokens[$firstMethod] = new Token([T_WHITESPACE, $contents]);
     }
 }
