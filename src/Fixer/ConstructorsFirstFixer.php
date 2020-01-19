@@ -13,7 +13,6 @@ namespace Polymorphine\CodeStandards\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
-use PhpCsFixer\Tokenizer\Token;
 use SplFileInfo;
 
 
@@ -62,14 +61,11 @@ final class ConstructorsFirstFixer implements FixerInterface
             if (!$mainConstructor) { return; }
             $firstConstructor = $this->getMethodIdx(0, $constructorCheck);
             if ($firstConstructor === $mainConstructor) { return; }
-            $this->normalizeIndentation();
             $this->extractMethod($mainConstructor);
-            $this->tokens->insertAt($firstConstructor, Tokens::fromArray($this->constructors));
-            $this->normalizeIndentation(true);
+            $this->moveConstructorsTo($firstConstructor);
             return;
         }
 
-        $this->normalizeIndentation();
         if ($mainConstructor > $firstMethod) {
             $this->extractMethod($mainConstructor);
         }
@@ -79,8 +75,7 @@ final class ConstructorsFirstFixer implements FixerInterface
             $this->extractMethod($idx);
         }
 
-        $this->tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
-        $this->normalizeIndentation(true);
+        $this->moveConstructorsTo($firstMethod);
     }
 
     private function isConstructor(int $idx): bool
@@ -150,16 +145,19 @@ final class ConstructorsFirstFixer implements FixerInterface
         return array_flip($classTypes);
     }
 
-    private function normalizeIndentation(bool $afterChanges = false): void
+    private function moveConstructorsTo(int $insertIdx): void
     {
-        $class = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]);
-        $brace = $this->tokens->getNextTokenOfKind($class, ['{']);
+        if (!$this->constructors) { return; }
 
-        $firstMethod = $this->getMethodIdx($brace, function () { return true; });
-        if ($firstMethod !== $brace + 1) { return; }
+        $class     = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]);
+        $topMethod = $this->getMethodIdx($class, function () { return true; });
 
-        $contents = $this->tokens[$firstMethod]->getContent();
-        $contents = $afterChanges ? substr($contents, 1) : "\n" . $contents;
-        $this->tokens[$firstMethod] = new Token([T_WHITESPACE, $contents]);
+        if ($insertIdx === $topMethod) {
+            $topIndent = $this->tokens[$topMethod];
+            $this->tokens[$topMethod] = $this->constructors[0];
+            $this->constructors[0] = $topIndent;
+        }
+
+        $this->tokens->insertAt($insertIdx, Tokens::fromArray($this->constructors));
     }
 }
