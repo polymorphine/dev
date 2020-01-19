@@ -51,37 +51,36 @@ final class ConstructorsFirstFixer implements FixerInterface
     {
         $this->tokens       = $tokens;
         $this->constructors = [];
-        $this->classTypes   = $this->getConstructorTypes();
 
-        $firstMethod      = $this->getMethodIdx(0, function (int $idx) { return !$this->isConstructor($idx); });
-        $mainConstructor  = $this->getMethodIdx(0, function (int $idx) { return $this->isMainConstructor($idx); });
-        $constructorCheck = function (int $idx) { return $this->isConstructor($idx); };
+        $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
+        $this->classTypes = $this->getConstructorTypes($classIdx);
 
-        if (!$firstMethod) {
-            if (!$mainConstructor) { return; }
-            $firstConstructor = $this->getMethodIdx(0, $constructorCheck);
-            if ($firstConstructor === $mainConstructor) { return; }
-            $this->extractMethod($mainConstructor);
-            $this->moveConstructorsTo($firstConstructor);
-            return;
+        $topMethod     = $this->getMethodIdx($classIdx);
+        $isConstructor = function (int $idx) { return $this->tokens[$idx + 2]->getContent() === '__construct'; };
+        $construct     = $this->getMethodIdx($topMethod, $isConstructor);
+        if ($construct && $construct !== $topMethod) {
+            $this->extractMethod($construct);
+            $this->moveConstructorsTo($topMethod);
+
+            $topMethod += count($this->constructors);
+            $this->constructors = [];
         }
 
-        if ($mainConstructor > $firstMethod) {
-            $this->extractMethod($mainConstructor);
-        }
+        $notConstructor = function (int $idx) { return !$this->isStaticConstructor($idx); };
+        $insertIdx      = $this->getMethodIdx($topMethod, $notConstructor);
+        if (!$insertIdx) { return; }
 
-        $idx = $firstMethod;
-        while ($idx = $this->getMethodIdx($idx + 10, $constructorCheck)) {
+        $isConstructor = function (int $idx) { return $this->isStaticConstructor($idx); };
+        $idx           = $insertIdx;
+        while ($idx = $this->getMethodIdx($idx + 10, $isConstructor)) {
             $this->extractMethod($idx);
         }
 
-        $this->moveConstructorsTo($firstMethod);
+        $this->moveConstructorsTo($insertIdx);
     }
 
-    private function isConstructor(int $idx): bool
+    private function isStaticConstructor(int $idx): bool
     {
-        if ($this->isMainConstructor($idx)) { return true; }
-
         $static = $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
         if (!$static) { return false; }
 
@@ -91,15 +90,10 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $returnType->isGivenKind(T_STRING) && isset($this->classTypes[$returnType->getContent()]);
     }
 
-    private function isMainConstructor(int $idx): bool
-    {
-        return $this->tokens[$idx + 2]->getContent() === '__construct';
-    }
-
-    private function getMethodIdx(int $start, callable $condition): int
+    private function getMethodIdx(int $start, callable $condition = null): int
     {
         $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
-        while ($idx && !$condition($idx)) {
+        while ($idx && $condition && !$condition($idx)) {
             $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
         }
 
@@ -128,9 +122,8 @@ final class ConstructorsFirstFixer implements FixerInterface
         }
     }
 
-    private function getConstructorTypes(): array
+    private function getConstructorTypes(int $class): array
     {
-        $class      = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
         $classTypes = ['self', $this->tokens[$class]->getContent()];
 
         if ($this->tokens[$class + 2]->isGivenKind(T_EXTENDS)) {
@@ -149,14 +142,9 @@ final class ConstructorsFirstFixer implements FixerInterface
     {
         if (!$this->constructors) { return; }
 
-        $class     = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]);
-        $topMethod = $this->getMethodIdx($class, function () { return true; });
-
-        if ($insertIdx === $topMethod) {
-            $topIndent = $this->tokens[$topMethod];
-            $this->tokens[$topMethod] = $this->constructors[0];
-            $this->constructors[0] = $topIndent;
-        }
+        $topIndent = $this->tokens[$insertIdx];
+        $this->tokens[$insertIdx] = $this->constructors[0];
+        $this->constructors[0] = $topIndent;
 
         $this->tokens->insertAt($insertIdx, Tokens::fromArray($this->constructors));
     }

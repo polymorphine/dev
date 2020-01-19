@@ -112,7 +112,7 @@ class ConstructorsFirstFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testMainConstructorIsMovedToTop()
+    public function testWithoutNonConstructorMethodsMainConstructorIsMovedToTop()
     {
         $code = <<<'CODE'
             <?php
@@ -175,6 +175,77 @@ class ConstructorsFirstFixerTest extends FixerTest
                 public static function fromData(array $data): self
                 {
                     //return new self()
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testMainConstructorIsMovedToTop()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass implements ExampleInterface
+            {
+                /** someMethod phpDoc */
+                public static function someMethod(): ExampleInterface
+                {
+                    //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /**
+                 * Non constructor with phpDoc
+                 */
+                public function fromData(array $data): SomeType
+                {
+                    //return new SomeType()
+                }
+            }
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            class ExampleClass implements ExampleInterface
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /** someMethod phpDoc */
+                public static function someMethod(): ExampleInterface
+                {
+                    //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /**
+                 * Non constructor with phpDoc
+                 */
+                public function fromData(array $data): SomeType
+                {
+                    //return new SomeType()
                 }
             }
             
