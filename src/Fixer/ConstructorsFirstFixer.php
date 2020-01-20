@@ -19,7 +19,6 @@ use SplFileInfo;
 final class ConstructorsFirstFixer implements FixerInterface
 {
     private Tokens $tokens;
-    private array  $classTypes;
 
     public function getName()
     {
@@ -50,28 +49,28 @@ final class ConstructorsFirstFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
-        $this->classTypes = $this->getConstructorTypes($classIdx);
-
+        $classIdx      = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
         $topMethod     = $this->getMethodIdx($classIdx);
-        $isConstructor = function (int $idx) { return $this->tokens[$idx + 2]->getContent() === '__construct'; };
+        $isConstructor = function ($idx) { return $this->tokens[$idx + 2]->getContent() === '__construct'; };
         $construct     = $this->getMethodIdx($topMethod, $isConstructor);
         if ($construct && $construct !== $topMethod) {
             $topMethod = $this->moveMethod($construct, $topMethod);
         }
 
-        $notConstructor = function (int $idx) { return !$this->isStaticConstructor($idx); };
-        $insertIdx      = $this->getMethodIdx($topMethod, $notConstructor);
+        $classTypes     = $this->getConstructorTypes($classIdx);
+        $isConstructor  = function ($idx) use ($classTypes) { return $this->isStaticConstructor($idx, $classTypes); };
+        $notConstructor = function ($idx) use ($isConstructor) { return !$isConstructor($idx); };
+
+        $insertIdx = $this->getMethodIdx($topMethod, $notConstructor);
         if (!$insertIdx) { return; }
 
-        $isConstructor = function (int $idx) { return $this->isStaticConstructor($idx); };
-        $idx           = $insertIdx;
+        $idx = $insertIdx;
         while ($idx = $this->getMethodIdx($idx + 10, $isConstructor)) {
             $insertIdx = $this->moveMethod($idx, $insertIdx);
         }
     }
 
-    private function isStaticConstructor(int $idx): bool
+    private function isStaticConstructor(int $idx, array $classTypes): bool
     {
         $static = $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
         if (!$static) { return false; }
@@ -79,7 +78,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         $openBrace  = $this->tokens->getNextTokenOfKind($idx + 4, ['{']);
         $returnType = $this->tokens[$this->tokens->getPrevMeaningfulToken($openBrace)];
 
-        return $returnType->isGivenKind(T_STRING) && isset($this->classTypes[$returnType->getContent()]);
+        return $returnType->isGivenKind(T_STRING) && isset($classTypes[$returnType->getContent()]);
     }
 
     private function getMethodIdx(int $start, callable $condition = null): int
