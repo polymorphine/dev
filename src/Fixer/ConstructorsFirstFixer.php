@@ -19,7 +19,6 @@ use SplFileInfo;
 final class ConstructorsFirstFixer implements FixerInterface
 {
     private Tokens $tokens;
-    private array  $constructors;
     private array  $classTypes;
 
     public function getName()
@@ -49,8 +48,7 @@ final class ConstructorsFirstFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens)
     {
-        $this->tokens       = $tokens;
-        $this->constructors = [];
+        $this->tokens = $tokens;
 
         $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
         $this->classTypes = $this->getConstructorTypes($classIdx);
@@ -59,11 +57,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         $isConstructor = function (int $idx) { return $this->tokens[$idx + 2]->getContent() === '__construct'; };
         $construct     = $this->getMethodIdx($topMethod, $isConstructor);
         if ($construct && $construct !== $topMethod) {
-            $this->extractMethod($construct);
-            $this->moveConstructorsTo($topMethod);
-
-            $topMethod += count($this->constructors);
-            $this->constructors = [];
+            $topMethod = $this->moveMethod($construct, $topMethod);
         }
 
         $notConstructor = function (int $idx) { return !$this->isStaticConstructor($idx); };
@@ -73,10 +67,8 @@ final class ConstructorsFirstFixer implements FixerInterface
         $isConstructor = function (int $idx) { return $this->isStaticConstructor($idx); };
         $idx           = $insertIdx;
         while ($idx = $this->getMethodIdx($idx + 10, $isConstructor)) {
-            $this->extractMethod($idx);
+            $insertIdx = $this->moveMethod($idx, $insertIdx);
         }
-
-        $this->moveConstructorsTo($insertIdx);
     }
 
     private function isStaticConstructor(int $idx): bool
@@ -106,20 +98,36 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $idx + 1;
     }
 
-    private function extractMethod($idx)
+    private function moveMethod(int $methodIdx, int $insertIdx): int
+    {
+        $methodTokens = $this->extractMethod($methodIdx);
+
+        $topIndent = $this->tokens[$insertIdx];
+        $this->tokens[$insertIdx] = $methodTokens[0];
+        $methodTokens[0] = $topIndent;
+
+        $this->tokens->insertAt($insertIdx, Tokens::fromArray($methodTokens));
+
+        return $insertIdx + count($methodTokens);
+    }
+
+    private function extractMethod($idx): array
     {
         $beginBlock = $this->tokens->getNextTokenOfKind($idx, ['{']);
         $endBlock   = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock);
 
+        $methodTokens = [];
         while ($idx <= $endBlock) {
-            if ($this->tokens[$idx]->getContent() === '') {
+            if ($this->tokens->isEmptyAt($idx)) {
                 $idx++;
                 continue;
             }
-            $this->constructors[] = $this->tokens[$idx];
+            $methodTokens[] = $this->tokens[$idx];
             $this->tokens->clearAt($idx);
             $idx++;
         }
+
+        return $methodTokens;
     }
 
     private function getConstructorTypes(int $class): array
@@ -136,16 +144,5 @@ final class ConstructorsFirstFixer implements FixerInterface
         }
 
         return array_flip($classTypes);
-    }
-
-    private function moveConstructorsTo(int $insertIdx): void
-    {
-        if (!$this->constructors) { return; }
-
-        $topIndent = $this->tokens[$insertIdx];
-        $this->tokens[$insertIdx] = $this->constructors[0];
-        $this->constructors[0] = $topIndent;
-
-        $this->tokens->insertAt($insertIdx, Tokens::fromArray($this->constructors));
     }
 }
