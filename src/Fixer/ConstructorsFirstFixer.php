@@ -95,7 +95,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         while ($this->tokens[$idx]->isGivenKind($definition)) {
             $idx = $this->tokens->getPrevMeaningfulToken($idx);
         }
-        return $idx + 1;
+        return $this->tokens->getNonEmptySibling($idx, 1);
     }
 
     private function moveMethod(int $methodIdx, int $insertIdx): int
@@ -118,10 +118,6 @@ final class ConstructorsFirstFixer implements FixerInterface
 
         $methodTokens = [];
         while ($idx <= $endBlock) {
-            if ($this->tokens->isEmptyAt($idx)) {
-                $idx++;
-                continue;
-            }
             $methodTokens[] = $this->tokens[$idx];
             $this->tokens->clearAt($idx);
             $idx++;
