@@ -53,8 +53,10 @@ final class ConstructorsFirstFixer implements FixerInterface
         $topMethod     = $this->getMethodIdx($classIdx);
         $isConstructor = fn ($idx) => $this->tokens[$idx + 2]->getContent() === '__construct';
         $construct     = $this->getMethodIdx($topMethod, $isConstructor);
-        if ($construct && $construct !== $topMethod) {
-            $topMethod = $this->moveMethod($construct, $topMethod);
+        if ($construct) {
+            $topMethod = $topMethod === $construct
+                ? $this->tokens->getNextTokenOfKind($topMethod, [[T_FUNCTION]])
+                : $this->moveMethod($construct, $topMethod);
         }
 
         $classTypes     = $this->getConstructorTypes($classIdx);

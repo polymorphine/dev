@@ -266,6 +266,12 @@ class ConstructorsFirstFixerTest extends FixerTest
                 {
                     $this->self = $self;
                 }
+            
+                /** Static Constructor */
+                public static function constructor(ExampleClass $self): self
+                {
+                    $this->self = $self;
+                }
             }
             
             CODE;
