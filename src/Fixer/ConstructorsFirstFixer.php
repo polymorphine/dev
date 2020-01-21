@@ -59,11 +59,10 @@ final class ConstructorsFirstFixer implements FixerInterface
                 : $this->moveMethod($construct, $topMethod);
         }
 
-        $classTypes     = $this->getConstructorTypes($classIdx);
-        $isConstructor  = fn ($idx) => $this->isStaticConstructor($idx, $classTypes);
-        $notConstructor = fn ($idx) => !$isConstructor($idx);
+        $classTypes    = $this->getConstructorTypes($classIdx);
+        $isConstructor = fn ($idx) => $this->isStaticConstructor($idx, $classTypes);
 
-        $insertIdx = $this->getMethodIdx($topMethod, $notConstructor);
+        $insertIdx = $this->getMethodIdx($topMethod, $isConstructor, false);
         if (!$insertIdx) { return; }
 
         $idx = $insertIdx;
@@ -83,10 +82,10 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $returnType->isGivenKind(T_STRING) && isset($classTypes[$returnType->getContent()]);
     }
 
-    private function getMethodIdx(int $start, callable $condition = null): int
+    private function getMethodIdx(int $start, callable $condition = null, bool $expected = true): int
     {
         $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
-        while ($idx && $condition && !$condition($idx)) {
+        while ($idx && $condition && $condition($idx) !== $expected) {
             $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
         }
 
