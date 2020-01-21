@@ -22,7 +22,7 @@ class ConstructorsFirstFixerTest extends FixerTest
         $code = <<<'CODE'
             <?php
             
-            class ExampleClass
+            class ExampleClass extends BaseExample implements ExampleInterface
             {
                 private $self;
             
@@ -32,7 +32,12 @@ class ConstructorsFirstFixerTest extends FixerTest
                     //code...
                 }
             
-                final public static function staticConstructor(array $data): self
+                public static function notConstructor(): SomeType
+                {
+                    //code without 'self' return type
+                }
+            
+                final public static function staticConstructor(array $data): BaseExample
                 {
                     //return new self()
                 }
@@ -41,6 +46,11 @@ class ConstructorsFirstFixerTest extends FixerTest
                  * Static constructor with phpDoc
                  */
                 public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            
+                public static function staticInterfaceConstructor(array $data): ExampleInterface
                 {
                     //return new self()
                 }
@@ -57,7 +67,7 @@ class ConstructorsFirstFixerTest extends FixerTest
         $expected = <<<'CODE'
             <?php
             
-            class ExampleClass
+            class ExampleClass extends BaseExample implements ExampleInterface
             {
                 private $self;
             
@@ -65,6 +75,93 @@ class ConstructorsFirstFixerTest extends FixerTest
                 public function __construct(ExampleClass $self)
                 {
                     $this->self = $self;
+                }
+            
+                final public static function staticConstructor(array $data): BaseExample
+                {
+                    //return new self()
+                }
+            
+                /**
+                 * Static constructor with phpDoc
+                 */
+                public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            
+                public static function staticInterfaceConstructor(array $data): ExampleInterface
+                {
+                    //return new self()
+                }
+            
+                /** someMethod phpDoc */
+                public function someMethod()
+                {
+                    //code...
+                }
+            
+                public static function notConstructor(): SomeType
+                {
+                    //code without 'self' return type
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testWithoutNonConstructorMethodsMainConstructorIsMovedToTop()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass implements ExampleInterface
+            {
+                /** someMethod phpDoc */
+                public static function someMethod(): ExampleInterface
+                {
+                    //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /**
+                 * Static constructor with phpDoc
+                 */
+                public static function fromData(array $data): self
+                {
+                    //return new self()
+                }
+            }
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            class ExampleClass implements ExampleInterface
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /** someMethod phpDoc */
+                public static function someMethod(): ExampleInterface
+                {
+                    //code...
                 }
             
                 final public static function staticConstructor(array $data): self
@@ -79,17 +176,147 @@ class ConstructorsFirstFixerTest extends FixerTest
                 {
                     //return new self()
                 }
+            }
             
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testMainConstructorIsMovedToTop()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass implements ExampleInterface
+            {
                 /** someMethod phpDoc */
-                public function someMethod()
+                public static function someMethod(): ExampleInterface
                 {
                     //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /**
+                 * Non constructor with phpDoc
+                 */
+                public function fromData(array $data): SomeType
+                {
+                    //return new SomeType()
+                }
+            }
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            class ExampleClass implements ExampleInterface
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /** someMethod phpDoc */
+                public static function someMethod(): ExampleInterface
+                {
+                    //code...
+                }
+            
+                final public static function staticConstructor(array $data): self
+                {
+                    //return new self()
+                }
+            
+                /**
+                 * Non constructor with phpDoc
+                 */
+                public function fromData(array $data): SomeType
+                {
+                    //return new SomeType()
                 }
             }
             
             CODE;
 
         $this->assertSame($expected, $this->runner->fix($code));
+    }
+
+    public function testFirstMainConstructorIsNotMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            
+                /** Static Constructor */
+                public static function constructor(ExampleClass $self): self
+                {
+                    $this->self = $self;
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
+    public function testMainConstructorOnlyIsNotMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
+    public function testFirstStaticConstructorIsNotMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+                private $self;
+            
+                /** Static Constructor */
+                public static function constructor(ExampleClass $self): self
+                {
+                    $this->self = $self;
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
     }
 
     protected function fixer(): ConstructorsFirstFixer

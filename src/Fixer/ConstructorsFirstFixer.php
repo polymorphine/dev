@@ -18,7 +18,7 @@ use SplFileInfo;
 
 final class ConstructorsFirstFixer implements FixerInterface
 {
-    private $constructors = [];
+    private Tokens $tokens;
 
     public function getName()
     {
@@ -42,89 +42,103 @@ final class ConstructorsFirstFixer implements FixerInterface
 
     public function isCandidate(Tokens $tokens)
     {
-        return $tokens->isAnyTokenKindsFound([T_CLASS]);
+        return $tokens->isAllTokenKindsFound([T_CLASS, T_FUNCTION]);
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens)
     {
-        $this->constructors = [];
-        if (!$firstMethod = $this->getFirstMethodIdx($tokens)) { return; }
+        $this->tokens = $tokens;
 
-        if ($mainConstructor = $this->getConstructorIdx($tokens)) {
-            $this->extractMethod($mainConstructor, $tokens);
+        $classIdx    = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
+        $isConstruct = fn ($idx) => $this->tokens[$idx + 2]->getContent() === '__construct';
+        $insertIdx   = $this->getMethodIdx($classIdx, $isConstruct, false);
+        if (!$insertIdx) { return; }
+
+        $construct = $this->getMethodIdx($classIdx, $isConstruct);
+        if ($insertIdx < $construct) {
+            $insertIdx = $this->moveMethod($construct, $insertIdx);
         }
 
-        $idx = 0;
-        while ($definition = $this->getSequenceStartId([[T_PUBLIC], [T_STATIC], [T_FUNCTION]], $tokens, $idx)) {
-            $start = $this->methodBeginIdx($definition, $tokens);
-            $this->extractMethod($start, $tokens);
-            $idx = $start + 5;
-        }
+        $classTypes          = $this->getClassTypes($classIdx);
+        $isStaticConstructor = fn ($idx) => $this->isStaticConstructor($idx, $classTypes);
 
-        $tokens->insertAt($firstMethod, Tokens::fromArray($this->constructors));
+        $insertIdx = $this->getMethodIdx($insertIdx, $isStaticConstructor, false);
+        if (!$insertIdx) { return; }
+
+        $idx = $insertIdx;
+        while ($idx = $this->getMethodIdx($idx + 10, $isStaticConstructor)) {
+            $insertIdx = $this->moveMethod($idx, $insertIdx);
+        }
     }
 
-    private function extractMethod($idx, Tokens $tokens)
+    private function isStaticConstructor(int $idx, array $classTypes): bool
     {
-        $beginBlock = $tokens->getNextTokenOfKind($idx, ['{']);
-        $endBlock   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock) + 1;
+        $static = $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
+        if (!$static) { return false; }
 
-        if ($this->isLastMethod($endBlock, $tokens)) {
-            $previousBreak = $tokens->getPrevMeaningfulToken($idx) + 1;
-            $break         = $tokens[$previousBreak];
-            $tokens[$previousBreak] = $tokens[$endBlock];
-            $tokens[$endBlock]      = $break;
+        $openBrace  = $this->tokens->getNextTokenOfKind($idx + 4, ['{']);
+        $returnType = $this->tokens[$this->tokens->getPrevMeaningfulToken($openBrace)];
+
+        return $returnType->isGivenKind(T_STRING) && isset($classTypes[$returnType->getContent()]);
+    }
+
+    private function getMethodIdx(int $start, callable $condition = null, bool $expected = true): int
+    {
+        $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
+        while ($idx && $condition && $condition($idx) !== $expected) {
+            $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
         }
 
+        if (!$idx) { return 0; }
+
+        $definition = [T_PUBLIC, T_PRIVATE, T_PROTECTED, T_STATIC, T_FINAL, T_ABSTRACT, T_FUNCTION];
+        while ($this->tokens[$idx]->isGivenKind($definition)) {
+            $idx = $this->tokens->getPrevMeaningfulToken($idx);
+        }
+        return $this->tokens->getNonEmptySibling($idx, 1);
+    }
+
+    private function moveMethod(int $methodIdx, int $insertIdx): int
+    {
+        $methodTokens = $this->extractMethod($methodIdx);
+
+        $topIndent = $this->tokens[$insertIdx];
+        $this->tokens[$insertIdx] = $methodTokens[0];
+        $methodTokens[0] = $topIndent;
+
+        $this->tokens->insertAt($insertIdx, Tokens::fromArray($methodTokens));
+
+        return $insertIdx + count($methodTokens);
+    }
+
+    private function extractMethod($idx): array
+    {
+        $beginBlock = $this->tokens->getNextTokenOfKind($idx, ['{']);
+        $endBlock   = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock);
+
+        $methodTokens = [];
         while ($idx <= $endBlock) {
-            $this->constructors[] = $tokens[$idx];
-            $tokens->clearAt($idx);
+            $methodTokens[] = $this->tokens[$idx];
+            $this->tokens->clearAt($idx);
             $idx++;
         }
+
+        return $methodTokens;
     }
 
-    private function getConstructorIdx(Tokens $tokens, $idx = 0)
+    private function getClassTypes(int $class): array
     {
-        $start = $this->getSequenceStartId([[T_PUBLIC], [T_FUNCTION], [T_STRING]], $tokens, $idx);
+        $classTypes = ['self', $this->tokens[$class]->getContent()];
 
-        if (!$start) { return null; }
-
-        if ($tokens[$start + 4]->getContent() !== '__construct') {
-            return $this->getConstructorIdx($tokens, $start + 5);
+        if ($this->tokens[$class + 2]->isGivenKind(T_EXTENDS)) {
+            $class = $class + 4;
+            $classTypes[] = $this->tokens[$class]->getContent();
         }
 
-        return $this->methodBeginIdx($start, $tokens);
-    }
+        if ($this->tokens[$class + 2]->isGivenKind(T_IMPLEMENTS)) {
+            $classTypes[] = $this->tokens[$class + 4]->getContent();
+        }
 
-    private function getSequenceStartId(array $sequence, Tokens $tokens, $idx = 0)
-    {
-        $sequence = $tokens->findSequence($sequence, $idx);
-
-        return ($sequence) ? array_keys($sequence)[0] : null;
-    }
-
-    private function getFirstMethodIdx(Tokens $tokens): int
-    {
-        $idx = min(array_filter([
-            $this->getSequenceStartId([[T_PUBLIC], [T_FUNCTION]], $tokens),
-            $this->getSequenceStartId([[T_PUBLIC], [T_ABSTRACT], [T_FUNCTION]], $tokens)
-        ]) + [0]);
-
-        return $idx ? $this->methodBeginIdx($idx, $tokens) : 0;
-    }
-
-    private function methodBeginIdx($definition, Tokens $tokens): int
-    {
-        $previous = $tokens->getPrevNonWhitespace($definition);
-        if ($tokens[$previous]->isComment()) { return $previous; }
-        return $tokens[$previous]->isGivenKind([T_FINAL])
-            ? $this->methodBeginIdx($previous, $tokens)
-            : $definition;
-    }
-
-    private function isLastMethod($whitespaceIdx, Tokens $tokens): bool
-    {
-        $next = $tokens->getNextMeaningfulToken($whitespaceIdx);
-        return $tokens[$next]->getContent() === '}';
+        return array_flip($classTypes);
     }
 }
