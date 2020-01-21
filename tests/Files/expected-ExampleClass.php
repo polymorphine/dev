@@ -42,11 +42,6 @@ abstract class ExampleClass implements SomeInterface
         $this->variable = $variable;
     }
 
-    public static function withHelloString()
-    {
-        return new self('Hello World!');
-    }
-
     /**
      * Creates from array.
      *
@@ -60,6 +55,12 @@ abstract class ExampleClass implements SomeInterface
     }
 
     abstract public function somethingAbstract();
+
+    // Non-constructor method - no return type
+    public static function withHelloString()
+    {
+        return new self('Hello World!');
+    }
 
     public function getVariable()
     {

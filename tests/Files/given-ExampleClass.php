@@ -42,6 +42,7 @@ abstract class ExampleClass
         return;
     }
     public abstract function somethingAbstract();
+    // Non-constructor method - no return type
     public static function withHelloString() {
         return new self('Hello World!');
     }
