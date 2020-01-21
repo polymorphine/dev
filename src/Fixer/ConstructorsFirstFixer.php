@@ -49,25 +49,24 @@ final class ConstructorsFirstFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $classIdx      = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
-        $isConstructor = fn ($idx) => $this->tokens[$idx + 2]->getContent() === '__construct';
+        $classIdx    = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
+        $isConstruct = fn ($idx) => $this->tokens[$idx + 2]->getContent() === '__construct';
+        $insertIdx   = $this->getMethodIdx($classIdx, $isConstruct, false);
+        if (!$insertIdx) { return; }
 
-        $topMethod = $this->getMethodIdx($classIdx, $isConstructor, false);
-        if (!$topMethod) { return; }
-
-        $construct = $this->getMethodIdx($classIdx, $isConstructor);
-        if ($construct && $topMethod < $construct) {
-            $topMethod = $this->moveMethod($construct, $topMethod);
+        $construct = $this->getMethodIdx($classIdx, $isConstruct);
+        if ($insertIdx < $construct) {
+            $insertIdx = $this->moveMethod($construct, $insertIdx);
         }
 
-        $classTypes    = $this->getConstructorTypes($classIdx);
-        $isConstructor = fn ($idx) => $this->isStaticConstructor($idx, $classTypes);
+        $classTypes          = $this->getClassTypes($classIdx);
+        $isStaticConstructor = fn ($idx) => $this->isStaticConstructor($idx, $classTypes);
 
-        $insertIdx = $this->getMethodIdx($topMethod, $isConstructor, false);
+        $insertIdx = $this->getMethodIdx($insertIdx, $isStaticConstructor, false);
         if (!$insertIdx) { return; }
 
         $idx = $insertIdx;
-        while ($idx = $this->getMethodIdx($idx + 10, $isConstructor)) {
+        while ($idx = $this->getMethodIdx($idx + 10, $isStaticConstructor)) {
             $insertIdx = $this->moveMethod($idx, $insertIdx);
         }
     }
@@ -127,7 +126,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $methodTokens;
     }
 
-    private function getConstructorTypes(int $class): array
+    private function getClassTypes(int $class): array
     {
         $classTypes = ['self', $this->tokens[$class]->getContent()];
 
