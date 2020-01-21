@@ -279,6 +279,25 @@ class ConstructorsFirstFixerTest extends FixerTest
         $this->assertSame($code, $this->runner->fix($code));
     }
 
+    public function testMainConstructorOnlyIsNotMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            class ExampleClass
+            {
+                /** Main Constructor */
+                public function __construct(ExampleClass $self)
+                {
+                    $this->self = $self;
+                }
+            }
+            
+            CODE;
+
+        $this->assertSame($code, $this->runner->fix($code));
+    }
+
     public function testFirstStaticConstructorIsNotMoved()
     {
         $code = <<<'CODE'
