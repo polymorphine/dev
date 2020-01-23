@@ -24,5 +24,8 @@ class CustomPrototypeSniff implements Sniff
 
     public function process(File $file, $stackPtr)
     {
+        if ($file->getTokens()[$stackPtr + 2]['content'] === 'InvalidClassName') {
+            $file->addWarning('Invalid class name example', $stackPtr, 'Found');
+        }
     }
 }
