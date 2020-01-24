@@ -17,6 +17,11 @@ use PHP_CodeSniffer\Files\File;
 
 class PhpDocCallableDefinitionSniff implements Sniff
 {
+    private $descriptionRegexp = [
+        'short' => '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#',
+        'long'  => '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#'
+    ];
+
     public function register()
     {
         return [T_CLASS, T_TRAIT, T_INTERFACE];
@@ -25,34 +30,35 @@ class PhpDocCallableDefinitionSniff implements Sniff
     public function process(File $file, $idx)
     {
         $tokens = $file->getTokens();
-
         while ($idx = $file->findNext(['PHPCS_T_DOC_COMMENT_TAG'], ++$idx)) {
             if ($tokens[$idx]['content'] !== '@param') { continue; }
 
-            $line     = $tokens[$idx + 2]['content'];
-            $isLambda = substr($line, 0, 9) === 'callable ' || substr($line, 0, 8) === 'Closure ';
-            if (!$isLambda) { continue; }
-
-            $varStart = strpos($line, '$', 8);
-            if (!$varStart) {
-                $file->addWarning('Missing variable in callable param definition', $idx, 'Found');
-                continue;
+            if (!$this->validDescription($tokens[$idx + 2]['content'])) {
+                $file->addWarning('Callable param description should contain definition', $idx, 'Found');
             }
-
-            $descriptionStart = strpos($line, ' ', $varStart);
-            $description      = $descriptionStart ? trim(substr($line, $descriptionStart)) : '';
-            if (!$description) {
-                $file->addWarning('Missing callable param description', $idx, 'Found');
-                continue;
-            }
-
-            $pattern = '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#';
-            if (preg_match($pattern, $description)) { continue; }
-
-            $pattern = '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#';
-            if (preg_match($pattern, $description)) { continue; }
-
-            $file->addWarning('Missing callable param description', $idx, 'Found');
         }
+    }
+
+    private function validDescription(string $line): bool
+    {
+        if (!$this->isLambda($line)) { return true; }
+
+        $varStart         = strpos($line, '$', 8);
+        $descriptionStart = $varStart ? strpos($line, ' ', $varStart) : 0;
+        $description      = $descriptionStart ? trim(substr($line, $descriptionStart)) : '';
+        if (!$description) { return false; }
+
+        foreach ($this->descriptionRegexp as $pattern) {
+            if (preg_match($pattern, $description)) { return true; }
+        }
+
+        return false;
+    }
+
+    private function isLambda(string $line): bool
+    {
+        $typeEnd = strpos($line, ' ');
+        $type    = $typeEnd ? substr($line, 0, $typeEnd) : $line;
+        return $type === 'callable' || $type === 'Closure';
     }
 }
