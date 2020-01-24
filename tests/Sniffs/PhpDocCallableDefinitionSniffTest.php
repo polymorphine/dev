@@ -12,7 +12,7 @@
 namespace Polymorphine\CodeStandards\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\CodeStandards\Sniffs\CustomPrototypeSniff;
+use Polymorphine\CodeStandards\Sniffs\PhpDocCallableDefinitionSniff;
 use PHP_CodeSniffer\Files\LocalFile;
 use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Config;
@@ -20,22 +20,23 @@ use PHP_CodeSniffer\Config;
 require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
 
 
-class CustomPrototypeSniffTest extends TestCase
+class PhpDocCallableDefinitionSniffTest extends TestCase
 {
-    public function testInvalidClassNameGivesWarning()
+    public function testCallableParamDocWithoutDefinitionGivesWarning()
     {
         $sniffer = new Runner();
         $sniffer->config = new Config(['-q']);
         $sniffer->init();
 
         $sniffer->ruleset->sniffs = [
-            CustomPrototypeSniff::class => CustomPrototypeSniff::class
+            PhpDocCallableDefinitionSniff::class => PhpDocCallableDefinitionSniff::class
         ];
         $sniffer->ruleset->populateTokenListeners();
 
-        $testFile = new LocalFile(dirname(__DIR__) . '/Files/Sniffs/InvalidClassName.php', $sniffer->ruleset, $sniffer->config);
+        $fileName = dirname(__DIR__) . '/Files/Sniffs/PhpDocCallableDefinitions.php';
+        $testFile = new LocalFile($fileName, $sniffer->ruleset, $sniffer->config);
         $testFile->process();
 
-        $this->assertEquals([3], array_keys($testFile->getWarnings()));
+        $this->assertEquals([20, 28], array_keys($testFile->getWarnings()));
     }
 }
