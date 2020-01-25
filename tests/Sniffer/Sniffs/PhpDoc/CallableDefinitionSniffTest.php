@@ -52,10 +52,10 @@ class CallableDefinitionSniffTest extends TestCase
     public function properties()
     {
         return [
-            [['shortSyntax' => true, 'longSyntax' => true, 'describeClosure' => true], [20, 28]],
-            [['shortSyntax' => true, 'longSyntax' => true, 'describeClosure' => false], [20]],
-            [['shortSyntax' => true, 'longSyntax' => false, 'describeClosure' => false], [20, 42]],
-            [['shortSyntax' => false, 'longSyntax' => true, 'describeClosure' => true], [11, 20, 21, 28, 35]]
+            [['syntax' => 'both', 'includeClosure' => true], [20, 28]],
+            [['syntax' => 'both', 'includeClosure' => false], [20]],
+            [['syntax' => 'short', 'includeClosure' => false], [20, 42]],
+            [['syntax' => 'long', 'includeClosure' => true], [11, 20, 21, 28, 35]]
         ];
     }
 }

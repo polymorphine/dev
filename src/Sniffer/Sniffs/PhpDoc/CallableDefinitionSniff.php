@@ -17,13 +17,12 @@ use PHP_CodeSniffer\Files\File;
 
 class CallableDefinitionSniff implements Sniff
 {
-    public $shortSyntax     = true;
-    public $longSyntax      = true;
-    public $describeClosure = true;
+    public $syntax;
+    public $includeClosure = true;
 
-    private $descriptionRegexp = [
-        'shortSyntax' => '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#',
-        'longSyntax'  => '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#'
+    private $regexp = [
+        'short' => '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#',
+        'long'  => '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#'
     ];
 
     public function register()
@@ -52,8 +51,11 @@ class CallableDefinitionSniff implements Sniff
         $description      = $descriptionStart ? trim(substr($line, $descriptionStart)) : '';
         if (!$description) { return false; }
 
-        foreach ($this->descriptionRegexp as $syntax => $pattern) {
-            if (!$this->{$syntax}) { continue; }
+        if (isset($this->syntax, $this->regexp[$this->syntax])) {
+            return (bool) preg_match($this->regexp[$this->syntax], $description);
+        }
+
+        foreach ($this->regexp as $syntax => $pattern) {
             if (preg_match($pattern, $description)) { return true; }
         }
 
@@ -64,6 +66,6 @@ class CallableDefinitionSniff implements Sniff
     {
         $typeEnd = strpos($line, ' ');
         $type    = $typeEnd ? substr($line, 0, $typeEnd) : $line;
-        return $type === 'callable' || ($this->describeClosure && $type === 'Closure');
+        return $type === 'callable' || ($this->includeClosure && $type === 'Closure');
     }
 }
