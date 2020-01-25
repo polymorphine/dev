@@ -9,13 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\CodeStandards\Sniffs;
+namespace Polymorphine\CodeStandards\Sniffer\Sniffs\PhpDoc;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 
 
-class PhpDocCallableDefinitionSniff implements Sniff
+class CallableDefinitionSniff implements Sniff
 {
     public $shortSyntax     = true;
     public $longSyntax      = true;

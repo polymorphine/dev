@@ -9,19 +9,19 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\CodeStandards\Tests;
+namespace Polymorphine\CodeStandards\Tests\Sniffer\Sniffs\PhpDoc;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\CodeStandards\Sniffs\PhpDocCallableDefinitionSniff;
+use Polymorphine\CodeStandards\Sniffer\Sniffs\PhpDoc\CallableDefinitionSniff;
 use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Files\LocalFile;
 use PHP_CodeSniffer\Util\Common as Util;
 
-require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+require_once __DIR__ . '/../../../../vendor/squizlabs/php_codesniffer/autoload.php';
 
 
-class PhpDocCallableDefinitionSniffTest extends TestCase
+class CallableDefinitionSniffTest extends TestCase
 {
     /**
      * @dataProvider properties
@@ -35,14 +35,14 @@ class PhpDocCallableDefinitionSniffTest extends TestCase
         $runner->config = new Config(['-q']);
         $runner->init();
 
-        $class = PhpDocCallableDefinitionSniff::class;
+        $class = CallableDefinitionSniff::class;
         $code  = Util::getSniffCode($class);
 
         $runner->ruleset->sniffs[$class] = true;
         $runner->ruleset->ruleset[$code]['properties'] = $properties;
         $runner->ruleset->populateTokenListeners();
 
-        $fileName = dirname(__DIR__) . '/Files/Sniffs/PhpDocCallableDefinitions.php';
+        $fileName = './tests/Files/Sniffs/PhpDocCallableDefinitions.php';
         $testFile = new LocalFile($fileName, $runner->ruleset, $runner->config);
         $testFile->process();
 
