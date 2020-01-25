@@ -7,41 +7,29 @@ use Closure;
 class PhpDocCallableDefinitions
 {
     /**
-     * @param LongTypeName\With\NamespaceX $value
-     * @param callable                     $callback       fn(Type) => array
-     *                                                     further description...
+     * @param Type\With\Namespace $value
      * @param int                          $numberVariable
-     */
-    public function doSomethingA(LongTypeName\With\NamespaceX $value, callable $callback, int $numberVariable)
-    {
-    }
-
-    /**
+     * @param bool $param
+     * @return int
+     * @return Some\Type\Closure
      * @param callable $callback not definition
-     * @param Closure  $closure  fn(\typeOne, int) => Namespace\SomeOtherType
+     * @return callable not definition
+     * @param callable $callback
+     * @return callable
+     * @param Closure $callback   not definition
+     * @return Closure  not definition
+     * @param Closure $noDescription
+     * @return Closure
+     * @param callable                     $spacedCallback       fn(Type) => array
+     * @return callable fn(Type) => bool
+     * @param Closure  $short  fn(\typeOne, int) => Namespace\SomeOtherType
+     * @return Closure  fn(Something\NameSpace) => Type
+     * @param callable $longDefinition       function(bool, Some\Class): Type
+     * @return callable function(Type): bool
+     * @param Closure $long function(\typeOne, int, Third): Namespace\SomeOtherType
+     * @return Closure  function(Something\NameSpace): Type
      */
-    public function doSomethingB(callable $callback, Closure $closure)
-    {
-    }
-
-    /**
-     * @param Closure $callback
-     */
-    public function doSomethingC($callback)
-    {
-    }
-
-    /**
-     * @param callable $callback       fn() => Type
-     */
-    public function doSomethingD(callable $callback)
-    {
-    }
-
-    /**
-     * @param callable $longDescription       function(bool, Some\Class): Type
-     */
-    public function doSomethingE(callable $longDescription)
+    public function method()
     {
     }
 }

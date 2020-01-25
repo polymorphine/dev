@@ -34,19 +34,20 @@ class CallableDefinitionSniff implements Sniff
     {
         $tokens = $file->getTokens();
         while ($idx = $file->findNext(['PHPCS_T_DOC_COMMENT_TAG'], ++$idx)) {
-            if ($tokens[$idx]['content'] !== '@param') { continue; }
+            $tag = $tokens[$idx]['content'];
+            if ($tag !== '@param' && $tag !== '@return') { continue; }
 
-            if (!$this->validDescription($tokens[$idx + 2]['content'])) {
+            if (!$this->validDescription($tokens[$idx + 2]['content'], $tag === '@param')) {
                 $file->addWarning('Callable param description should contain definition', $idx, 'Found');
             }
         }
     }
 
-    private function validDescription(string $line): bool
+    private function validDescription(string $line, bool $variable = true): bool
     {
         if (!$this->isLambda($line)) { return true; }
 
-        $varStart         = strpos($line, '$', 8);
+        $varStart         = $variable ? strpos($line, '$', 8) : 1;
         $descriptionStart = $varStart ? strpos($line, ' ', $varStart) : 0;
         $description      = $descriptionStart ? trim(substr($line, $descriptionStart)) : '';
         if (!$description) { return false; }

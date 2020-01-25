@@ -32,10 +32,12 @@ class CallableDefinitionSniffTest extends SnifferTest
     public function properties()
     {
         return [
-            [['syntax' => 'both', 'includeClosure' => true], [20, 28]],
-            [['syntax' => 'both', 'includeClosure' => false], [20]],
-            [['syntax' => 'short', 'includeClosure' => false], [20, 42]],
-            [['syntax' => 'long', 'includeClosure' => true], [11, 20, 21, 28, 35]]
+            [['syntax' => 'both', 'includeClosure' => false], range(15, 18)],
+            [['syntax' => 'both', 'includeClosure' => true], range(15, 22)],
+            [['syntax' => 'short', 'includeClosure' => false], [15, 16, 17, 18, 27, 28]],
+            [['syntax' => 'long', 'includeClosure' => false], [15, 16, 17, 18, 23, 24]],
+            [['syntax' => 'short', 'includeClosure' => true], [15, 16, 17, 18, 19, 20, 21, 22, 27, 28, 29, 30]],
+            [['syntax' => 'long', 'includeClosure' => true], range(15, 26)]
         ];
     }
 
