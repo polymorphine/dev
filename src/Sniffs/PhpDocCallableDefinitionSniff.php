@@ -17,9 +17,13 @@ use PHP_CodeSniffer\Files\File;
 
 class PhpDocCallableDefinitionSniff implements Sniff
 {
+    public $shortSyntax     = true;
+    public $longSyntax      = true;
+    public $describeClosure = true;
+
     private $descriptionRegexp = [
-        'short' => '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#',
-        'long'  => '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#'
+        'shortSyntax' => '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#',
+        'longSyntax'  => '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#'
     ];
 
     public function register()
@@ -48,7 +52,8 @@ class PhpDocCallableDefinitionSniff implements Sniff
         $description      = $descriptionStart ? trim(substr($line, $descriptionStart)) : '';
         if (!$description) { return false; }
 
-        foreach ($this->descriptionRegexp as $pattern) {
+        foreach ($this->descriptionRegexp as $syntax => $pattern) {
+            if (!$this->{$syntax}) { continue; }
             if (preg_match($pattern, $description)) { return true; }
         }
 
@@ -59,6 +64,6 @@ class PhpDocCallableDefinitionSniff implements Sniff
     {
         $typeEnd = strpos($line, ' ');
         $type    = $typeEnd ? substr($line, 0, $typeEnd) : $line;
-        return $type === 'callable' || $type === 'Closure';
+        return $type === 'callable' || ($this->describeClosure && $type === 'Closure');
     }
 }

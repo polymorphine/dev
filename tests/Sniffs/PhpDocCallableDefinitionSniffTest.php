@@ -13,30 +13,49 @@ namespace Polymorphine\CodeStandards\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\CodeStandards\Sniffs\PhpDocCallableDefinitionSniff;
-use PHP_CodeSniffer\Files\LocalFile;
 use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Config;
+use PHP_CodeSniffer\Files\LocalFile;
+use PHP_CodeSniffer\Util\Common as Util;
 
 require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
 
 
 class PhpDocCallableDefinitionSniffTest extends TestCase
 {
-    public function testCallableParamDocWithoutDefinitionGivesWarning()
+    /**
+     * @dataProvider properties
+     *
+     * @param array $properties
+     * @param int[] $expectedWarningLines
+     */
+    public function testCallableParamDocWithoutDefinitionGivesWarning(array $properties, array $expectedWarningLines)
     {
-        $sniffer = new Runner();
-        $sniffer->config = new Config(['-q']);
-        $sniffer->init();
+        $runner = new Runner();
+        $runner->config = new Config(['-q']);
+        $runner->init();
 
-        $sniffer->ruleset->sniffs = [
-            PhpDocCallableDefinitionSniff::class => PhpDocCallableDefinitionSniff::class
-        ];
-        $sniffer->ruleset->populateTokenListeners();
+        $class = PhpDocCallableDefinitionSniff::class;
+        $code  = Util::getSniffCode($class);
+
+        $runner->ruleset->sniffs[$class] = true;
+        $runner->ruleset->ruleset[$code]['properties'] = $properties;
+        $runner->ruleset->populateTokenListeners();
 
         $fileName = dirname(__DIR__) . '/Files/Sniffs/PhpDocCallableDefinitions.php';
-        $testFile = new LocalFile($fileName, $sniffer->ruleset, $sniffer->config);
+        $testFile = new LocalFile($fileName, $runner->ruleset, $runner->config);
         $testFile->process();
 
-        $this->assertEquals([20, 28], array_keys($testFile->getWarnings()));
+        $this->assertEquals($expectedWarningLines, array_keys($testFile->getWarnings()));
+    }
+
+    public function properties()
+    {
+        return [
+            [['shortSyntax' => true, 'longSyntax' => true, 'describeClosure' => true], [20, 28]],
+            [['shortSyntax' => true, 'longSyntax' => true, 'describeClosure' => false], [20]],
+            [['shortSyntax' => true, 'longSyntax' => false, 'describeClosure' => false], [20, 42]],
+            [['shortSyntax' => false, 'longSyntax' => true, 'describeClosure' => true], [11, 20, 21, 28, 35]]
+        ];
     }
 }
