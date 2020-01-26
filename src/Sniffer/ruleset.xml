@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Polymorphine" namespace="Polymorphine\CodeStandards\Sniffer">
+    <description>Custom Polymorphine Sniffs for style errors that need to be fixed manually.</description>
+    <rule ref="Sniffer.PhpDoc.CallableDefinition">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+        <properties>
+            <property name="syntax" value="short"/>
+        </properties>
+    </rule>
+</ruleset>

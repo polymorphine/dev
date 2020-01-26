@@ -43,11 +43,11 @@ class CompoundFixerTest extends TestCase
     public function fileList()
     {
         $files = [];
-        foreach (array_diff(scandir(__DIR__ . '/Files'), ['..', '.']) as $file) {
+        foreach (array_diff(scandir(__DIR__ . '/Files/Fixer'), ['..', '.']) as $file) {
             [$type, $index] = explode('-', $file, 2) + [false, false];
             $id = ($type === 'expected') ? 0 : 1;
             isset($files[$index]) or $files[$index] = [];
-            $files[$index][$id] = __DIR__ . '/Files/' . $file;
+            $files[$index][$id] = __DIR__ . '/Files/Fixer/' . $file;
         }
 
         return $files;
