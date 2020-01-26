@@ -1,19 +1,14 @@
 <?xml version="1.0"?>
 <!--
-    Not fixable errors - checks only:
-    - naming conventions (PSR-2, camelCase for local & instance variables),
-    - line length
-    - phpDoc description for callable type
+    Intended as check only of non-fixable style errors:
+    - naming conventions (PSR-2, camelCase for local & instance variables)
+    - line length limit (warning level)
+    - fixable but left for other IDEs: line ending, tab width
+    - custom Polymorphine sniffs (src/Sniffer)
 -->
 <ruleset name="Polymorphine">
     <description>Polymorphine coding standard</description>
-    <rule ref="./src/Sniffer/Sniffs/PhpDoc/CallableDefinitionSniff.php"/>
-    <rule ref="Sniffer.PhpDoc.CallableDefinition">
-        <exclude-pattern>*/tests/*</exclude-pattern>
-        <properties>
-            <property name="syntax" value="short"/>
-        </properties>
-    </rule>
+    <rule ref="./src/Sniffer"/>
     <arg name="tab-width" value="4"/>
     <rule ref="Generic.Files.LineEndings">
         <properties>
