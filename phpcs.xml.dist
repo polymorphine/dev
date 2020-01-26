@@ -1,7 +1,19 @@
 <?xml version="1.0"?>
-<!-- Naming and line length checks only -->
+<!--
+    Not fixable errors - checks only:
+    - naming conventions (PSR-2, camelCase for local & instance variables),
+    - line length
+    - phpDoc description for callable type
+-->
 <ruleset name="Polymorphine">
     <description>Polymorphine coding standard</description>
+    <rule ref="./src/Sniffer/Sniffs/PhpDoc/CallableDefinitionSniff.php"/>
+    <rule ref="Sniffer.PhpDoc.CallableDefinition">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+        <properties>
+            <property name="syntax" value="short"/>
+        </properties>
+    </rule>
     <arg name="tab-width" value="4"/>
     <rule ref="Generic.Files.LineEndings">
         <properties>
