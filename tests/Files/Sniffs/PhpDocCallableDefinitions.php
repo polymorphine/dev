@@ -28,6 +28,8 @@ class PhpDocCallableDefinitions
      * @return callable function(Type): bool
      * @param Closure $long function(\typeOne, int, Third): Namespace\SomeOtherType
      * @return Closure  function(Something\NameSpace): Type
+     * @param callable|null $longDefinition       function(bool, Some\Class): Type
+     * @return Closure|null  fn(Something\NameSpace) => Type
      */
     public function method()
     {
