@@ -8,7 +8,9 @@
 -->
 <ruleset name="Polymorphine">
     <description>Polymorphine coding standard</description>
-    <rule ref="./src/Sniffer"/>
+    <rule ref="./src/Sniffer">
+        <exclude name="Sniffer.PhpDoc.RequiredForPublicApi"/>
+    </rule>
     <arg name="tab-width" value="4"/>
     <rule ref="Generic.Files.LineEndings">
         <properties>
