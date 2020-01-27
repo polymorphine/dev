@@ -13,6 +13,7 @@ namespace Polymorphine\CodeStandards\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
+use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
 
 
@@ -99,14 +100,22 @@ class AlignedTypedPropertiesFixer implements FixerInterface
                 $tokenId = T_STRING;
             }
             $tokenIds[] = $tokenId;
-            $idx = $this->tokens->getNextMeaningfulToken($idx);
+            do {
+                $idx = $this->tokens->getNextMeaningfulToken($idx);
+            } while ($this->isNullableToken($idx));
         }
 
         return $typed ? new Sequence($this->tokens, $end, $tokenIds) : $this->nextSequence($end);
     }
 
-    private function alignIndex($idx): array
+    private function alignIndex(int $idx): array
     {
-        return [$idx, strlen($this->tokens[$idx - 2]->getContent())];
+        $nullableChars = $this->isNullableToken($idx - 3) ? 1 : 0;
+        return [$idx, strlen($this->tokens[$idx - 2]->getContent()) + $nullableChars];
+    }
+
+    private function isNullableToken(int $idx): bool
+    {
+        return $this->tokens[$idx]->getId() === CT::T_NULLABLE_TYPE;
     }
 }

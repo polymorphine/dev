@@ -33,10 +33,10 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 private SomeInterface $baz;
             
                 protected static Foo $var1;
-                protected static FooX $var2;
+                protected static ?FooX $var2;
             
                 public callable $test;
-                public object $object;
+                public ?object $object;
                 public SomeTypeLongest $varTyped;
                 public int $number    = 1000;
                 public array $another = ['a', 'b'];
@@ -62,11 +62,11 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 protected static ShortType     $longVariable;
                 private SomeInterface $baz;
             
-                protected static Foo  $var1;
-                protected static FooX $var2;
+                protected static Foo   $var1;
+                protected static ?FooX $var2;
             
                 public callable        $test;
-                public object          $object;
+                public ?object         $object;
                 public SomeTypeLongest $varTyped;
                 public int             $number    = 1000;
                 public array           $another = ['a', 'b'];
