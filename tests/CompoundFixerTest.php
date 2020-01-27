@@ -25,7 +25,7 @@ class CompoundFixerTest extends TestCase
     protected function setUp(): void
     {
         $config = FixerFactory::createFor('Polymorphine/CodeStandards', __DIR__);
-        $this->runner = Fixtures\TestRunner::withConfig($config);
+        $this->runner = Fixtures\FixerTestRunner::withConfig($config);
     }
 
     /**

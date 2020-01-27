@@ -12,19 +12,19 @@
 namespace Polymorphine\CodeStandards\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\CodeStandards\Tests\Fixtures\TestRunner;
+use Polymorphine\CodeStandards\Tests\Fixtures\FixerTestRunner;
 use PhpCsFixer\Fixer\FixerInterface;
 use SplFileInfo;
 
 
 abstract class FixerTest extends TestCase
 {
-    protected TestRunner $runner;
+    protected FixerTestRunner $runner;
 
     protected function setUp(): void
     {
         $fixer = $this->fixer();
-        $this->runner = new TestRunner([$fixer]);
+        $this->runner = new FixerTestRunner([$fixer]);
     }
 
     public function testProperties()

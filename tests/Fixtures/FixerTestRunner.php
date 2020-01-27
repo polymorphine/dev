@@ -21,7 +21,7 @@ use PhpCsFixer\WhitespacesFixerConfig;
 use SplFileInfo;
 
 
-class TestRunner
+class FixerTestRunner
 {
     private $fixers;
 
