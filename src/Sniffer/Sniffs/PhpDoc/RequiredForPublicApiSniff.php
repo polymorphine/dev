@@ -27,10 +27,12 @@ class RequiredForPublicApiSniff implements Sniff
     public function process(File $file, $idx)
     {
         $this->tokens = $file->getTokens();
+
         while ($idx = $file->findNext([T_FUNCTION], ++$idx)) {
-            $previousLine = $this->previousLineBreak($idx) - 1;
-            $expectedDoc  = $this->tokens[$previousLine]['type'];
-            if ($expectedDoc !== 'T_DOC_COMMENT_CLOSE_TAG') {
+            $previousLineEnd = $this->previousLineBreak($idx);
+            if (!$this->isBeforePublic($previousLineEnd + 1)) { continue; }
+            $expectedDocEnd = $this->tokens[$previousLineEnd - 1]['type'];
+            if ($expectedDocEnd !== 'T_DOC_COMMENT_CLOSE_TAG') {
                 $file->addWarning('test warning', $idx, 'Found');
             }
         }
@@ -43,5 +45,14 @@ class RequiredForPublicApiSniff implements Sniff
             $idx--;
         }
         return $idx;
+    }
+
+    private function isBeforePublic(int $idx): bool
+    {
+        $searchNext = [T_PUBLIC, T_PRIVATE, T_PROTECTED, T_FUNCTION];
+        while (!in_array($this->tokens[$idx]['code'], $searchNext, true)) {
+            $idx++;
+        }
+        return $this->tokens[$idx]['code'] === T_PUBLIC;
     }
 }
