@@ -17,10 +17,16 @@ use Polymorphine\CodeStandards\Sniffer\Sniffs\PhpDoc\RequiredForPublicApiSniff;
 
 class RequiredForPublicApiSniffTest extends SnifferTest
 {
-    public function testWarning()
+    public function testInterfaceWarnings()
     {
         $filename = './tests/Files/Sniffs/PhpDocRequiredForInterfaceApi.php';
-        $this->assertWarningLines($filename, [6]);
+        $this->assertWarningLines($filename, [13]);
+    }
+
+    public function testClassWarnings()
+    {
+        $filename = './tests/Files/Sniffs/PhpDocRequiredForClassApi.php';
+        $this->assertWarningLines($filename, [11, 12]);
     }
 
     protected function sniffer(): string

@@ -17,6 +17,8 @@ use PHP_CodeSniffer\Files\File;
 
 class RequiredForPublicApiSniff implements Sniff
 {
+    private array $tokens;
+
     public function register()
     {
         return [T_CLASS, T_TRAIT, T_INTERFACE];
@@ -24,6 +26,22 @@ class RequiredForPublicApiSniff implements Sniff
 
     public function process(File $file, $idx)
     {
-        $file->addWarning('test warning', $idx, 'Found');
+        $this->tokens = $file->getTokens();
+        while ($idx = $file->findNext([T_FUNCTION], ++$idx)) {
+            $previousLine = $this->previousLineBreak($idx) - 1;
+            $expectedDoc  = $this->tokens[$previousLine]['type'];
+            if ($expectedDoc !== 'T_DOC_COMMENT_CLOSE_TAG') {
+                $file->addWarning('test warning', $idx, 'Found');
+            }
+        }
+    }
+
+    private function previousLineBreak(int $idx): int
+    {
+        $previousLine = $this->tokens[$idx]['line'] - 1;
+        while ($this->tokens[$idx]['line'] !== $previousLine) {
+            $idx--;
+        }
+        return $idx;
     }
 }
