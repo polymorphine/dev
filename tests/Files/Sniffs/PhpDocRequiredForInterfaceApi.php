@@ -8,7 +8,6 @@ interface PhpDocRequiredForInterfaceApi
     /**
      * Whatever - no content check
      */
-    public function methodA(int $value): bool;
-
-    public function methodB(array $test): self;
+    public function interfaceMethodA(int $value): bool;
+    public function interfaceMethodB(array $test): self;
 }

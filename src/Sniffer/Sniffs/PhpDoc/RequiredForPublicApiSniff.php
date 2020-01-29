@@ -13,6 +13,8 @@ namespace Polymorphine\CodeStandards\Sniffer\Sniffs\PhpDoc;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
+use ReflectionClass;
+use ReflectionMethod;
 
 
 class RequiredForPublicApiSniff implements Sniff
@@ -28,14 +30,67 @@ class RequiredForPublicApiSniff implements Sniff
     {
         $this->tokens = $file->getTokens();
 
+        $isInterface = $this->tokens[$idx]['code'] === T_INTERFACE;
+        $isOrigin    = $isInterface || $this->tokens[$idx]['code'] === T_TRAIT;
+
+        $className       = $isOrigin ? null : $this->getClassName($idx, $file);
+        $ancestorMethods = $className ? $this->getAncestorMethods($className) : [];
+
         while ($idx = $file->findNext([T_FUNCTION], ++$idx)) {
-            $previousLineEnd = $this->previousLineBreak($idx);
-            if (!$this->isBeforePublic($previousLineEnd + 1)) { continue; }
-            $expectedDocEnd = $this->tokens[$previousLineEnd - 1]['type'];
+            $lineBreak = $this->previousLineBreak($idx);
+            $isApi     = $isInterface || $this->isBeforePublic($lineBreak + 1);
+            if (!$isApi) { continue; }
+
+            if ($ancestorMethods) {
+                $methodName = $this->tokens[$idx + 2]['content'];
+                if (isset($ancestorMethods[$methodName])) { continue; }
+            }
+
+            $expectedDocEnd = $this->tokens[$lineBreak - 1]['type'];
             if ($expectedDocEnd !== 'T_DOC_COMMENT_CLOSE_TAG') {
                 $file->addWarning('test warning', $idx, 'Found');
             }
         }
+    }
+
+    private function getClassName(int $idx, File $file): string
+    {
+        $className = $this->tokens[$idx + 2]['content'];
+
+        $idx = $file->findNext([T_NAMESPACE], 0, $idx);
+        if (!$idx) { return $className; }
+        $namespaceEnd = $file->findNext([T_SEMICOLON], $idx);
+
+        $idx       = $idx + 2;
+        $namespace = [];
+        while ($idx < $namespaceEnd) {
+            $namespace[] = $this->tokens[$idx]['content'];
+            $idx++;
+        }
+
+        return implode('', $namespace) . '\\' . $className;
+    }
+
+    private function getAncestorMethods(string $class): array
+    {
+        $reflection = new ReflectionClass($class);
+        $parent     = $reflection->getParentClass();
+        $methods    = $parent ? $this->getMethods($parent) : [];
+        $interfaces = $reflection->getInterfaces();
+        foreach ($interfaces as $interface) {
+            $methods += $this->getMethods($interface);
+        }
+        return $methods;
+    }
+
+    private function getMethods(ReflectionClass $class): array
+    {
+        $methods = [];
+        foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($method->isStatic() || $method->isFinal()) { continue; }
+            $methods[] = $method->getName();
+        }
+        return array_flip($methods);
     }
 
     private function previousLineBreak(int $idx): int

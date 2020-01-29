@@ -20,13 +20,19 @@ class RequiredForPublicApiSniffTest extends SnifferTest
     public function testInterfaceWarnings()
     {
         $filename = './tests/Files/Sniffs/PhpDocRequiredForInterfaceApi.php';
-        $this->assertWarningLines($filename, [13]);
+        $this->assertWarningLines($filename, [12]);
     }
 
     public function testClassWarnings()
     {
         $filename = './tests/Files/Sniffs/PhpDocRequiredForClassApi.php';
-        $this->assertWarningLines($filename, [11]);
+        $this->assertWarningLines($filename, [14]);
+    }
+
+    public function testParentWarnings()
+    {
+        $filename = './tests/Files/Sniffs/PhpDocRequiredForParentApi.php';
+        $this->assertWarningLines($filename, [8]);
     }
 
     protected function sniffer(): string
