@@ -15,6 +15,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use ReflectionClass;
 use ReflectionMethod;
+use Throwable;
 
 
 class RequiredForPublicApiSniff implements Sniff
@@ -73,10 +74,14 @@ class RequiredForPublicApiSniff implements Sniff
 
     private function getAncestorMethods(string $class): array
     {
-        $reflection = new ReflectionClass($class);
-        $parent     = $reflection->getParentClass();
-        $methods    = $parent ? $this->getMethods($parent) : [];
-        $interfaces = $reflection->getInterfaces();
+        try {
+            $reflection = new ReflectionClass($class);
+            $parent     = $reflection->getParentClass();
+            $methods    = $parent ? $this->getMethods($parent) : [];
+            $interfaces = $reflection->getInterfaces();
+        } catch (Throwable $e) {
+            return [];
+        }
         foreach ($interfaces as $interface) {
             $methods += $this->getMethods($interface);
         }

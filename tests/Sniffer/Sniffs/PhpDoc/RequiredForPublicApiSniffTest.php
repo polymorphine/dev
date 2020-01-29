@@ -35,6 +35,12 @@ class RequiredForPublicApiSniffTest extends SnifferTest
         $this->assertWarningLines($filename, [8]);
     }
 
+    public function testInvalidClassWarnings()
+    {
+        $filename = './tests/Files/Sniffs/PhpDocRequiredForInvalidClass.php';
+        $this->assertWarningLines($filename, [8]);
+    }
+
     protected function sniffer(): string
     {
         return RequiredForPublicApiSniff::class;
