@@ -49,7 +49,7 @@ class RequiredForPublicApiSniff implements Sniff
 
             $expectedDocEnd = $this->tokens[$lineBreak - 1]['type'];
             if ($expectedDocEnd !== 'T_DOC_COMMENT_CLOSE_TAG') {
-                $file->addWarning('test warning', $idx, 'Found');
+                $file->addWarning('Missing phpDoc comment for original public method signature', $idx, 'Missing');
             }
         }
     }
