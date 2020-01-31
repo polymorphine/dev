@@ -33,24 +33,26 @@ class RequiredForPublicApiSniff implements Sniff
 
         $isInterface = $this->tokens[$idx]['code'] === T_INTERFACE;
         $isOrigin    = $isInterface || $this->tokens[$idx]['code'] === T_TRAIT;
+        $className   = $isOrigin ? null : $this->getClassName($idx, $file);
 
-        $className       = $isOrigin ? null : $this->getClassName($idx, $file);
-        $ancestorMethods = $className ? $this->getAncestorMethods($className) : [];
-
+        $undocumented = [];
         while ($idx = $file->findNext([T_FUNCTION], ++$idx)) {
             $lineBreak = $this->previousLineBreak($idx);
-            $isApi     = $isInterface || $this->isBeforePublic($lineBreak + 1);
+
+            $isApi = $isInterface || $this->isBeforePublic($lineBreak + 1);
             if (!$isApi) { continue; }
+            $isDocumented = $this->tokens[$lineBreak - 1]['type'] === 'T_DOC_COMMENT_CLOSE_TAG';
+            if ($isDocumented) { continue; }
 
-            if ($ancestorMethods) {
-                $methodName = $this->tokens[$idx + 2]['content'];
-                if (isset($ancestorMethods[$methodName])) { continue; }
-            }
+            $undocumented[] = [$this->tokens[$idx + 2]['content'], $idx];
+        }
 
-            $expectedDocEnd = $this->tokens[$lineBreak - 1]['type'];
-            if ($expectedDocEnd !== 'T_DOC_COMMENT_CLOSE_TAG') {
-                $file->addWarning('Missing phpDoc comment for original public method signature', $idx, 'Missing');
-            }
+        if (!$undocumented) { return; }
+        $ancestorMethods = $className ? $this->getAncestorMethods($className) : [];
+
+        foreach ($undocumented as [$methodName, $idx]) {
+            if (isset($ancestorMethods[$methodName])) { continue; }
+            $file->addWarning('Missing phpDoc comment for original public method signature', $idx, 'Missing');
         }
     }
 
