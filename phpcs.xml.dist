@@ -8,6 +8,7 @@
 -->
 <ruleset name="Polymorphine">
     <description>Polymorphine coding standard</description>
+    <autoload>./vendor/autoload.php</autoload>
     <rule ref="./src/Sniffer"/>
     <arg name="tab-width" value="4"/>
     <rule ref="Generic.Files.LineEndings">

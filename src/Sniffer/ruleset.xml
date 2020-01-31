@@ -7,4 +7,7 @@
             <property name="syntax" value="short"/>
         </properties>
     </rule>
+    <rule ref="Sniffer.PhpDoc.RequiredForPublicApi">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
 </ruleset>
