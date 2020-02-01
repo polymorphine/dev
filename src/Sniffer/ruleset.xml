@@ -9,13 +9,9 @@
 <ruleset name="Polymorphine" namespace="Polymorphine\CodeStandards\Sniffer">
     <description>Custom Polymorphine Sniffs for style errors that need to be fixed manually.</description>
     <rule ref="Sniffer.PhpDoc.CallableDefinition">
-        <exclude-pattern>*/tests/*</exclude-pattern>
         <properties>
             <property name="syntax" value="short"/>
         </properties>
-    </rule>
-    <rule ref="Sniffer.PhpDoc.RequiredForPublicApi">
-        <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
     <arg name="tab-width" value="4"/>
     <rule ref="Generic.Files.LineEndings">

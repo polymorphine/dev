@@ -18,6 +18,9 @@ use PHP_CodeSniffer\Files;
 use PHP_CodeSniffer\Util;
 
 require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+if (!defined('PHP_CODESNIFFER_CBF')) {
+    define('PHP_CODESNIFFER_CBF', false);
+}
 
 
 class SnifferTestRunner
@@ -29,7 +32,7 @@ class SnifferTestRunner
     public function __construct(string $sniffClass)
     {
         $runner = new Runner();
-        $runner->config = new Config(['-q']);
+        $runner->config = new Config(['-q', '--standard=' . __DIR__ . '/tests.phpcs.xml']);
         $runner->init();
 
         $this->ruleset = $runner->ruleset;

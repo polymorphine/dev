@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- Code Sniffer configuration for projects using Polymorphine/CodeStandard as composer dependency -->
+<ruleset name="Polymorphine-project">
+    <autoload>../../autoload.php</autoload>
+    <rule ref="./src/Sniffer"/>
+    <rule ref="Sniffer.PhpDoc.RequiredForPublicApi">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Sniffer.PhpDoc.CallableDefinition">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+</ruleset>

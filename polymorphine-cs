@@ -41,6 +41,6 @@ if (!empty($argv)) {
 
 if (!empty($files)) {
     $src = implode(' ', $files);
-    runCommand('phpcs --extensions=php --standard=' . __DIR__ . '/phpcs.xml.dist ' . $src);
+    runCommand('phpcs --extensions=php --standard=' . __DIR__ . '/phpcs.xml ' . $src);
     runCommand('php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix ' . $src);
 }
