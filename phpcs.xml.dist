@@ -1,33 +1,6 @@
 <?xml version="1.0"?>
-<!--
-    Intended as check only of non-fixable style errors:
-    - naming conventions (PSR-2, camelCase for local & instance variables)
-    - line length limit (warning level)
-    - fixable but left for other IDEs: line ending, tab width
-    - custom Polymorphine sniffs (src/Sniffer)
--->
-<ruleset name="Polymorphine">
+<ruleset name="Polymorphine-projects">
     <description>Polymorphine coding standard</description>
     <autoload>./vendor/autoload.php</autoload>
     <rule ref="./src/Sniffer"/>
-    <arg name="tab-width" value="4"/>
-    <rule ref="Generic.Files.LineEndings">
-        <properties>
-            <property name="eolChar" value="\n"/>
-        </properties>
-    </rule>
-    <rule ref="Generic.Files.LineLength">
-        <exclude-pattern>*/tests/*</exclude-pattern>
-        <properties>
-            <property name="lineLimit" value="120"/>
-            <property name="absoluteLineLimit" value="0"/>
-        </properties>
-    </rule>
-    <rule ref="Squiz.Classes.ValidClassName"/>
-    <rule ref="PSR1.Methods.CamelCapsMethodName">
-        <exclude-pattern>*/tests/*</exclude-pattern>
-    </rule>
-    <rule ref="Squiz.NamingConventions.ValidVariableName">
-        <exclude name="Squiz.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
-    </rule>
 </ruleset>
