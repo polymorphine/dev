@@ -31,10 +31,10 @@ class RequiredForPublicApiSniffTest extends SnifferTest
     public function classFileWarnings()
     {
         return [
-            'interface' => ['./tests/Files/Sniffs/PhpDocRequiredForInterfaceApi.php', [12]],
-            'class'     => ['./tests/Files/Sniffs/PhpDocRequiredForClassApi.php', [14]],
-            'parent'    => ['./tests/Files/Sniffs/PhpDocRequiredForParentApi.php', [8]],
-            'invalid'   => ['./tests/Files/Sniffs/PhpDocRequiredForInvalidClass.php', [8]]
+            'interface' => ['./tests/CodeSamples/Sniffs/PhpDocRequiredForInterfaceApi.php', [12]],
+            'class'     => ['./tests/CodeSamples/Sniffs/PhpDocRequiredForClassApi.php', [14]],
+            'parent'    => ['./tests/CodeSamples/Sniffs/PhpDocRequiredForParentApi.php', [8]],
+            'invalid'   => ['./tests/CodeSamples/Sniffs/PhpDocRequiredForInvalidClass.php', [8]]
         ];
     }
 
