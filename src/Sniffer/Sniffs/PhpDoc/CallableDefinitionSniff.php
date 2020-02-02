@@ -70,6 +70,11 @@ class CallableDefinitionSniff implements Sniff
         if ($alternative = strpos($type, '|')) {
             $type = substr($type, 0, $alternative);
         }
+
+        if (substr($type, -2) === '[]') {
+            $type = substr($type, 0, -2);
+        }
+        
         return $type === 'callable' || ($this->includeClosure && $type === 'Closure');
     }
 }

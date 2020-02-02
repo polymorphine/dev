@@ -30,6 +30,8 @@ class PhpDocCallableDefinitions
      * @return Closure  function(Something\NameSpace): Type
      * @param callable|null $longDefinition       function(bool, Some\Class): Type
      * @return Closure|null  fn(Something\NameSpace) => Type
+     * @param callable[]|null $callback fn(Type) => bool
+     * @return Closure[]|null fn(Type) => bool
      */
     public function method()
     {

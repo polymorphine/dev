@@ -35,9 +35,9 @@ class CallableDefinitionSniffTest extends SnifferTest
             [['syntax' => 'both', 'includeClosure' => false], range(15, 18)],
             [['syntax' => 'both', 'includeClosure' => true], range(15, 22)],
             [['syntax' => 'short', 'includeClosure' => false], array_merge(range(15, 18), [27, 28, 31])],
-            [['syntax' => 'long', 'includeClosure' => false], array_merge(range(15, 18), [23, 24])],
+            [['syntax' => 'long', 'includeClosure' => false], array_merge(range(15, 18), [23, 24], [33])],
             [['syntax' => 'short', 'includeClosure' => true], array_merge(range(15, 22), range(27, 31))],
-            [['syntax' => 'long', 'includeClosure' => true], array_merge(range(15, 26), [32])]
+            [['syntax' => 'long', 'includeClosure' => true], array_merge(range(15, 26), [32, 33, 34])]
         ];
     }
 
