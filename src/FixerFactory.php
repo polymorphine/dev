@@ -80,7 +80,14 @@ EOF;
         'yoda_style'                            => false
     ];
 
-    public static function createFor(string $packageName, string $workingDir)
+    /**
+     * @param string     $packageName
+     * @param string     $workingDir
+     * @param callable[] $filters     fn(\SplFileInfo) => bool - false will ignore file
+     *
+     * @return PhpCsFixer\Config|PhpCsFixer\ConfigInterface
+     */
+    public static function createFor(string $packageName, string $workingDir, array $filters = [])
     {
         self::$rules['header_comment']['header'] = str_replace('{{name}}', $packageName, self::HEADER);
         self::$rules['no_extra_blank_lines']['tokens'] = [
@@ -97,10 +104,15 @@ EOF;
         self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/short_conditions_single_line']            = true;
 
+        $finder = PhpCsFixer\Finder::create()->in($workingDir);
+        foreach ($filters as $filter) {
+            $finder = $finder->filter($filter);
+        }
+
         return PhpCsFixer\Config::create()
             ->setRiskyAllowed(true)
             ->setRules(self::$rules)
-            ->setFinder(PhpCsFixer\Finder::create()->in($workingDir))
+            ->setFinder($finder)
             ->setUsingCache(false)
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),
