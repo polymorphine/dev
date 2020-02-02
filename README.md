@@ -1,4 +1,9 @@
 # Polymorphine/CodeStandards
+[![Latest Stable Version](https://poser.pugx.org/polymorphine/cs/version)](https://packagist.org/packages/polymorphine/cs)
+[![Build status](https://travis-ci.org/shudd3r/polymorphine-cs.svg?branch=develop)](https://travis-ci.org/shudd3r/polymorphine-cs)
+[![Coverage status](https://coveralls.io/repos/github/shudd3r/polymorphine-cs/badge.svg?branch=develop)](https://coveralls.io/github/shudd3r/polymorphine-cs?branch=develop)
+[![PHP version](https://img.shields.io/packagist/php-v/polymorphine/cs.svg)](https://packagist.org/packages/polymorphine/cs)
+[![LICENSE](https://img.shields.io/github/license/shudd3r/polymorphine-cs.svg?color=blue)](LICENSE)
 ### Code standards check & fix scripts for Polymorphine libraries
 
 Combination of [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
