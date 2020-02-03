@@ -13,6 +13,7 @@ namespace Polymorphine\CodeStandards\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
+use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
 
 
@@ -52,10 +53,16 @@ final class AlignedArrayValuesFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $array = new ArrayContext(0, $tokens);
-        if (!$groups = $array->operatorGroups()) { return; }
-        foreach ($groups as $group) {
-            $this->fixGroupIndentation($group);
+        $idx = 0;
+        while ($array = $this->findArrayContext($idx)) {
+            $array->alignIndentation();
+            $idx = $array->lastTokenIdx();
         }
+    }
+
+    private function findArrayContext(int $idx): ?ArrayContext
+    {
+        $start = $this->tokens->getNextTokenOfKind($idx, [[CT::T_ARRAY_SQUARE_BRACE_OPEN]]);
+        return $start ? new ArrayContext($this->tokens, $start) : null;
     }
 }
