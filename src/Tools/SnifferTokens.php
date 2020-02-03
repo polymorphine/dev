@@ -14,6 +14,7 @@ namespace Polymorphine\CodeStandards\Tools;
 use PHP_CodeSniffer\Files;
 use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Config;
+use PHP_CodeSniffer\Exceptions;
 
 require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
 
@@ -22,6 +23,10 @@ final class SnifferTokens
 {
     use ArrayDump;
 
+    /**
+     * @param string      $sourceCode Php code
+     * @param null|string $dumpFile
+     */
     public static function dumpSourceCode(string $sourceCode, ?string $dumpFile = null): void
     {
         $sourceFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
@@ -31,6 +36,12 @@ final class SnifferTokens
         unlink($sourceFile);
     }
 
+    /**
+     * @param string      $sourceFile File with php code
+     * @param null|string $dumpFile
+     *
+     * @throws Exceptions\DeepExitException
+     */
     public static function dumpSourceFile(string $sourceFile, string $dumpFile = null): void
     {
         $runner = new Runner();
@@ -45,6 +56,10 @@ final class SnifferTokens
         self::dump($testFile, $dumpFile);
     }
 
+    /**
+     * @param Files\File  $tokens     Processed php code file
+     * @param null|string $tokensFile
+     */
     public static function dump(Files\File $tokens, ?string $tokensFile = null): void
     {
         $tokens = $tokens->getTokens();

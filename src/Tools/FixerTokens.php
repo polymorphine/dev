@@ -18,16 +18,28 @@ final class FixerTokens
 {
     use ArrayDump;
 
-    public static function dumpSourceFile(string $sourceFile, string $dumpFile = null)
+    /**
+     * @param string      $sourceFile File with php code
+     * @param null|string $dumpFile
+     */
+    public static function dumpSourceFile(string $sourceFile, string $dumpFile = null): void
     {
         self::dumpSourceCode(file_get_contents($sourceFile), $dumpFile);
     }
 
+    /**
+     * @param string      $sourceCode Php code
+     * @param null|string $dumpFile
+     */
     public static function dumpSourceCode(string $sourceCode, ?string $dumpFile = null): void
     {
         self::dump(Tokens::fromCode($sourceCode), $dumpFile);
     }
 
+    /**
+     * @param Tokens      $tokens   Processed php code tokens
+     * @param null|string $dumpFile
+     */
     public static function dump(Tokens $tokens, ?string $dumpFile = null): void
     {
         $data = [];

@@ -21,6 +21,11 @@ final class Sequence
     public int   $idx;
     public array $tokenIds;
 
+    /**
+     * @param Tokens $tokens
+     * @param int    $idx      First element in the sequence
+     * @param array  $tokenIds Ordered list of meaningful tokens
+     */
     public function __construct(Tokens $tokens, int $idx, array $tokenIds = [])
     {
         $this->tokens   = $tokens;
@@ -28,6 +33,14 @@ final class Sequence
         $this->tokenIds = $tokenIds;
     }
 
+    /**
+     * Compares two sequences for consecutive lines and
+     * same meaningful tokens.
+     *
+     * @param Sequence $sequence
+     *
+     * @return bool
+     */
     public function sameGroup(Sequence $sequence): bool
     {
         $idx = $this->prevLineBreak($sequence->idx);
@@ -37,6 +50,13 @@ final class Sequence
         return $this->match($sequence);
     }
 
+    /**
+     * Compares two sequences for same meaningful tokens.
+     *
+     * @param Sequence $sequence
+     *
+     * @return bool
+     */
     public function match(Sequence $sequence): bool
     {
         return $this->tokenIds === $sequence->tokenIds;

@@ -2,9 +2,7 @@
 <!-- Code Sniffer configuration for Polymorphine/CodeStandard package only -->
 <ruleset name="Polymorphine-cs">
     <autoload>./vendor/autoload.php</autoload>
-    <rule ref="./src/Sniffer">
-        <exclude name="Sniffer.PhpDoc.RequiredForPublicApi.Missing"/>
-    </rule>
+    <rule ref="./src/Sniffer"/>
     <rule ref="Sniffer.PhpDoc.CallableDefinition">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>

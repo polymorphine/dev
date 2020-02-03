@@ -23,17 +23,27 @@ final class ArrayContext
     private $start;
     private $end;
 
+    /**
+     * @param Tokens $tokens
+     * @param int    $start  Opening brace index of array
+     */
     public function __construct(Tokens $tokens, int $start)
     {
         $this->tokens = $tokens;
         $this->start  = $start;
     }
 
+    /**
+     * @return int Index of the closing brace
+     */
     public function lastTokenIdx(): int
     {
         return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $this->start);
     }
 
+    /**
+     * Aligns associative indentation for array and its sub arrays.
+     */
     public function alignIndentation(): void
     {
         $tokenTypes = [[CT::T_ARRAY_SQUARE_BRACE_OPEN], [T_DOUBLE_ARROW], [CT::T_ARRAY_SQUARE_BRACE_CLOSE]];
