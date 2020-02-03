@@ -16,7 +16,7 @@ use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class AlignedArrayValuesFixer implements FixerInterface
+final class AlignedArrayValuesFixer implements FixerInterface
 {
     use FixerMethods;
 

@@ -14,7 +14,7 @@ namespace Polymorphine\CodeStandards\Fixer;
 use PhpCsFixer\Tokenizer\Tokens;
 
 
-class ArrayContext
+final class ArrayContext
 {
     use FixerMethods;
 

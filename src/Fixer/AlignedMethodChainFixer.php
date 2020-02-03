@@ -17,7 +17,7 @@ use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class AlignedMethodChainFixer implements FixerInterface
+final class AlignedMethodChainFixer implements FixerInterface
 {
     use FixerMethods;
 

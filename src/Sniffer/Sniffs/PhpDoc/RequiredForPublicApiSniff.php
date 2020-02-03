@@ -18,7 +18,7 @@ use ReflectionMethod;
 use Throwable;
 
 
-class RequiredForPublicApiSniff implements Sniff
+final class RequiredForPublicApiSniff implements Sniff
 {
     private array $tokens;
 

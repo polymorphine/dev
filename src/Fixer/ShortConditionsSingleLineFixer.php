@@ -17,7 +17,7 @@ use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class ShortConditionsSingleLineFixer implements FixerInterface
+final class ShortConditionsSingleLineFixer implements FixerInterface
 {
     public function getName()
     {

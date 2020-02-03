@@ -18,7 +18,7 @@ use PHP_CodeSniffer\Config;
 require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
 
 
-class SnifferTokens
+final class SnifferTokens
 {
     use ArrayDump;
 

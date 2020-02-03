@@ -14,7 +14,7 @@ namespace Polymorphine\CodeStandards\Fixer;
 use PhpCsFixer\Tokenizer\Tokens;
 
 
-class Sequence
+final class Sequence
 {
     use FixerMethods;
 

@@ -17,7 +17,7 @@ use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
 
 
-class AlignedTypedPropertiesFixer implements FixerInterface
+final class AlignedTypedPropertiesFixer implements FixerInterface
 {
     use FixerMethods;
 

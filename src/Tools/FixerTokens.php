@@ -14,7 +14,7 @@ namespace Polymorphine\CodeStandards\Tools;
 use PhpCsFixer\Tokenizer\Tokens;
 
 
-class FixerTokens
+final class FixerTokens
 {
     use ArrayDump;
 

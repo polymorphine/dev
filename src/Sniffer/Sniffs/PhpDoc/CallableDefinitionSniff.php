@@ -15,7 +15,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 
 
-class CallableDefinitionSniff implements Sniff
+final class CallableDefinitionSniff implements Sniff
 {
     public $syntax;
     public $includeClosure = true;
@@ -74,7 +74,7 @@ class CallableDefinitionSniff implements Sniff
         if (substr($type, -2) === '[]') {
             $type = substr($type, 0, -2);
         }
-        
+
         return $type === 'callable' || ($this->includeClosure && $type === 'Closure');
     }
 }

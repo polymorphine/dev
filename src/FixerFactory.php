@@ -14,7 +14,7 @@ namespace Polymorphine\CodeStandards;
 use PhpCsFixer;
 
 
-class FixerFactory
+final class FixerFactory
 {
     const HEADER = <<<'EOF'
 This file is part of {{name}} package.
