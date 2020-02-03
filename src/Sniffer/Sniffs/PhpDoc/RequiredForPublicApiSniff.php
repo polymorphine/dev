@@ -41,7 +41,7 @@ final class RequiredForPublicApiSniff implements Sniff
 
             $isApi = $isInterface || $this->isBeforePublic($lineBreak + 1);
             if (!$isApi) { continue; }
-            $isDocumented = $this->tokens[$lineBreak - 1]['type'] === 'T_DOC_COMMENT_CLOSE_TAG';
+            $isDocumented = $this->tokens[$lineBreak - 1]['code'] === T_DOC_COMMENT_CLOSE_TAG;
             if ($isDocumented) { continue; }
 
             $undocumented[] = [$this->tokens[$idx + 2]['content'], $idx];

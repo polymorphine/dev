@@ -33,7 +33,7 @@ final class CallableDefinitionSniff implements Sniff
     public function process(File $file, $idx)
     {
         $tokens = $file->getTokens();
-        while ($idx = $file->findNext(['PHPCS_T_DOC_COMMENT_TAG'], ++$idx)) {
+        while ($idx = $file->findNext([T_DOC_COMMENT_TAG], ++$idx)) {
             $tag = $tokens[$idx]['content'];
             if ($tag !== '@param' && $tag !== '@return') { continue; }
 
