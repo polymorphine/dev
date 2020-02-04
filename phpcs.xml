@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- Code Sniffer configuration for projects using Polymorphine/CodeStandard as composer dependency -->
+<!-- Code Sniffer configuration for projects using Polymorphine coding standard as composer dependency -->
 <ruleset name="Polymorphine-project">
     <autoload>../../autoload.php</autoload>
     <rule ref="./src/Sniffer"/>

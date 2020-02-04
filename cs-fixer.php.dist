@@ -1,10 +1,10 @@
 <?php
 
-use Polymorphine\CodeStandards\FixerFactory;
+use Polymorphine\Dev\FixerFactory;
 
 $filter = function (SplFileInfo $file) {
     $samples = __DIR__ . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'CodeSamples';
     return strpos($file->getPath(), $samples) !== 0;
 };
 
-return FixerFactory::createFor('Polymorphine/CodeStandards', __DIR__, [$filter]);
+return FixerFactory::createFor('Polymorphine/Dev', __DIR__, [$filter]);

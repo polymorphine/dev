@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of Polymorphine/CodeStandards package.
+ * This file is part of Polymorphine/Dev package.
  *
  * (c) Shudd3r <q3.shudder@gmail.com>
  *
@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\CodeStandards\Tests\Sniffer\Sniffs\PhpDoc;
+namespace Polymorphine\Dev\Tests\Sniffer\Sniffs\PhpDoc;
 
-use Polymorphine\CodeStandards\Tests\SnifferTest;
-use Polymorphine\CodeStandards\Sniffer\Sniffs\PhpDoc\CallableDefinitionSniff;
+use Polymorphine\Dev\Tests\SnifferTest;
+use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\CallableDefinitionSniff;
 
 
 class CallableDefinitionSniffTest extends SnifferTest

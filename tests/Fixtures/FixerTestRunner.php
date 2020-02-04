@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of Polymorphine/CodeStandards package.
+ * This file is part of Polymorphine/Dev package.
  *
  * (c) Shudd3r <q3.shudder@gmail.com>
  *
@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\CodeStandards\Tests\Fixtures;
+namespace Polymorphine\Dev\Tests\Fixtures;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;

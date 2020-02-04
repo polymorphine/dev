@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- UNITE TEST Code Sniffer configuration for Polymorphine/CodeStandard package -->
+<!-- UNIT TEST Code Sniffer configuration for Polymorphine/Dev package -->
 <ruleset name="Polymorphine-cs">
     <autoload>./vendor/autoload.php</autoload>
     <rule ref="./src/Sniffer"/>

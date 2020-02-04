@@ -6,7 +6,7 @@
     - fixable but left for other IDEs: line ending, tab width
     - custom Polymorphine sniffs (src/Sniffer)
 -->
-<ruleset name="Polymorphine" namespace="Polymorphine\CodeStandards\Sniffer">
+<ruleset name="Polymorphine" namespace="Polymorphine\Dev\Sniffer">
     <description>Custom Polymorphine Sniffs for style errors that need to be fixed manually.</description>
     <rule ref="Sniffer.PhpDoc.CallableDefinition">
         <properties>

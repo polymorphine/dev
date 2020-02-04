@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of Polymorphine/CodeStandards package.
+ * This file is part of Polymorphine/Dev package.
  *
  * (c) Shudd3r <q3.shudder@gmail.com>
  *
@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\CodeStandards\Tests;
+namespace Polymorphine\Dev\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\CodeStandards\Tests\Fixtures\SnifferTestRunner;
+use Polymorphine\Dev\Tests\Fixtures\SnifferTestRunner;
 
 
 abstract class SnifferTest extends TestCase

@@ -1,6 +1,6 @@
 <?php
 
-namespace Polymorphine\CodeStandards\Tests\CodeSamples\Sniffs;
+namespace Polymorphine\Dev\Tests\CodeSamples\Sniffs;
 
 
 class PhpDocRequiredForParentApi

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of Polymorphine/CodeStandards package.
+ * This file is part of Polymorphine/Dev package.
  *
  * (c) Shudd3r <q3.shudder@gmail.com>
  *
@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\CodeStandards\Tests\Fixer;
+namespace Polymorphine\Dev\Tests\Fixer;
 
-use Polymorphine\CodeStandards\Tests\FixerTest;
-use Polymorphine\CodeStandards\Fixer\ConstructorsFirstFixer;
+use Polymorphine\Dev\Tests\FixerTest;
+use Polymorphine\Dev\Fixer\ConstructorsFirstFixer;
 
 
 class ConstructorsFirstFixerTest extends FixerTest

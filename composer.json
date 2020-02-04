@@ -1,6 +1,6 @@
 {
-    "name": "polymorphine/cs",
-    "description": "Code standards check & fix scripts for Polymorphine libraries",
+    "name": "polymorphine/dev",
+    "description": "Development tools & coding standard scripts for Polymorphine libraries",
     "type": "library",
     "minimum-stability": "stable",
     "require": {
@@ -21,12 +21,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Polymorphine\\CodeStandards\\": "src/"
+            "Polymorphine\\Dev\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Polymorphine\\CodeStandards\\Tests\\": "tests/"
+            "Polymorphine\\Dev\\Tests\\": "tests/"
         }
     },
     "bin": [

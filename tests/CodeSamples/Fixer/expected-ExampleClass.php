@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of Polymorphine/CodeStandards package.
+ * This file is part of Polymorphine/Dev package.
  *
  * (c) Shudd3r <q3.shudder@gmail.com>
  *
