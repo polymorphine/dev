@@ -12,6 +12,8 @@ before_install:
   - composer self-update
 
 before_script:
+  - if [ "$TEST_TYPE" = "cover" ]; then composer require --dev --no-update php-coveralls/php-coveralls ^2.0; fi;
+  - composer update $STABILITY
   - |
     run_tests() {
       if [ "$TEST_TYPE" = "style" ]; then
@@ -26,7 +28,6 @@ before_script:
         vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml;
       fi;
     }
-  - composer update $STABILITY
 script:
   - run_tests
 
