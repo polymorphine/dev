@@ -20,10 +20,10 @@ before_script:
         vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src;
         vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix tests;
 
-        vendor/bin/phpunit --no-coverage --exclude-group integrated;
+        vendor/bin/phpunit --exclude-group integrated --no-coverage;
       else
         mkdir -p build/logs;
-        vendor/bin/phpunit --exclude-group integrated;
+        vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml;
       fi;
     }
   - composer update $STABILITY
