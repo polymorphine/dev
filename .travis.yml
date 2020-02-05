@@ -8,28 +8,28 @@ env:
   - TEST_TYPE="style" STABILITY=""
 
 before_install:
-  - if [ "$TEST_TYPE" = "style" ]; then phpenv config-rm xdebug.ini; fi;
+  - if [ "$TEST_TYPE" = "style" ]; then phpenv config-rm xdebug.ini; fi
   - composer self-update
 
 before_script:
-  - if [ "$TEST_TYPE" = "cover" ]; then composer require --dev --no-update php-coveralls/php-coveralls ^2.0; fi;
+  - if [ "$TEST_TYPE" = "cover" ]; then composer require --dev --no-update php-coveralls/php-coveralls ^2.0; fi
   - composer update $STABILITY
   - |
     run_tests() {
       if [ "$TEST_TYPE" = "style" ]; then
-        vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist src;
-        vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/CodeSamples/* tests;
-        vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src;
-        vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix tests;
+        vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist src
+        vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/CodeSamples/* tests
+        vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src
+        vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix tests
 
-        vendor/bin/phpunit --exclude-group integrated --no-coverage;
+        vendor/bin/phpunit --exclude-group integrated --no-coverage
       else
-        mkdir -p build/logs;
-        vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml;
-      fi;
+        mkdir -p build/logs
+        vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml
+      fi
     }
 script:
   - run_tests
 
 after_success:
-  - if [ "$TEST_TYPE" = "cover" ]; then vendor/bin/php-coveralls; fi;
+  - if [ "$TEST_TYPE" = "cover" ]; then vendor/bin/php-coveralls; fi
