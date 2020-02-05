@@ -4,31 +4,30 @@ php:
   - 7.4
 
 env:
-  - TEST_TYPE="cover" STABILITY="--prefer-stable"
-  - TEST_TYPE="style" STABILITY=""
+  - TEST_TYPE="cover" VER_PREFS="--prefer-lowest --prefer-stable" COVERAGE="--coverage-clover build/logs/clover.xml"
+  - TEST_TYPE="style" VER_PREFS="" COVERAGE="--no-coverage"
 
 before_install:
-  - if [ "$TEST_TYPE" = "style" ]; then phpenv config-rm xdebug.ini; fi;
+  - if [ "$TEST_TYPE" = "style" ]; then phpenv config-rm xdebug.ini; fi
   - composer self-update
 
 before_script:
+  - composer update $VER_PREFS
   - |
-    run_tests() {
-      if [ "$TEST_TYPE" = "style" ]; then
-        vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist src;
-        vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/CodeSamples/* tests;
-        vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src;
-        vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix tests;
+    if [ "$TEST_TYPE" = "cover" ]; then
+      mkdir -p build/logs
+      composer require --dev php-coveralls/php-coveralls ^2.0
+    fi
 
-        vendor/bin/phpunit --no-coverage --exclude-group integrated;
-      else
-        mkdir -p build/logs;
-        vendor/bin/phpunit --exclude-group integrated;
-      fi;
-    }
-  - composer update $STABILITY
 script:
-  - run_tests
+  - |
+    if [ "$TEST_TYPE" = "style" ]; then
+      vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist src || travis_terminate 1
+      vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/CodeSamples/* tests || travis_terminate 1
+      vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src || travis_terminate 1
+      vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix tests || travis_terminate 1
+    fi
+  - vendor/bin/phpunit --exclude-group integrated $COVERAGE
 
 after_success:
-  - if [ "$TEST_TYPE" = "cover" ]; then vendor/bin/php-coveralls; fi;
+  - if [ "$TEST_TYPE" = "cover" ]; then vendor/bin/php-coveralls; fi
