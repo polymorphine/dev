@@ -1,0 +1,47 @@
+name: CI checks
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@v1
+        with:
+          php-version: "7.4"
+          coverage: pcov
+          extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
+          ini-values: assert.exception=1, zend.assertions=1
+
+      - name: "Update composer"
+        run: composer self-update
+      - name: "Validate composer.json"
+        run: composer validate
+      - name: "Add coveralls dependency"
+        run: composer require --dev --no-update php-coveralls/php-coveralls ^2.0
+      - name: "Install dependencies"
+        run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-stable
+
+      - name: "Coding standard Php-CS-Fixer checks"
+        run: |
+          $FIXER fix src tests
+        env:
+          FIXER: vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection
+      - name: "Coding standard CodeSniffer checks"
+        run: |
+          $SNIFFER src
+          $SNIFFER --ignore=*/CodeSamples/* tests
+        env:
+          SNIFFER: vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist
+
+      - name: "Create directory for coverage log"
+        run: mkdir -p build/logs
+      - name: "Run tests with PhpUnit"
+        run: vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml
+      - name: "Send coverage report to coveralls.io"
+        run: vendor/bin/php-coveralls -v
+        env:
+          COVERALLS_RUN_LOCALLY: 1
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
