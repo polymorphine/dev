@@ -1,8 +1,8 @@
-name: CI checks
+name: build
 on: [push, pull_request]
 
 jobs:
-  build:
+  full-build:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
@@ -38,7 +38,7 @@ jobs:
 
       - name: "Create directory for coverage log"
         run: mkdir -p build/logs
-      - name: "Run tests with PhpUnit"
+      - name: "Run PhpUnit tests with coverage"
         run: vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml
       - name: "Send coverage report to coveralls.io"
         run: vendor/bin/php-coveralls -v
