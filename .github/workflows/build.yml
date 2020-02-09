@@ -25,21 +25,16 @@ jobs:
         run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-stable
 
       - name: "Coding standard Php-CS-Fixer checks"
-        run: |
-          $FIXER fix src tests
-        env:
-          FIXER: vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection
+        run: vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests
       - name: "Coding standard CodeSniffer checks"
         run: |
-          $SNIFFER src
-          $SNIFFER --ignore=*/CodeSamples/* tests
-        env:
-          SNIFFER: vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist
+          vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist src
+          vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/CodeSamples/* tests
 
-      - name: "Create directory for coverage log"
-        run: mkdir -p build/logs
       - name: "Run PhpUnit tests with coverage"
-        run: vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml
+        run: |
+          mkdir -p build/logs
+          vendor/bin/phpunit --exclude-group integrated --coverage-clover build/logs/clover.xml
       - name: "Send coverage report to coveralls.io"
         run: vendor/bin/php-coveralls -v
         env:
