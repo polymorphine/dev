@@ -40,3 +40,21 @@ jobs:
         env:
           COVERALLS_RUN_LOCALLY: 1
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+  lowest-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@v1
+        with:
+          php-version: "7.4"
+          coverage: pcov
+          extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
+          ini-values: assert.exception=1, zend.assertions=1
+
+      - name: "Install lowest dependencies"
+        run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-stable --prefer-lowest
+      - name: "Run PhpUnit tests (no coverage)"
+        run: vendor/bin/phpunit --exclude-group integrated --no-coverage
