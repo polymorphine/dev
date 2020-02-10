@@ -18,8 +18,6 @@ jobs:
         run: composer self-update
       - name: "Validate composer.json"
         run: composer validate
-      - name: "Add coveralls dependency"
-        run: composer require --dev --no-update php-coveralls/php-coveralls ^2.0
       - name: "Setup composer cache"
         uses: actions/cache@v1
         with:
