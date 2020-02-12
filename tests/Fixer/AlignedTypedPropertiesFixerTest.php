@@ -25,7 +25,7 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
             
             class ExampleClass
             {
-                private Foo $foo;
+                private Foo\Bar $foo;
                 private Typed $bar;
                 public Typed $variable;
                 protected static TypedProperty $x;
@@ -35,11 +35,15 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 protected static Foo $var1;
                 protected static ?FooX $var2;
             
-                public callable $test;
+                public \Closure $test;
                 public ?object $object;
                 public SomeTypeLongest $varTyped;
                 public int $number    = 1000;
                 public array $another = ['a', 'b'];
+                private $var;
+            
+                public int   $same       = 11;
+                public array $notChanged = [];
             
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)
@@ -55,8 +59,8 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
             
             class ExampleClass
             {
-                private Foo   $foo;
-                private Typed $bar;
+                private Foo\Bar $foo;
+                private Typed   $bar;
                 public Typed $variable;
                 protected static TypedProperty $x;
                 protected static ShortType     $longVariable;
@@ -65,11 +69,15 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
                 protected static Foo   $var1;
                 protected static ?FooX $var2;
             
-                public callable        $test;
+                public \Closure        $test;
                 public ?object         $object;
                 public SomeTypeLongest $varTyped;
                 public int             $number    = 1000;
                 public array           $another = ['a', 'b'];
+                private $var;
+            
+                public int   $same       = 11;
+                public array $notChanged = [];
             
                 /** Main Constructor */
                 public function __construct(ExampleClass $self)

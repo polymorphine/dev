@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
-use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
 
 
@@ -90,32 +89,20 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
             return $this->nextSequence($end);
         }
 
-        $definition = [T_PUBLIC, T_PROTECTED, T_PRIVATE, T_STATIC];
-        $typed      = false;
-        $tokenIds   = [];
-        while ($idx < $end) {
-            $tokenId = $this->tokens[$idx]->getId();
-            if (!in_array($tokenId, $definition, true)) {
-                $typed   = true;
-                $tokenId = T_STRING;
-            }
-            $tokenIds[] = $tokenId;
-            do {
-                $idx = $this->tokens->getNextMeaningfulToken($idx);
-            } while ($this->isNullableToken($idx));
+        $tokenIds[] = $this->tokens[$idx]->getId();
+        while ($idx = $this->tokens->getNextMeaningfulToken($idx)) {
+            if ($idx === $end) { return $this->nextSequence($end); }
+            if (!$this->tokens[$idx]->isGivenKind(T_STATIC)) { break; }
+            $tokenIds[] = $this->tokens[$idx]->getId();
         }
 
-        return $typed ? new Sequence($this->tokens, $end, $tokenIds) : $this->nextSequence($end);
+        $tokenIds[] = T_STRING;
+        return new Sequence($this->tokens, $end, $tokenIds);
     }
 
     private function alignIndex(int $idx): array
     {
-        $nullableChars = $this->isNullableToken($idx - 3) ? 1 : 0;
-        return [$idx, strlen($this->tokens[$idx - 2]->getContent()) + $nullableChars];
-    }
-
-    private function isNullableToken(int $idx): bool
-    {
-        return $this->tokens[$idx]->getId() === CT::T_NULLABLE_TYPE;
+        $start = $this->tokens->getPrevTokenOfKind($idx, [[T_PRIVATE], [T_PROTECTED], [T_PUBLIC]]);
+        return [$idx, $this->indentationPointLength($start + 2, $idx - 1)];
     }
 }
