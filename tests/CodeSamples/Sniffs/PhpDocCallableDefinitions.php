@@ -20,16 +20,16 @@ class PhpDocCallableDefinitions
      * @return Closure  not definition
      * @param Closure $noDescription
      * @return Closure
-     * @param callable                     $spacedCallback       fn(Type) => array
+     * @param callable                     $spacedCallback       fn(Type) => array|null
      * @return callable fn(Type) => bool
-     * @param Closure  $short  fn(\typeOne, int) => Namespace\SomeOtherType
+     * @param Closure  $short  fn(\typeOne, ?int) => Namespace\SomeOtherType
      * @return Closure  fn(Something\NameSpace) => Type
-     * @param callable $longDefinition       function(bool, Some\Class): Type
+     * @param callable $longDefinition       function(bool, Some\Class): Type|SomethingElse|array
      * @return callable function(Type): bool
-     * @param Closure $long function(\typeOne, int, Third): Namespace\SomeOtherType
-     * @return Closure  function(Something\NameSpace): Type
+     * @param Closure $long function(\typeOne, int|float, ?Third): ?Namespace\SomeOtherType
+     * @return Closure  function(?Something\NameSpace): Type
      * @param callable|null $longDefinition       function(bool, Some\Class): Type
-     * @return Closure|null  fn(Something\NameSpace) => Type
+     * @return Closure|null  fn(?Something\NameSpace) => ?Type\Valid
      * @param callable[]|null $callback fn(Type) => bool
      * @return Closure[]|null fn(Type) => bool
      */

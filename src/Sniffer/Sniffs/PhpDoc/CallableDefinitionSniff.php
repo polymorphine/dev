@@ -21,8 +21,8 @@ final class CallableDefinitionSniff implements Sniff
     public $includeClosure = true;
 
     private $regexp = [
-        'short' => '#fn\([a-zA-Z\\\\, ]*\) => [a-zA-Z\\\\]+#',
-        'long'  => '#function\([a-zA-Z\\\\, ]*\): [a-zA-Z\\\\]+#'
+        'short' => '#fn\([?a-zA-Z\\\\, |]*\) => \??[a-zA-Z\\\\|]+#',
+        'long'  => '#function\([?a-zA-Z\\\\, |]*\): \??[a-zA-Z\\\\|]+#'
     ];
 
     public function register()
