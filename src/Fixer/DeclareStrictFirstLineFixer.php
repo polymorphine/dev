@@ -19,6 +19,8 @@ use SplFileInfo;
 
 class DeclareStrictFirstLineFixer implements FixerInterface
 {
+    private const DECLARE_DIRECTIVE = 'declare(strict_types=1);';
+
     public function getName()
     {
         return 'Polymorphine/declare_strict_first_line';
@@ -47,20 +49,15 @@ class DeclareStrictFirstLineFixer implements FixerInterface
     public function fix(SplFileInfo $file, Tokens $tokens)
     {
         $idx = $tokens->getNextTokenOfKind(0, [[T_DECLARE]]);
-        if ($idx === 1) { return; }
+        $end = $idx + 6;
 
-        $directive = $tokens[$idx + 2]->getContent();
-        if ($directive !== 'strict_types') { return; }
+        $isDirective = $tokens->generatePartialCode($idx, $end) === self::DECLARE_DIRECTIVE;
+        if (!$isDirective || !$tokens[$end + 1]->isWhitespace()) { return; }
 
         $tokens[0] = new Token([T_OPEN_TAG, '<?php ']);
+        if ($idx === 1) { return; }
 
-        $expression = [];
-        while (!$tokens[$idx]->isWhitespace()) {
-            $expression[] = $tokens[$idx];
-            $tokens[$idx] = new Token('');
-            $idx++;
-        }
-
-        $tokens->insertAt(1, $expression);
+        $tokens->clearRange($idx, $end + 1);
+        $tokens->insertAt(1, Tokens::fromCode(self::DECLARE_DIRECTIVE . "\n"));
     }
 }

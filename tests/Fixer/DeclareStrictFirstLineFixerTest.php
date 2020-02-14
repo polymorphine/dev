@@ -75,6 +75,29 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
+    public function testDeclareNotInFirstLineIsMovedWIthFollowingWhitespace()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            /* Comment */
+            declare(strict_types=1);
+            
+            echo 'declare';
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php declare(strict_types=1);
+            
+            /* Comment */
+            echo 'declare';
+            
+            CODE;
+
+        $this->assertSame($expected, $this->runner->fix($code));
+    }
+
     protected function fixer(): FixerInterface
     {
         return new DeclareStrictFirstLineFixer();
