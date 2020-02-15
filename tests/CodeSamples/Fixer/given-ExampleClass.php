@@ -6,7 +6,7 @@ use Another\Unused\Lib;
 
 use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
 
-
+declare(strict_types=1);
 /**
  * Class MyClass summary
  *
