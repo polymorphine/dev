@@ -103,6 +103,7 @@ EOF;
         self::$rules['Polymorphine/aligned_array_values']                    = true;
         self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/short_conditions_single_line']            = true;
+        self::$rules['Polymorphine/declare_strict_first_line']               = true;
 
         $finder = PhpCsFixer\Finder::create()->in($workingDir);
         foreach ($filters as $filter) {
@@ -122,7 +123,8 @@ EOF;
                 new Fixer\AlignedAssignmentsFixer(),
                 new Fixer\AlignedArrayValuesFixer(),
                 new Fixer\AlignedTypedPropertiesFixer(),
-                new Fixer\ShortConditionsSingleLineFixer()
+                new Fixer\ShortConditionsSingleLineFixer(),
+                new Fixer\DeclareStrictFirstLineFixer()
             ]);
     }
 }
