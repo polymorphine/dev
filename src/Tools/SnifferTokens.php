@@ -17,11 +17,31 @@ use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Exceptions;
 
 require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+if (!defined('PHP_CODESNIFFER_CBF')) {
+    define('PHP_CODESNIFFER_CBF', false);
+}
 
 
 final class SnifferTokens
 {
     use ArrayDump;
+
+    /**
+     * @param null|string $configFile
+     *
+     * @throws Exceptions\DeepExitException
+     *
+     * @return Runner
+     */
+    public static function runner(string $configFile = null): Runner
+    {
+        $configFile = $configFile ?: dirname(dirname(__DIR__)) . '/phpcs.xml.dist';
+        $runner     = new Runner();
+        $runner->config = new Config(['-q', '--standard=' . $configFile]);
+        $runner->init();
+
+        return $runner;
+    }
 
     /**
      * @param string      $sourceCode Php code
@@ -44,10 +64,7 @@ final class SnifferTokens
      */
     public static function dumpSourceFile(string $sourceFile, string $dumpFile = null): void
     {
-        $runner = new Runner();
-        $runner->config = new Config(['-q']);
-        $runner->init();
-
+        $runner = self::runner();
         $runner->ruleset->populateTokenListeners();
 
         $testFile = new Files\LocalFile($sourceFile, $runner->ruleset, $runner->config);
