@@ -105,6 +105,6 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/declare_strict_first_line', 'priority' => -40];
+        return ['name' => 'Polymorphine/declare_strict_first_line', 'priority' => -39];
     }
 }

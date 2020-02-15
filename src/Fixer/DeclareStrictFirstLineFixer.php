@@ -28,7 +28,7 @@ class DeclareStrictFirstLineFixer implements FixerInterface
 
     public function getPriority()
     {
-        return -40;
+        return -39;
     }
 
     public function isRisky()
