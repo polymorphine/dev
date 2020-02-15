@@ -28,3 +28,11 @@ $mixedNested = [
     ],
     3 => 'assoc'
 ];
+
+$valid = foo([
+    'one' => max(1, 7),
+    'two' => 2
+]);
+
+
+foreach ($mixedNested as $key => $value) {}

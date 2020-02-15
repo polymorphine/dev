@@ -33,29 +33,29 @@ class AmbiguousAssociativitySniff implements Sniff
 
     private function isValidArray(File $file, int $idx): bool
     {
-        $assoc    = false;
-        $expected = null;
-        while ($idx = $file->findNext([T_DOUBLE_ARROW, T_COMMA, T_OPEN_SHORT_ARRAY, T_CLOSE_SHORT_ARRAY], ++$idx)) {
+        $assoc      = false;
+        $expected   = null;
+        $tokenTypes = [T_DOUBLE_ARROW, T_COMMA, T_OPEN_SHORT_ARRAY, T_CLOSE_SHORT_ARRAY, T_OPEN_PARENTHESIS];
+        while ($idx = $file->findNext($tokenTypes, ++$idx)) {
             $type = $this->tokens[$idx]['code'];
             switch ($type) {
-                case T_CLOSE_SHORT_ARRAY:
-                    break 2;
                 case T_OPEN_SHORT_ARRAY:
                     $idx = $this->tokens[$idx]['bracket_closer'];
                     break;
-                case T_COMMA:
-                    if (isset($this->tokens[$idx]['nested_parenthesis'])) {
-                        $idx = array_values($this->tokens[$idx]['nested_parenthesis'])[0];
-                        break;
-                    }
-                    if ($expected === T_DOUBLE_ARROW) { return false; }
-                    $expected = $assoc ? T_DOUBLE_ARROW : T_COMMA;
+                case T_OPEN_PARENTHESIS:
+                    $idx = $this->tokens[$idx]['parenthesis_closer'];
                     break;
                 case T_DOUBLE_ARROW:
                     if ($expected === T_COMMA) { return false; }
                     $assoc    = true;
                     $expected = T_COMMA;
                     break;
+                case T_COMMA:
+                    if ($expected === T_DOUBLE_ARROW) { return false; }
+                    $expected = $assoc ? T_DOUBLE_ARROW : T_COMMA;
+                    break;
+                case T_CLOSE_SHORT_ARRAY:
+                    break 2;
             }
         }
         return $expected === T_DOUBLE_ARROW ? $this->isTrailingComma($idx) : true;
