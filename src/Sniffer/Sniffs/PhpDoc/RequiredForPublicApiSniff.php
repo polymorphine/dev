@@ -37,10 +37,9 @@ final class RequiredForPublicApiSniff implements Sniff
 
         $undocumented = [];
         while ($idx = $file->findNext([T_FUNCTION], ++$idx)) {
-            $lineBreak = $this->previousLineBreak($idx);
+            if (!$isInterface && !$this->isApi($idx)) { continue; }
 
-            $isApi = $isInterface || $this->isBeforePublic($lineBreak + 1);
-            if (!$isApi) { continue; }
+            $lineBreak    = $this->previousLineBreak($idx);
             $isDocumented = $this->tokens[$lineBreak - 1]['code'] === T_DOC_COMMENT_CLOSE_TAG;
             if ($isDocumented) { continue; }
 
@@ -109,12 +108,8 @@ final class RequiredForPublicApiSniff implements Sniff
         return $idx;
     }
 
-    private function isBeforePublic(int $idx): bool
+    private function isApi(int $idx): bool
     {
-        $searchNext = [T_PUBLIC, T_PRIVATE, T_PROTECTED, T_FUNCTION];
-        while (!in_array($this->tokens[$idx]['code'], $searchNext, true)) {
-            $idx++;
-        }
-        return $this->tokens[$idx]['code'] === T_PUBLIC;
+        return $this->tokens[$idx - 2]['code'] === T_PUBLIC;
     }
 }

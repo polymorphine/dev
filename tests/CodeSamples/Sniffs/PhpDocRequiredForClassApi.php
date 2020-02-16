@@ -14,4 +14,5 @@ class PhpDocRequiredForClassApi extends PhpDocRequiredForParentApi implements Ph
     public function originalMethodWithoutDoc() {}
     public function interfaceMethodA(int $value): bool { return true; }
     public function interfaceMethodB(array $test): PhpDocRequiredForInterfaceApi { return $this; }
+    public static function staticConstructor(): self { return new self(); }
 }
