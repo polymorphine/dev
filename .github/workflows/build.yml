@@ -14,8 +14,6 @@ jobs:
           coverage: pcov
           extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
           ini-values: assert.exception=1, zend.assertions=1
-      - name: "Update composer"
-        run: composer self-update
       - name: "Validate composer.json"
         run: composer validate
       - name: "Setup composer cache"
