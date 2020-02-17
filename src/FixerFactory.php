@@ -67,7 +67,7 @@ EOF;
         'php_unit_test_class_requires_covers'   => false,
         'phpdoc_add_missing_param_annotation'   => true,
         'phpdoc_order'                          => true,
-        'phpdoc_types_order'                    => true,
+        'phpdoc_types_order'                    => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
         'pow_to_exponentiation'                 => true,
         'psr4'                                  => true,
         'simplified_null_return'                => false,
