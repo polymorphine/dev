@@ -26,8 +26,5 @@
         "psr-4": {
             "Polymorphine\\Dev\\Tests\\": "tests/"
         }
-    },
-    "bin": [
-        "polymorphine-cs"
-    ]
+    }
 }
