@@ -8,7 +8,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v2
       - name: "Install PHP with extensions"
-        uses: shivammathur/setup-php@v1
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "7.4"
           coverage: pcov
@@ -47,10 +47,10 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v2
       - name: "Install PHP with extensions"
-        uses: shivammathur/setup-php@v1
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "7.4"
-          coverage: pcov
+          coverage: none
           extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Setup composer cache"
