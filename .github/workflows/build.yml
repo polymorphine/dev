@@ -3,16 +3,36 @@ on: [push, pull_request]
 
 jobs:
   full-build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ["7.4"]
+    env:
+      extensions: pcov, dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
+      key: cache-v1
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
-      - name: "Install PHP with extensions"
-        uses: shivammathur/setup-php@v1
+      - name: "Setup PHP extensions cache environment"
+        id: cache-env
+        uses: shivammathur/cache-extensions@v1
         with:
-          php-version: "7.4"
+          php-version: ${{ matrix.php-versions }}
+          extensions: ${{ env.extensions }}
+          key: ${{ env.key }}
+      - name: "Cache PHP extensions"
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.cache-env.outputs.dir }}
+          key: ${{ steps.cache-env.outputs.key }}
+          restore-keys: ${{ steps.cache-env.outputs.key }}
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
           coverage: pcov
-          extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
+          extensions: ${{ env.extensions }}
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Validate composer.json"
         run: composer validate
@@ -42,16 +62,36 @@ jobs:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
   lowest-build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ["7.4"]
+    env:
+      extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
+      key: cache-v1
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
-      - name: "Install PHP with extensions"
-        uses: shivammathur/setup-php@v1
+      - name: "Setup PHP extensions cache environment"
+        id: cache-env
+        uses: shivammathur/cache-extensions@v1
         with:
-          php-version: "7.4"
-          coverage: pcov
-          extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
+          php-version: ${{ matrix.php-versions }}
+          extensions: ${{ env.extensions }}
+          key: ${{ env.key }}
+      - name: "Cache PHP extensions"
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.cache-env.outputs.dir }}
+          key: ${{ steps.cache-env.outputs.key }}
+          restore-keys: ${{ steps.cache-env.outputs.key }}
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          coverage: none
+          extensions: ${{ env.extensions }}
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Setup composer cache"
         uses: actions/cache@v1
