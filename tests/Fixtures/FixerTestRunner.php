@@ -68,7 +68,7 @@ class FixerTestRunner
             }
         }
 
-        return  $tokens->generateCode();
+        return $tokens->generateCode();
     }
 
     private function applyFixer(Tokens $tokens, FixerInterface $fixer, SplFileInfo $file): ?string
