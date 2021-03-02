@@ -25,7 +25,7 @@ This source file is subject to the MIT license that is bundled
 with this source code in the file LICENSE.
 EOF;
 
-    protected static $rules = [
+    private static $rules = [
         '@Symfony'                              => true,
         'align_multiline_comment'               => true,
         'backtick_to_shell_exec'                => true,
