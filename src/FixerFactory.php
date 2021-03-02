@@ -62,6 +62,7 @@ EOF;
         'ordered_class_elements'                => true,
         'ordered_imports'                       => false,
         'php_unit_strict'                       => false,
+        'php_unit_method_casing'                => false,
         'php_unit_namespaced'                   => true,
         'php_unit_test_annotation'              => false,
         'php_unit_test_class_requires_covers'   => false,
