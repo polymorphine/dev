@@ -22,7 +22,7 @@ jobs:
           extensions: ${{ env.extensions }}
           key: ${{ env.key }}
       - name: "Cache PHP extensions"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -36,13 +36,15 @@ jobs:
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Validate composer.json"
         run: composer validate
+      - name: "Set composer cache directory"
+        id: composer-cache-full-build
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: "Setup composer cache"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ~/.composer/cache
-          key: composer-full-build-cache-${{ hashFiles('**/composer.json') }}
-          restore-keys: |
-            composer-full-build-cache-
+          path: ${{ steps.composer-cache-full-build.outputs.dir }}
+          key: ${{ runner.os }}-composer-full-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-full-
       - name: "Install highest dependencies"
         run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-stable
       - name: "Coding standard Php-CS-Fixer checks"
@@ -81,7 +83,7 @@ jobs:
           extensions: ${{ env.extensions }}
           key: ${{ env.key }}
       - name: "Cache PHP extensions"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -93,13 +95,15 @@ jobs:
           coverage: none
           extensions: ${{ env.extensions }}
           ini-values: assert.exception=1, zend.assertions=1
+      - name: "Set composer cache directory"
+        id: composer-cache-lowest-build
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: "Setup composer cache"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ~/.composer/cache
-          key: composer-lowest-build-cache-${{ hashFiles('**/composer.json') }}
-          restore-keys: |
-            composer-lowest-build-cache-
+          path: ${{ steps.composer-cache-lowest-build.outputs.dir }}
+          key: ${{ runner.os }}-composer-low-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-low-
       - name: "Install lowest dependencies"
         run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-stable --prefer-lowest
       - name: "Run PhpUnit tests (no coverage)"
