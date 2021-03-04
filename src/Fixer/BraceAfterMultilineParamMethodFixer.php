@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -26,12 +26,12 @@ class BraceAfterMultilineParamMethodFixer implements FixerInterface
 {
     use FixerMethods;
 
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/brace_after_multiline_param_method';
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         $classConstruct = $tokens->isAnyTokenKindsFound([T_CLASS, T_TRAIT]);
         return $classConstruct && $tokens->isTokenKindFound(T_FUNCTION);
@@ -52,7 +52,7 @@ class BraceAfterMultilineParamMethodFixer implements FixerInterface
         return -40;
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = $tokens;
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -20,9 +20,9 @@ use PHP_CodeSniffer\Util;
 
 class SnifferTestRunner
 {
-    private Ruleset $ruleset;
-    private Config  $config;
-    private array   $properties;
+    private ?Ruleset $ruleset;
+    private ?Config  $config;
+    private array    $properties;
 
     public function __construct(string $sniffClass)
     {
@@ -48,7 +48,7 @@ class SnifferTestRunner
         return $testFile;
     }
 
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): void
     {
         $this->properties = $properties;
     }

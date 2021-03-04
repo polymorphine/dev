@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -20,32 +20,32 @@ final class ConstructorsFirstFixer implements FixerInterface
 {
     private Tokens $tokens;
 
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/constructors_first';
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return -40;
     }
 
-    public function isRisky()
+    public function isRisky(): bool
     {
         return false;
     }
 
-    public function supports(SplFileInfo $file)
+    public function supports(SplFileInfo $file): bool
     {
         return true;
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isAllTokenKindsFound([T_CLASS, T_FUNCTION]);
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = $tokens;
 
@@ -60,7 +60,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         }
 
         $classTypes          = $this->getClassTypes($classIdx);
-        $isStaticConstructor = fn ($idx) => $this->isStaticConstructor($idx, $classTypes);
+        $isStaticConstructor = fn (int $idx) => $this->isStaticConstructor($idx, $classTypes);
 
         $insertIdx = $this->getMethodIdx($insertIdx, $isStaticConstructor, false);
         if (!$insertIdx) { return; }
@@ -111,7 +111,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $insertIdx + count($methodTokens);
     }
 
-    private function extractMethod($idx): array
+    private function extractMethod(int $idx): array
     {
         $beginBlock = $this->tokens->getNextTokenOfKind($idx, ['{']);
         $endBlock   = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock);

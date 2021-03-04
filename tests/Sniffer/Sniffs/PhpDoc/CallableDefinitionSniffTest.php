@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -29,7 +29,7 @@ class CallableDefinitionSniffTest extends SnifferTest
         $this->assertWarningLines('./tests/CodeSamples/Sniffs/PhpDocCallableDefinitions.php', $expectedWarningLines);
     }
 
-    public function properties()
+    public function properties(): array
     {
         return [
             [['syntax' => 'both', 'includeClosure' => false], range(15, 18)],

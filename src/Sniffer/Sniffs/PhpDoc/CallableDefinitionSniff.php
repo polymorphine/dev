@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -17,28 +17,28 @@ use PHP_CodeSniffer\Files\File;
 
 final class CallableDefinitionSniff implements Sniff
 {
-    public $syntax;
-    public $includeClosure = true;
+    public string $syntax;
+    public bool   $includeClosure = true;
 
     private $regexp = [
         'short' => '#fn\([?a-zA-Z\\\\, |]*\) => \??[a-zA-Z\\\\|]+#',
         'long'  => '#function\([?a-zA-Z\\\\, |]*\): \??[a-zA-Z\\\\|]+#'
     ];
 
-    public function register()
+    public function register(): array
     {
         return [T_CLASS, T_TRAIT, T_INTERFACE];
     }
 
-    public function process(File $file, $idx)
+    public function process(File $phpcsFile, $stackPtr): void
     {
-        $tokens = $file->getTokens();
-        while ($idx = $file->findNext([T_DOC_COMMENT_TAG], ++$idx)) {
-            $tag = $tokens[$idx]['content'];
+        $tokens = $phpcsFile->getTokens();
+        while ($stackPtr = $phpcsFile->findNext([T_DOC_COMMENT_TAG], ++$stackPtr)) {
+            $tag = $tokens[$stackPtr]['content'];
             if ($tag !== '@param' && $tag !== '@return') { continue; }
 
-            if (!$this->validDescription($tokens[$idx + 2]['content'], $tag === '@param')) {
-                $file->addWarning('Callable param description should contain definition', $idx, 'Found');
+            if (!$this->validDescription($tokens[$stackPtr + 2]['content'], $tag === '@param')) {
+                $phpcsFile->addWarning('Callable param description should contain definition', $stackPtr, 'Found');
             }
         }
     }

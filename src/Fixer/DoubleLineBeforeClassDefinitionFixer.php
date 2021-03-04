@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -19,12 +19,12 @@ use SplFileInfo;
 
 final class DoubleLineBeforeClassDefinitionFixer implements FixerInterface
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/double_line_before_class_definition';
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isAnyTokenKindsFound([T_TRAIT, T_INTERFACE, T_CLASS]);
     }
@@ -44,7 +44,7 @@ final class DoubleLineBeforeClassDefinitionFixer implements FixerInterface
         return -40;
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $definition = $tokens->getNextTokenOfKind(0, [[T_CLASS], [T_INTERFACE], [T_TRAIT]]);
         $idx        = $tokens->getPrevMeaningfulToken($definition);

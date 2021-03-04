@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -19,12 +19,12 @@ use SplFileInfo;
 
 final class BraceAfterFunctionFixer implements FixerInterface
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/brace_after_method';
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isTokenKindFound(T_FUNCTION);
     }
@@ -44,7 +44,7 @@ final class BraceAfterFunctionFixer implements FixerInterface
         return -40;
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
             if (!$token->isGivenKind(T_FUNCTION)) { continue; }

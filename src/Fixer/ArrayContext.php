@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -19,9 +19,7 @@ final class ArrayContext
 {
     use FixerMethods;
 
-    private $tokens;
-    private $start;
-    private $end;
+    private int $start;
 
     /**
      * @param Tokens $tokens
@@ -75,7 +73,7 @@ final class ArrayContext
         return !$isComma && !$this->tokens[$lineEnd + 1]->isGivenKind(CT::T_ARRAY_SQUARE_BRACE_CLOSE);
     }
 
-    private function isMultipleAssign(int $firstArrow, int $lineEnd): int
+    private function isMultipleAssign(int $firstArrow, int $lineEnd): bool
     {
         $last = $this->tokens->getPrevTokenOfKind($lineEnd, [[T_DOUBLE_ARROW], [CT::T_ARRAY_SQUARE_BRACE_CLOSE]]);
         if ($this->tokens[$last]->isGivenKind(CT::T_ARRAY_SQUARE_BRACE_CLOSE)) {

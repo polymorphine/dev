@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -20,56 +20,56 @@ use SplFileInfo;
 
 final class NoTrailingCommaInMultilineArrayFixer implements FixerInterface
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/no_trailing_comma_after_multiline_array';
     }
 
-    public function isRisky()
+    public function isRisky(): bool
     {
         return false;
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return -40;
     }
 
-    public function supports(SplFileInfo $file)
+    public function supports(SplFileInfo $file): bool
     {
         return true;
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isAnyTokenKindsFound([T_ARRAY, CT::T_ARRAY_SQUARE_BRACE_OPEN]);
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $tokensAnalyzer = new TokensAnalyzer($tokens);
 
-        for ($index = $tokens->count() - 1; $index >= 0; --$index) {
-            if ($tokensAnalyzer->isArray($index) && $tokensAnalyzer->isArrayMultiLine($index)) {
-                $this->fixArray($tokens, $index);
+        for ($idx = $tokens->count() - 1; $idx >= 0; --$idx) {
+            if ($tokensAnalyzer->isArray($idx) && $tokensAnalyzer->isArrayMultiLine($idx)) {
+                $this->fixArray($tokens, $idx);
             }
         }
     }
 
-    private function fixArray(Tokens $tokens, $index)
+    private function fixArray(Tokens $tokens, int $idx): void
     {
-        $startIndex = $index;
+        $startIdx = $idx;
 
-        if ($tokens[$startIndex]->isGivenKind(T_ARRAY)) {
-            $startIndex = $tokens->getNextTokenOfKind($startIndex, ['(']);
-            $endIndex   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $startIndex);
+        if ($tokens[$startIdx]->isGivenKind(T_ARRAY)) {
+            $startIdx = $tokens->getNextTokenOfKind($startIdx, ['(']);
+            $endIdx   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $startIdx);
         } else {
-            $endIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $startIndex);
+            $endIdx = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $startIdx);
         }
 
-        $beforeEndIndex = $tokens->getPrevMeaningfulToken($endIndex);
-        $beforeEndToken = $tokens[$beforeEndIndex];
+        $beforeEndIdx   = $tokens->getPrevMeaningfulToken($endIdx);
+        $beforeEndToken = $tokens[$beforeEndIdx];
 
-        if ($beforeEndToken->equals(',')) { $tokens->clearAt($beforeEndIndex); }
+        if ($beforeEndToken->equals(',')) { $tokens->clearAt($beforeEndIdx); }
     }
 }

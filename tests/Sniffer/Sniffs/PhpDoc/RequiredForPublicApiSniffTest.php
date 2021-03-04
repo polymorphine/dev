@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -28,7 +28,7 @@ class RequiredForPublicApiSniffTest extends SnifferTest
         $this->assertWarningLines($filename, $warningLines);
     }
 
-    public function classFileWarnings()
+    public function classFileWarnings(): array
     {
         return [
             'interface' => ['./tests/CodeSamples/Sniffs/PhpDocRequiredForInterfaceApi.php', [12]],

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -13,6 +13,7 @@ namespace Polymorphine\Dev\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\Dev\FixerFactory;
+use Polymorphine\Dev\Tests\Fixtures\FixerTestRunner;
 
 
 /**
@@ -20,12 +21,12 @@ use Polymorphine\Dev\FixerFactory;
  */
 class CompoundFixerTest extends TestCase
 {
-    private $runner;
+    private FixerTestRunner $runner;
 
     protected function setUp(): void
     {
         $config = FixerFactory::createFor('Polymorphine/Dev', __DIR__);
-        $this->runner = Fixtures\FixerTestRunner::withConfig($config);
+        $this->runner = FixerTestRunner::withConfig($config);
     }
 
     /**
@@ -34,13 +35,13 @@ class CompoundFixerTest extends TestCase
      * @param string $fileExpected
      * @param string $fileGiven
      */
-    public function testFixedFiles_MatchExpectations($fileExpected, $fileGiven)
+    public function testFixedFiles_MatchExpectations(string $fileExpected, string $fileGiven)
     {
         $sourceCode = file_get_contents($fileGiven);
         $this->assertSame(file_get_contents($fileExpected), $this->runner->fix($sourceCode));
     }
 
-    public function fileList()
+    public function fileList(): array
     {
         $files = [];
         foreach (array_diff(scandir(__DIR__ . '/CodeSamples/Fixer'), ['..', '.']) as $file) {

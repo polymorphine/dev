@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -11,21 +11,22 @@
 
 namespace Polymorphine\Dev;
 
-use PhpCsFixer;
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
 
 
 final class FixerFactory
 {
     const HEADER = <<<'EOF'
-This file is part of {{name}} package.
+        This file is part of {{name}} package.
+        
+        (c) Shudd3r <q3.shudder@gmail.com>
+        
+        This source file is subject to the MIT license that is bundled
+        with this source code in the file LICENSE.
+        EOF;
 
-(c) Shudd3r <q3.shudder@gmail.com>
-
-This source file is subject to the MIT license that is bundled
-with this source code in the file LICENSE.
-EOF;
-
-    private static $rules = [
+    private static array $rules = [
         '@Symfony'                              => true,
         'align_multiline_comment'               => true,
         'backtick_to_shell_exec'                => true,
@@ -84,11 +85,11 @@ EOF;
     /**
      * @param string     $packageName
      * @param string     $workingDir
-     * @param callable[] $filters     fn(\SplFileInfo) => bool - false will ignore file
+     * @param callable[] $filters     fn(SplFileInfo) => bool - false will ignore file
      *
-     * @return PhpCsFixer\Config|PhpCsFixer\ConfigInterface
+     * @return Config
      */
-    public static function createFor(string $packageName, string $workingDir, array $filters = [])
+    public static function createFor(string $packageName, string $workingDir, array $filters = []): Config
     {
         self::$rules['header_comment']['header'] = str_replace('{{name}}', $packageName, self::HEADER);
         self::$rules['no_extra_blank_lines']['tokens'] = [
@@ -107,12 +108,12 @@ EOF;
         self::$rules['Polymorphine/declare_strict_first_line']               = true;
         self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
-        $finder = PhpCsFixer\Finder::create()->in($workingDir);
+        $finder = Finder::create()->in($workingDir);
         foreach ($filters as $filter) {
             $finder = $finder->filter($filter);
         }
 
-        $config = new PhpCsFixer\Config();
+        $config = new Config();
         return $config
             ->setRiskyAllowed(true)
             ->setRules(self::$rules)

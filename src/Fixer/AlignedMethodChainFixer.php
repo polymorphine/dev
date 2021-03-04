@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -21,15 +21,12 @@ final class AlignedMethodChainFixer implements FixerInterface
 {
     use FixerMethods;
 
-    /** @var Tokens */
-    private $tokens;
-
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/aligned_method_chain';
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         if (!$arrows = $tokens->findGivenKind(T_OBJECT_OPERATOR)) {
             return false;
@@ -68,10 +65,10 @@ final class AlignedMethodChainFixer implements FixerInterface
         }
     }
 
-    private function findNextChain($search)
+    private function findNextChain(int $search): ?int
     {
         $idx = $this->tokens->getNextTokenOfKind($search, [[T_OBJECT_OPERATOR]]);
-        if (!$idx) { return false; }
+        if (!$idx) { return null; }
 
         if ($this->tokens[$idx - 1]->isWhitespace() || !$this->isStartOfMultilineChain($idx)) {
             return $this->findNextChain($idx);
@@ -80,7 +77,7 @@ final class AlignedMethodChainFixer implements FixerInterface
         return $idx;
     }
 
-    private function isStartOfMultilineChain($idx)
+    private function isStartOfMultilineChain(int $idx): bool
     {
         $next = ($this->tokens[$idx + 2]->getContent() === '(') ? $this->findClosing($idx + 2) + 1 : $idx + 2;
         if ($this->tokens[$next]->isWhitespace() && $this->tokens[$next + 1]->isGivenKind(T_OBJECT_OPERATOR)) {
@@ -90,14 +87,14 @@ final class AlignedMethodChainFixer implements FixerInterface
         return $this->tokens[$next]->isGivenKind(T_OBJECT_OPERATOR) ? $this->isStartOfMultilineChain($next) : false;
     }
 
-    private function indentationLength($idx): int
+    private function indentationLength(int $idx): int
     {
         $lineBreak = $this->prevLineBreak($idx);
         $code      = $this->tokens->generatePartialCode($lineBreak, $idx - 1);
         return $this->codeLength($code);
     }
 
-    private function alignChain($idx, $indent): void
+    private function alignChain(int $idx, int $indent): void
     {
         $next = $this->nextIndentation($idx + 2, $indent);
         if (!$next) { return; }
@@ -117,7 +114,7 @@ final class AlignedMethodChainFixer implements FixerInterface
         if ($idx) { $this->alignChain($idx, $indent); }
     }
 
-    private function nextIndentation($idx, $indent)
+    private function nextIndentation(int $idx, int $indent): ?int
     {
         if ($this->tokens[$idx]->getContent() !== '(') {
             return $this->tokens[$idx]->isWhitespace() ? $idx : null;
@@ -133,7 +130,7 @@ final class AlignedMethodChainFixer implements FixerInterface
         return $next;
     }
 
-    private function findClosing($idx)
+    private function findClosing(int $idx): ?int
     {
         $parenthesis = $this->tokens->getNextTokenOfKind($idx, ['(', ')']);
 
@@ -145,7 +142,7 @@ final class AlignedMethodChainFixer implements FixerInterface
         return $parenthesis;
     }
 
-    private function indentMultilineParam($idx, $end, $indent)
+    private function indentMultilineParam(int $idx, int $end, int $indent): void
     {
         $minLevel = $this->codeLength($this->tokens[$idx]->getContent());
 

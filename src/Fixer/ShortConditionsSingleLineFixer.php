@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -19,12 +19,12 @@ use SplFileInfo;
 
 final class ShortConditionsSingleLineFixer implements FixerInterface
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/short_conditions_single_line';
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isTokenKindFound(T_IF);
     }
@@ -44,7 +44,7 @@ final class ShortConditionsSingleLineFixer implements FixerInterface
         return -40;
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($this->possibleFixes($tokens) as $idx => [$begin, $end]) {
             if ($this->singleLineLength($tokens, $idx, $begin, $end) > 80) {
@@ -57,7 +57,7 @@ final class ShortConditionsSingleLineFixer implements FixerInterface
         }
     }
 
-    private function singleLineLength(Tokens $tokens, $idx, $bodyStart, $bodyEnd)
+    private function singleLineLength(Tokens $tokens, int $idx, int $bodyStart, int $bodyEnd): int
     {
         $proto  = [];
         $indent = $tokens[$idx - 1]->getContent();
@@ -78,13 +78,10 @@ final class ShortConditionsSingleLineFixer implements FixerInterface
         return strlen($code);
     }
 
-    private function possibleFixes(Tokens $tokens)
+    private function possibleFixes(Tokens $tokens): array
     {
         $possibleFixes = [];
-
-        if (!$conditions = $tokens->findGivenKind(T_IF)) { return false; }
-
-        foreach ($conditions as $idx => $token) {
+        foreach ($tokens->findGivenKind(T_IF) as $idx => $token) {
             $bodyStart = $tokens->getNextTokenOfKind($idx, ['{']);
             $bodyEnd   = $tokens->getNextTokenOfKind($bodyStart, ['}']);
             $nextOpen  = $tokens->getNextTokenOfKind($bodyStart, ['{']);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -22,15 +22,12 @@ final class AlignedAssignmentsFixer implements FixerInterface
 
     private const TYPES = [T_VARIABLE, T_CONST, T_PUBLIC, T_PROTECTED, T_PRIVATE];
 
-    /** @var Tokens */
-    private $tokens;
-
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/aligned_assignments';
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isTokenKindFound('=');
     }
@@ -50,7 +47,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
         return -40;
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = $tokens;
 
@@ -72,7 +69,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
         }
     }
 
-    private function findSiblings($newLine, $assign)
+    private function findSiblings(int $newLine, int $assign): ?array
     {
         $siblings  = [];
         $signature = $this->getTokenSignature($newLine, $assign);
@@ -89,7 +86,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
         return $siblings;
     }
 
-    private function findNextSibling($idx, $signature)
+    private function findNextSibling(int $idx, array $signature): ?array
     {
         $newLine = $this->nextLineBreak($idx);
         if (!$newLine || !$this->isNextLine($newLine)) { return null; }
@@ -104,7 +101,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
         return [$assign, $this->indentationPointLength($newLine, $assign)];
     }
 
-    private function getTokenSignature($idx, $assign)
+    private function getTokenSignature(int $idx, int $assign): array
     {
         $signature = [];
         while (++$idx <= $assign) {
@@ -113,7 +110,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
         return $signature;
     }
 
-    private function isPureAssignment($newLine, $assign)
+    private function isPureAssignment(int $newLine, int $assign): bool
     {
         $endLine = $this->nextLineBreak($assign);
         if ($this->tokens[$endLine - 1]->getContent() !== ';') {
@@ -127,10 +124,10 @@ final class AlignedAssignmentsFixer implements FixerInterface
             if ($this->tokens[$idx]->getContent() === '(') { return false; }
         }
 
-        return $assign;
+        return true;
     }
 
-    private function validAssignType($newLine)
+    private function validAssignType(int $newLine): bool
     {
         $token = $this->tokens[$newLine + 1];
 
@@ -141,7 +138,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
         return $token->isGivenKind(self::TYPES);
     }
 
-    private function isStaticAssign($newLine)
+    private function isStaticAssign(int $newLine): bool
     {
         $operator = $this->tokens[$newLine + 2]->isGivenKind(T_PAAMAYIM_NEKUDOTAYIM);
         return $operator && $this->tokens[$newLine + 3]->isGivenKind(T_VARIABLE);

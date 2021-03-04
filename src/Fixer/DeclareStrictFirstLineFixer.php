@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -19,45 +19,45 @@ use SplFileInfo;
 
 class DeclareStrictFirstLineFixer implements FixerInterface
 {
-    private const DECLARE_DIRECTIVE = 'declare(strict_types=1);';
+    private const STRICT_TYPES = 'declare(strict_types=1);';
 
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/declare_strict_first_line';
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return -39;
     }
 
-    public function isRisky()
+    public function isRisky(): bool
     {
         return false;
     }
 
-    public function supports(SplFileInfo $file)
+    public function supports(SplFileInfo $file): bool
     {
         return true;
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens[0]->getContent() === "<?php\n" && $tokens->isTokenKindFound(T_DECLARE);
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $idx = $tokens->getNextTokenOfKind(0, [[T_DECLARE]]);
         $end = $idx + 6;
 
-        $isDirective = $tokens->generatePartialCode($idx, $end) === self::DECLARE_DIRECTIVE;
+        $isDirective = $tokens->generatePartialCode($idx, $end) === self::STRICT_TYPES;
         if (!$isDirective || !$tokens[$end + 1]->isWhitespace()) { return; }
 
         $tokens[0] = new Token([T_OPEN_TAG, '<?php ']);
         if ($idx === 1) { return; }
 
         $tokens->clearRange($idx, $end + 1);
-        $tokens->insertAt(1, Tokens::fromCode(self::DECLARE_DIRECTIVE . "\n"));
+        $tokens->insertAt(1, Tokens::fromCode(self::STRICT_TYPES . "\n"));
     }
 }

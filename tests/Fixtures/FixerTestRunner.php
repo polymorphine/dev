@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -23,7 +23,7 @@ use SplFileInfo;
 
 class FixerTestRunner
 {
-    private $fixers;
+    private array $fixers;
 
     /**
      * @param FixerInterface[] $fixers
@@ -61,11 +61,8 @@ class FixerTestRunner
 
         $tokens = Tokens::fromCode($sourceCode);
 
-        $appliedFixers = [];
         foreach ($this->fixers as $fixer) {
-            if ($applied = $this->applyFixer($tokens, $fixer, $file)) {
-                $appliedFixers[] = $applied;
-            }
+            $this->applyFixer($tokens, $fixer, $file);
         }
 
         return $tokens->generateCode();

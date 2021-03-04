@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -20,32 +20,32 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
 {
     use FixerMethods;
 
-    public function getName()
+    public function getName(): string
     {
         return 'Polymorphine/aligned_properties';
     }
 
-    public function isRisky()
+    public function isRisky(): bool
     {
         return false;
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return -39;
     }
 
-    public function supports(SplFileInfo $file)
+    public function supports(SplFileInfo $file): bool
     {
         return true;
     }
 
-    public function isCandidate(Tokens $tokens)
+    public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isAnyTokenKindsFound([T_CLASS, T_TRAIT]);
     }
 
-    public function fix(SplFileInfo $file, Tokens $tokens)
+    public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = $tokens;
 
@@ -56,7 +56,7 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
         }
     }
 
-    private function findGroups($idx): array
+    private function findGroups(int $idx): array
     {
         $groups = [];
         $group  = [];

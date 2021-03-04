@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -24,12 +24,12 @@ abstract class SnifferTest extends TestCase
         $this->runner = new SnifferTestRunner($this->sniffer());
     }
 
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): void
     {
         $this->runner->setProperties($properties);
     }
 
-    public function assertWarningLines(string $filename, array $expectedWarningLines)
+    public function assertWarningLines(string $filename, array $expectedWarningLines): void
     {
         $fileWarnings = $this->runner->sniff($filename)->getWarnings();
         $this->assertEquals($expectedWarningLines, array_keys($fileWarnings));

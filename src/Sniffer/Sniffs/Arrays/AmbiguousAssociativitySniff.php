@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -17,18 +17,18 @@ use PHP_CodeSniffer\Files\File;
 
 class AmbiguousAssociativitySniff implements Sniff
 {
-    private $tokens;
+    private array $tokens;
 
-    public function register()
+    public function register(): array
     {
         return [T_OPEN_SHORT_ARRAY];
     }
 
-    public function process(File $file, $idx)
+    public function process(File $phpcsFile, $stackPtr): void
     {
-        $this->tokens = $file->getTokens();
-        if ($this->isValidArray($file, $idx)) { return; }
-        $file->addWarning('Array should be either associative or list of values', $idx, 'Found');
+        $this->tokens = $phpcsFile->getTokens();
+        if ($this->isValidArray($phpcsFile, $stackPtr)) { return; }
+        $phpcsFile->addWarning('Array should be either associative or list of values', $stackPtr, 'Found');
     }
 
     private function isValidArray(File $file, int $idx): bool

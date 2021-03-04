@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -22,36 +22,36 @@ final class RequiredForPublicApiSniff implements Sniff
 {
     private array $tokens;
 
-    public function register()
+    public function register(): array
     {
         return [T_CLASS, T_TRAIT, T_INTERFACE];
     }
 
-    public function process(File $file, $idx)
+    public function process(File $phpcsFile, $stackPtr): void
     {
-        $this->tokens = $file->getTokens();
+        $this->tokens = $phpcsFile->getTokens();
 
-        $isInterface = $this->tokens[$idx]['code'] === T_INTERFACE;
-        $isOrigin    = $isInterface || $this->tokens[$idx]['code'] === T_TRAIT;
-        $className   = $isOrigin ? null : $this->getClassName($idx, $file);
+        $isInterface = $this->tokens[$stackPtr]['code'] === T_INTERFACE;
+        $isOrigin    = $isInterface || $this->tokens[$stackPtr]['code'] === T_TRAIT;
+        $className   = $isOrigin ? null : $this->getClassName($stackPtr, $phpcsFile);
 
         $undocumented = [];
-        while ($idx = $file->findNext([T_FUNCTION], ++$idx)) {
-            if (!$isInterface && !$this->isApi($idx)) { continue; }
+        while ($stackPtr = $phpcsFile->findNext([T_FUNCTION], ++$stackPtr)) {
+            if (!$isInterface && !$this->isApi($stackPtr)) { continue; }
 
-            $lineBreak    = $this->previousLineBreak($idx);
+            $lineBreak    = $this->previousLineBreak($stackPtr);
             $isDocumented = $this->tokens[$lineBreak - 1]['code'] === T_DOC_COMMENT_CLOSE_TAG;
             if ($isDocumented) { continue; }
 
-            $undocumented[] = [$this->tokens[$idx + 2]['content'], $idx];
+            $undocumented[] = [$this->tokens[$stackPtr + 2]['content'], $stackPtr];
         }
 
         if (!$undocumented) { return; }
         $ancestorMethods = $className ? $this->getAncestorMethods($className) : [];
 
-        foreach ($undocumented as [$methodName, $idx]) {
+        foreach ($undocumented as [$methodName, $stackPtr]) {
             if (isset($ancestorMethods[$methodName])) { continue; }
-            $file->addWarning('Missing phpDoc comment for original public method signature', $idx, 'Missing');
+            $phpcsFile->addWarning('Missing phpDoc comment for original public method signature', $stackPtr, 'Missing');
         }
     }
 
