@@ -105,6 +105,7 @@ EOF;
         self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/short_conditions_single_line']            = true;
         self::$rules['Polymorphine/declare_strict_first_line']               = true;
+        self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
         $finder = PhpCsFixer\Finder::create()->in($workingDir);
         foreach ($filters as $filter) {
@@ -125,7 +126,8 @@ EOF;
                 new Fixer\AlignedArrayValuesFixer(),
                 new Fixer\AlignedTypedPropertiesFixer(),
                 new Fixer\ShortConditionsSingleLineFixer(),
-                new Fixer\DeclareStrictFirstLineFixer()
+                new Fixer\DeclareStrictFirstLineFixer(),
+                new Fixer\BraceAfterMultilineParamMethodFixer()
             ]);
     }
 }
