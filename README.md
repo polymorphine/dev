@@ -16,10 +16,10 @@ settings added as dev dependency of Polymorphine packages.
 will check style errors that need to be adjusted manually like: naming
 conventions, line lengths and some [phpDoc constraints](#codesniffer-custom-phpdoc-requirements).
 
-Fixer needs project scope configuration to setup factory with package name
-used in file docBlock headers and absolute path to its root directory.
+Fixer needs project scope configuration to set up factory with package name
+used in a file docBlock headers and absolute path to its root directory.
 Add [`cs-fixer.php.dist`](cs-fixer.php.dist) configuration file similar to
-the one supplied with this package to root directory directory of your project.
+the one supplied with this package to root directory of your project.
 
 Use this command to run fixer for given file or directory (path):
 ```
@@ -32,9 +32,9 @@ constraint violation can be automatically fixed, so this tool will inform you
 about inconsistencies that need manual fixing.
 
 [`phpcs.xml`](phpcs.xml) file is the configuration for all projects using this
-package as a composer dependency (in default vendor directory). However console
-command running CodeSniffer requires absolute path to this config file. For example
-Github Action command may build absolute path with `$GITHUB_WORKSPACE` env variable:
+package as a composer dependency (in default vendor directory). However, console
+command running CodeSniffer requires the absolute path to this config file. For example
+Github Action command may build the absolute path with `$GITHUB_WORKSPACE` env variable:
 ```
 vendor/bin/phpcs --extensions=php --standard=$GITHUB_WORKSPACE/vendor/polymorphine/dev/phpcs.xml path
 ```
