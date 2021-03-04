@@ -112,7 +112,8 @@ EOF;
             $finder = $finder->filter($filter);
         }
 
-        return PhpCsFixer\Config::create()
+        $config = new PhpCsFixer\Config();
+        return $config
             ->setRiskyAllowed(true)
             ->setRules(self::$rules)
             ->setFinder($finder)
