@@ -73,9 +73,16 @@ abstract class ExampleClass implements SomeInterface
         ArraySyntaxFixer $fixer,
         Library $library
     ) {
-        $this->field    = function () use ($fixer) { return $this->getVar(); };
+        $this->field    = function () use ($fixer) { return $this->getVar($fixer); };
         $this->variable = $library;
         $test = ['Set-Cookie' => [$headerLine]];
+    }
+
+    public function anotherFixer(
+        ArraySyntaxFixer $fixer,
+        Library $library
+    ) {
+        return true;
     }
 
     protected function getVar2()

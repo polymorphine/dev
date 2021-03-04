@@ -78,11 +78,20 @@ abstract class ExampleClass
     }
 
     public function fixer(
-        ArraySyntaxFixer $fixer, Library $library) {
-        $this->field = function () use ($fixer) { return $this->getVar(); };
+        ArraySyntaxFixer $fixer, Library $library)
+    {
+        $this->field = function () use ($fixer) { return $this->getVar($fixer); };
         $this->variable = $library;
         $test = ['Set-Cookie' => [$headerLine]];
         return;
+    }
+
+    public function anotherFixer(
+        ArraySyntaxFixer $fixer,
+        Library $library
+    )
+    {
+        return true;
     }
 
     protected function cookieData()

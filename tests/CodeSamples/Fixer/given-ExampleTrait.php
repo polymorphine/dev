@@ -36,7 +36,7 @@ trait ExampleTrait {
     }
     public function fixer(
         ArraySyntaxFixer $fixer, Library $library) {
-        $this->field = function () use ($fixer) { return $this->getVar(); };
+        $this->field = function () use ($fixer) { return $this->getVar($fixer); };
         $this->variable = $library;
         return;
     }
