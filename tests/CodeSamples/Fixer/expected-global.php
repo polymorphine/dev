@@ -13,7 +13,7 @@ $x = $argv[0] ?? 'command';
 
 if ($x === 'command') { echo 'Allman style?'; }
 
-    //Try something else (indentation unfixed)
+// Try something else (indentation)
 
 echo "string with evaluated $x variable and $argv[0] variable";
 

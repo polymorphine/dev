@@ -25,9 +25,9 @@ return $next = 400;
 
 class Some
 {
-    const VAR = '20';
+    public const VAR = '20';
     public $var = 10;
-    const VARIABLE = 'foo bar baz';
+    public const VARIABLE = 'foo bar baz';
     protected $some = 23;
     private $test = 22;
     protected $x = true;

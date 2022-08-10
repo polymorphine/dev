@@ -11,7 +11,7 @@ if ($x === 'command')
 }
 else
 {
-    //Try something else (indentation unfixed)
+    //Try something else (indentation)
 }
 
 echo "string with evaluated $x variable and $argv[0] variable";

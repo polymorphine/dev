@@ -36,8 +36,8 @@ return $next = 400;
 
 class Some
 {
-    const VAR      = '20';
-    const VARIABLE = 'foo bar baz';
+    public const VAR      = '20';
+    public const VARIABLE = 'foo bar baz';
     public $var = 10;
 
     public static $stat;

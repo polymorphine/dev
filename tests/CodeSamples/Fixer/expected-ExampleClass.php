@@ -23,7 +23,7 @@ use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
  */
 abstract class ExampleClass implements SomeInterface
 {
-    const CONSTANT = 'string';
+    public const CONSTANT = 'string';
 
     public array $field = [
         'key'   => 1,
@@ -130,11 +130,11 @@ abstract class ExampleClass implements SomeInterface
             unset($x);
             return;
         }
-        //4 whitespaces in body
+        // 4 whitespaces in body
         if ($notShortStatement) {
             return $this->call($arg, $arg2);
         }
-        //3 whitespaces in body
+        // 3 whitespaces in body
         if ($oneArgumentMethod) { return $this->callLongerMethodName($arg); }
         if ($twoArgumentMethod) { $this->commandMethodName($arg, $arg2); }
     }

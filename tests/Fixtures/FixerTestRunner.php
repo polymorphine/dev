@@ -15,7 +15,7 @@ use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\ConfigInterface;
 use PhpCsFixer\FixerFactory;
-use PhpCsFixer\RuleSet;
+use PhpCsFixer\RuleSet\RuleSet;
 use PhpCsFixer\Runner\Runner;
 use PhpCsFixer\WhitespacesFixerConfig;
 use SplFileInfo;

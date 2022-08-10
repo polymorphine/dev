@@ -12,6 +12,8 @@
 namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
@@ -24,6 +26,11 @@ class DeclareStrictFirstLineFixer implements FixerInterface
     public function getName(): string
     {
         return 'Polymorphine/declare_strict_first_line';
+    }
+
+    public function getDefinition(): FixerDefinitionInterface
+    {
+        return new FixerDefinition('Moves strict types declaration to first line.', []);
     }
 
     public function getPriority(): int

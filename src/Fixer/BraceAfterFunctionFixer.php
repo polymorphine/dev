@@ -12,6 +12,8 @@
 namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
@@ -22,6 +24,11 @@ final class BraceAfterFunctionFixer implements FixerInterface
     public function getName(): string
     {
         return 'Polymorphine/brace_after_method';
+    }
+
+    public function getDefinition(): FixerDefinitionInterface
+    {
+        return new FixerDefinition('Opening brace for function starts in the same line.', []);
     }
 
     public function isCandidate(Tokens $tokens): bool

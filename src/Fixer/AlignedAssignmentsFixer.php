@@ -12,6 +12,8 @@
 namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
@@ -25,6 +27,11 @@ final class AlignedAssignmentsFixer implements FixerInterface
     public function getName(): string
     {
         return 'Polymorphine/aligned_assignments';
+    }
+
+    public function getDefinition(): FixerDefinitionInterface
+    {
+        return new FixerDefinition('Aligns equal operator for consecutive assignments of similar type.', []);
     }
 
     public function isCandidate(Tokens $tokens): bool

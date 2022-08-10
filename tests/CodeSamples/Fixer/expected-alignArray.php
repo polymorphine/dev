@@ -26,7 +26,7 @@ $goBonkers = [
     'call' => function () {
         return ['nasty' => 'trick', 'multiline' => 'function'];
     },
-    //skip line
+    // skip line
     'lastLong'  => true,
     'call2' => function () {
         return [

@@ -18,7 +18,7 @@ use Exception;
 
 class MethodChainsClass implements ArrayAccess
 {
-    const TEST = 1;
+    public const TEST = 1;
 
     protected $inheritedValues = [
         'key'       => 'value',

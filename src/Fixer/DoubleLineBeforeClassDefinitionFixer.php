@@ -12,6 +12,8 @@
 namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
@@ -22,6 +24,11 @@ final class DoubleLineBeforeClassDefinitionFixer implements FixerInterface
     public function getName(): string
     {
         return 'Polymorphine/double_line_before_class_definition';
+    }
+
+    public function getDefinition(): FixerDefinitionInterface
+    {
+        return new FixerDefinition('Adds second line break before class definition.', []);
     }
 
     public function isCandidate(Tokens $tokens): bool

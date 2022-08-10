@@ -12,6 +12,8 @@
 namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
@@ -27,6 +29,11 @@ final class AlignedArrayValuesFixer implements FixerInterface
     public function getName(): string
     {
         return 'Polymorphine/aligned_array_values';
+    }
+
+    public function getDefinition(): FixerDefinitionInterface
+    {
+        return new FixerDefinition('Aligns arrow operator in multiline arrays.', []);
     }
 
     public function isCandidate(Tokens $tokens): bool

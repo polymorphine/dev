@@ -17,7 +17,7 @@ use PhpCsFixer\Finder;
 
 final class FixerFactory
 {
-    const HEADER = <<<'EOF'
+    public const HEADER = <<<'EOF'
         This file is part of {{name}} package.
         
         (c) Shudd3r <q3.shudder@gmail.com>
@@ -41,7 +41,7 @@ final class FixerFactory
         'explicit_string_variable'              => false,
         'final_internal_class'                  => true,
         'function_to_constant'                  => true,
-        'header_comment'                        => ['commentType' => 'comment'],
+        'header_comment'                        => ['comment_type' => 'comment'],
         'heredoc_to_nowdoc'                     => true,
         'increment_style'                       => false,
         'list_syntax'                           => ['syntax' => 'short'],
@@ -53,7 +53,7 @@ final class FixerFactory
         'no_homoglyph_names'                    => true,
         'no_null_property_initialization'       => true,
         'no_php4_constructor'                   => true,
-        'no_short_echo_tag'                     => false,
+        'echo_tag_syntax'                       => false,
         'no_superfluous_elseif'                 => true,
         'no_superfluous_phpdoc_tags'            => false,
         'no_unreachable_default_argument_value' => true,
@@ -71,14 +71,14 @@ final class FixerFactory
         'phpdoc_order'                          => true,
         'phpdoc_types_order'                    => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
         'pow_to_exponentiation'                 => true,
-        'psr4'                                  => true,
+        'psr_autoloading'                       => true,
         'simplified_null_return'                => false,
         'single_line_after_imports'             => false,
         'single_line_comment_style'             => true,
         'strict_comparison'                     => true,
         'strict_param'                          => true,
         'ternary_to_null_coalescing'            => true,
-        'trailing_comma_in_multiline_array'     => false,
+        'trailing_comma_in_multiline'           => false,
         'yoda_style'                            => false
     ];
 

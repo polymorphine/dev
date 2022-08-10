@@ -12,6 +12,8 @@
 namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
@@ -23,6 +25,11 @@ final class ConstructorsFirstFixer implements FixerInterface
     public function getName(): string
     {
         return 'Polymorphine/constructors_first';
+    }
+
+    public function getDefinition(): FixerDefinitionInterface
+    {
+        return new FixerDefinition('Moves constructor methods (including static named constructors) to the top.', []);
     }
 
     public function getPriority(): int
