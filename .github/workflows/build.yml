@@ -11,7 +11,7 @@ jobs:
         php-versions: ['7.4']
     env:
       extensions: pcov, dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
-      key: cache-v1
+      key: cache-v2
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -70,7 +70,7 @@ jobs:
         php-versions: ['8.0', '8.1']
     env:
       extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
-      key: cache-v1
+      key: cache-v2
     steps:
       - name: "Turn off git EOL conversion"
         run: git config --global core.autocrlf false
