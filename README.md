@@ -6,10 +6,16 @@
 [![LICENSE](https://img.shields.io/github/license/polymorphine/dev.svg?color=blue)](LICENSE)
 ### Development tools & coding standard scripts for Polymorphine libraries
 
-## Coding Standards
-Combination of [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
-and [CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) with custom
-settings added as dev dependency of Polymorphine packages.
+- [PHPUnit](https://github.com/sebastianbergmann/phpunit) testing library.
+- Combination of [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
+  and [CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) with custom
+  settings added as dev dependency of Polymorphine packages.
+- Package skeleton scripted with [Skeletons](https://github.com/shudd3r/skeletons) engine.
+
+### Installation with [Composer](https://getcomposer.org/)
+```bash
+composer require --dev polymorphine/dev
+```
 
 #### PHP-CS-Fixer
 `PHP-CS-Fixer` will automatically fix code formatting, and `CodeSniffer`
