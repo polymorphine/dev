@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+use Shudd3r\Skeletons\Application;
+use Shudd3r\Skeletons\InputArgs;
+use Shudd3r\Skeletons\Environment\Files\Directory\LocalDirectory;
+use Shudd3r\Skeletons\Replacements\Replacement;
+use Shudd3r\Skeletons\Templates\Contents;
+use Shudd3r\Skeletons\Templates\Template;
+
+// This script should be executed from package root directory
+$rootDirectory = getcwd();
+if (!file_exists($rootDirectory . '/vendor/autoload.php')) {
+    fwrite(STDERR, 'Cannot find vendor/autoload.php file in package root directory');
+    die(1);
+}
+
+if (!file_exists($rootDirectory . '/composer.json')) {
+    fwrite(STDERR, 'Cannot find composer.json file in package root directory');
+    die(1);
+}
+
+require_once $rootDirectory . '/vendor/autoload.php';
+
+$args = new InputArgs($argv ?? []);
+
+$skeleton = new LocalDirectory(__DIR__ . '/template');
+$package  = new LocalDirectory($rootDirectory);
+$app      = new Application($package, $skeleton);
+
+$app->backup(new LocalDirectory($rootDirectory . '/.dev/.skeleton-backup'));
+
+$app->replacement('package.name')->add(new Replacement\PackageName());
+$app->replacement('repository.name')->add(new Replacement\RepositoryName('package.name'));
+$app->replacement('package.description')->add(new Replacement\PackageDescription('package.name'));
+$app->replacement('namespace.src')->add(new Replacement\SrcNamespace('package.name'));
+
+$isUpdate = $args->command() === 'update';
+$app->template('composer.json')->createWith(function (Contents $contents) use ($isUpdate) {
+    $baseTemplate = new Template\BasicTemplate($contents->template());
+    return new Template\MergedJsonTemplate($baseTemplate, $contents->package(), $isUpdate);
+});
+
+$exitCode = $app->run($args);
+exit($exitCode);
