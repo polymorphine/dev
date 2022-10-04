@@ -5,8 +5,8 @@
     "license": null,
     "authors": [
         {
-            "name": null,
-            "email": null,
+            "name": "{author.name}",
+            "email": "{author.email}",
             "homepage": null,
             "role": null
         }

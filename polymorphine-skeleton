@@ -14,6 +14,7 @@ use Shudd3r\Skeletons\Application;
 use Shudd3r\Skeletons\InputArgs;
 use Shudd3r\Skeletons\Environment\Files\Directory\LocalDirectory;
 use Shudd3r\Skeletons\Replacements\Replacement;
+use Shudd3r\Skeletons\Replacements\Source;
 use Shudd3r\Skeletons\Templates\Contents;
 use Shudd3r\Skeletons\Templates\Template;
 
@@ -43,6 +44,18 @@ $app->replacement('package.name')->add(new Replacement\PackageName());
 $app->replacement('repository.name')->add(new Replacement\RepositoryName('package.name'));
 $app->replacement('package.description')->add(new Replacement\PackageDescription('package.name'));
 $app->replacement('namespace.src')->add(new Replacement\SrcNamespace('package.name'));
+$app->replacement('author.name')
+    ->build(fn (Source $source) => $source->composer()->value('authors.0.name') ?? 'Author Name')
+    ->argumentName('author')
+    ->inputPrompt('Author\'s name')
+    ->description('Name of package author [format: non-empty string]' . PHP_EOL . 'Replaces {%s} placeholder')
+    ->validate(fn (string $value) => !empty($value));
+$app->replacement('author.email')
+    ->build(fn (Source $source) => $source->composer()->value('authors.0.email') ?? 'default@example.com')
+    ->argumentName('email')
+    ->inputPrompt('Author\'s email address')
+    ->description('Email address of package author [format: <username>@<domain>]' . PHP_EOL . 'Replaces {%s} placeholder')
+    ->validate(fn (string $value) => $value === filter_var($value, FILTER_VALIDATE_EMAIL));
 
 $isUpdate = $args->command() === 'update';
 $app->template('composer.json')->createWith(function (Contents $contents) use ($isUpdate) {
