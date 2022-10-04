@@ -58,9 +58,23 @@ $app->replacement('author.email')
     ->validate(fn (string $value) => $value === filter_var($value, FILTER_VALIDATE_EMAIL));
 
 $isUpdate = $args->command() === 'update';
-$app->template('composer.json')->createWith(function (Contents $contents) use ($isUpdate) {
-    $baseTemplate = new Template\BasicTemplate($contents->template());
+$isSelf   = $rootDirectory === __DIR__;
+
+$app->template('composer.json')->createWith(function (Contents $contents) use ($isSelf, $isUpdate) {
+    $placeholders = ['{$tpl.REQUIRE_DEV}', '{$tpl.PHP_EXEC}', '{$tpl.PHPCS}'];
+    $replacements = $isSelf
+        ? ['null', '@php ', 'phpcs.xml.dist']
+        : ['{ "polymorphine/dev": null }', '', 'vendor/polymorphine/dev/phpcs.xml'];
+    $baseTemplate = new Template\BasicTemplate(str_replace($placeholders, $replacements, $contents->template()));
     return new Template\MergedJsonTemplate($baseTemplate, $contents->package(), $isUpdate);
+});
+
+$app->template('.github/workflows/build.yml')->createWith(function (Contents $contents) use ($isSelf) {
+    $placeholders = ['${tpl.PHP_EXEC}', '${tpl.PHPCS}'];
+    $replacements = $isSelf
+        ? ['php ', 'phpcs.xml.dist']
+        : ['vendor/bin/', 'vendor/polymorphine/dev/phpcs.xml'];
+    return new Template\BasicTemplate(str_replace($placeholders, $replacements, $contents->template()));
 });
 
 $app->template('LICENSE')->createWith(function (Contents $contents) {
