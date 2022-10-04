@@ -63,5 +63,9 @@ $app->template('composer.json')->createWith(function (Contents $contents) use ($
     return new Template\MergedJsonTemplate($baseTemplate, $contents->package(), $isUpdate);
 });
 
+$app->template('LICENSE')->createWith(function (Contents $contents) {
+    return new Template\BasicTemplate(str_replace('{$tpl.CURRENT_YEAR}', date('Y'), $contents->template()));
+});
+
 $exitCode = $app->run($args);
 exit($exitCode);
