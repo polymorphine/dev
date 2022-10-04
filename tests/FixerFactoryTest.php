@@ -20,7 +20,18 @@ class FixerFactoryTest extends TestCase
 {
     public function testConfigInstantiation()
     {
-        $filters = [fn () => true];
-        $this->assertInstanceOf(ConfigInterface::class, FixerFactory::createFor('package/name', __DIR__, $filters));
+        $this->assertInstanceOf(ConfigInterface::class, FixerFactory::createFor('package/name', __DIR__));
+    }
+
+    public function testConfigFinder_IgnoresCodeSamples()
+    {
+        $excluded = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/Fixtures/code-samples');
+        $finder   = FixerFactory::createFor('package/name', dirname(__DIR__))->getFinder();
+
+        $this->assertTrue($finder->hasResults());
+
+        foreach ($finder->getIterator() as $file) {
+            $this->assertFalse(strpos($file->getPath(), $excluded));
+        }
     }
 }

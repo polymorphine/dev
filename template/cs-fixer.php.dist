@@ -10,5 +10,5 @@
  */
 
 use Polymorphine\Dev\FixerFactory;
-{original.content}
-return FixerFactory::createFor('{package.name}', __DIR__{original.content});
+
+return FixerFactory::createFor('{package.name}', __DIR__);

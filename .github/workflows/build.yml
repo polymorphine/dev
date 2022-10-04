@@ -50,7 +50,7 @@ jobs:
       - name: "Coding standard CodeSniffer checks"
         run: |
           vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist src
-          vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=tests/CodeSamples/* tests
+          vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/code-samples/* tests
       - name: "Package skeleton validation"
         run: php polymorphine-skeleton check
       - name: "Run PhpUnit tests with coverage"

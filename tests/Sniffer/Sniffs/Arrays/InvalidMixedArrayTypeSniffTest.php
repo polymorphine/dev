@@ -19,7 +19,7 @@ class InvalidMixedArrayTypeSniffTest extends SnifferTest
 {
     public function testAssocArrayWithNonAssocValuesGivesWarning()
     {
-        $this->assertWarningLines('./tests/CodeSamples/Sniffs/InvalidArrays.php', [5, 20, 22, 27]);
+        $this->assertWarningLines('./tests/Fixtures/code-samples/Sniffs/InvalidArrays.php', [5, 20, 22, 27]);
     }
 
     protected function sniffer(): string

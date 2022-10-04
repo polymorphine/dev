@@ -13,6 +13,7 @@ namespace Polymorphine\Dev;
 
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
+use SplFileInfo;
 
 
 final class FixerFactory
@@ -83,13 +84,12 @@ final class FixerFactory
     ];
 
     /**
-     * @param string     $packageName
-     * @param string     $workingDir
-     * @param callable[] $filters     fn(SplFileInfo) => bool - false will ignore file
+     * @param string $packageName
+     * @param string $workingDir
      *
      * @return Config
      */
-    public static function createFor(string $packageName, string $workingDir, array $filters = []): Config
+    public static function createFor(string $packageName, string $workingDir): Config
     {
         self::$rules['header_comment']['header'] = str_replace('{{name}}', $packageName, self::HEADER);
         self::$rules['no_extra_blank_lines']['tokens'] = [
@@ -108,16 +108,18 @@ final class FixerFactory
         self::$rules['Polymorphine/declare_strict_first_line']               = true;
         self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
-        $finder = Finder::create()->in($workingDir);
-        foreach ($filters as $filter) {
-            $finder = $finder->filter($filter);
-        }
+        $excludeSamples = function (SplFileInfo $file) use ($workingDir) {
+            $filePath   = $file->getPath();
+            $testsPath  = $workingDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+            $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
+            return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
+        };
 
         $config = new Config();
         return $config
             ->setRiskyAllowed(true)
             ->setRules(self::$rules)
-            ->setFinder($finder)
+            ->setFinder(Finder::create()->in($workingDir)->filter($excludeSamples))
             ->setUsingCache(false)
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),

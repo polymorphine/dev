@@ -32,7 +32,7 @@
         "test-cs": [
             "php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests",
             "phpcs --extensions=php --standard={$tpl.PHPCS} src",
-            "phpcs --extensions=php --standard={$tpl.PHPCS} --ignore=tests/CodeSamples/* tests"
+            "phpcs --extensions=php --standard={$tpl.PHPCS} --ignore=*/code-samples/* tests"
         ],
         "test-php": "phpunit",
         "test-skeleton": "{$tpl.PHP_EXEC}polymorphine-skeleton check"

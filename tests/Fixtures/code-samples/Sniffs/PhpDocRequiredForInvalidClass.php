@@ -1,6 +1,6 @@
 <?php
 
-namespace Polymorphine\Dev\Tests\CodeSamples\Sniffs;
+namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
 class PhpDocRequiredForInvalidClass extends NotExistingParent
