@@ -1,5 +1,5 @@
 # Polymorphine/Dev
-[![Latest Stable Version](https://poser.pugx.org/polymorphine/dev/version)](https://packagist.org/packages/polymorphine/dev)
+[![Latest stable release](https://poser.pugx.org/polymorphine/dev/version)](https://packagist.org/packages/polymorphine/dev)
 [![Build status](https://github.com/polymorphine/dev/workflows/build/badge.svg)](https://github.com/polymorphine/dev/actions)
 [![Coverage status](https://coveralls.io/repos/github/polymorphine/dev/badge.svg?branch=develop)](https://coveralls.io/github/polymorphine/dev?branch=develop)
 [![PHP version](https://img.shields.io/packagist/php-v/polymorphine/dev.svg)](https://packagist.org/packages/polymorphine/dev)

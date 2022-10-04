@@ -1,0 +1,40 @@
+{
+    "name": "{package.name.composer}",
+    "description": "{package.description}",
+    "type": null,
+    "license": null,
+    "authors": [
+        {
+            "name": "{author.name}",
+            "email": "{author.email}",
+            "homepage": null,
+            "role": null
+        }
+    ],
+    "minimum-stability": null,
+    "prefer-stable": null,
+    "require": {
+        "php": null
+    },
+    "require-dev": {$tpl.REQUIRE_DEV},
+    "autoload": {
+        "psr-4": {
+            "{namespace.src.esc}\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "{namespace.src.esc}\\Tests\\": "tests/"
+        }
+    },
+    "bin": null,
+    "scripts": {
+        "test-cs": [
+            "php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests",
+            "phpcs --extensions=php --standard={$tpl.PHPCS} src",
+            "phpcs --extensions=php --standard={$tpl.PHPCS} --ignore=tests/CodeSamples/* tests"
+        ],
+        "test-php": "phpunit",
+        "test-skeleton": "{$tpl.PHP_EXEC}polymorphine-skeleton check"
+    }
+}

@@ -1,0 +1,85 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+use Shudd3r\Skeletons\Application;
+use Shudd3r\Skeletons\InputArgs;
+use Shudd3r\Skeletons\Environment\Files\Directory\LocalDirectory;
+use Shudd3r\Skeletons\Replacements\Replacement;
+use Shudd3r\Skeletons\Replacements\Source;
+use Shudd3r\Skeletons\Templates\Contents;
+use Shudd3r\Skeletons\Templates\Template;
+
+// This script should be executed from package root directory
+$rootDirectory = getcwd();
+if (!file_exists($rootDirectory . '/vendor/autoload.php')) {
+    fwrite(STDERR, 'Cannot find vendor/autoload.php file in package root directory');
+    die(1);
+}
+
+if (!file_exists($rootDirectory . '/composer.json')) {
+    fwrite(STDERR, 'Cannot find composer.json file in package root directory');
+    die(1);
+}
+
+require_once $rootDirectory . '/vendor/autoload.php';
+
+$args = new InputArgs($argv ?? []);
+
+$skeleton = new LocalDirectory(__DIR__ . '/template');
+$package  = new LocalDirectory($rootDirectory);
+$app      = new Application($package, $skeleton);
+
+$app->backup(new LocalDirectory($rootDirectory . '/.dev/.skeleton-backup'));
+
+$app->replacement('package.name')->add(new Replacement\PackageName());
+$app->replacement('repository.name')->add(new Replacement\RepositoryName('package.name'));
+$app->replacement('package.description')->add(new Replacement\PackageDescription('package.name'));
+$app->replacement('namespace.src')->add(new Replacement\SrcNamespace('package.name'));
+$app->replacement('author.name')
+    ->build(fn (Source $source) => $source->composer()->value('authors.0.name') ?? 'Author Name')
+    ->argumentName('author')
+    ->inputPrompt('Author\'s name')
+    ->description('Name of package author [format: non-empty string]' . PHP_EOL . 'Replaces {%s} placeholder')
+    ->validate(fn (string $value) => !empty($value));
+$app->replacement('author.email')
+    ->build(fn (Source $source) => $source->composer()->value('authors.0.email') ?? 'default@example.com')
+    ->argumentName('email')
+    ->inputPrompt('Author\'s email address')
+    ->description('Email address of package author [format: <username>@<domain>]' . PHP_EOL . 'Replaces {%s} placeholder')
+    ->validate(fn (string $value) => $value === filter_var($value, FILTER_VALIDATE_EMAIL));
+
+$isUpdate = $args->command() === 'update';
+$isSelf   = $rootDirectory === __DIR__;
+
+$app->template('composer.json')->createWith(function (Contents $contents) use ($isSelf, $isUpdate) {
+    $placeholders = ['{$tpl.REQUIRE_DEV}', '{$tpl.PHP_EXEC}', '{$tpl.PHPCS}'];
+    $replacements = $isSelf
+        ? ['null', '@php ', 'phpcs.xml.dist']
+        : ['{ "polymorphine/dev": null }', '', 'vendor/polymorphine/dev/phpcs.xml'];
+    $baseTemplate = new Template\BasicTemplate(str_replace($placeholders, $replacements, $contents->template()));
+    return new Template\MergedJsonTemplate($baseTemplate, $contents->package(), $isUpdate);
+});
+
+$app->template('.github/workflows/build.yml')->createWith(function (Contents $contents) use ($isSelf) {
+    $placeholders = ['${tpl.PHP_EXEC}', '${tpl.PHPCS}'];
+    $replacements = $isSelf
+        ? ['php ', 'phpcs.xml.dist']
+        : ['vendor/bin/', 'vendor/polymorphine/dev/phpcs.xml'];
+    return new Template\BasicTemplate(str_replace($placeholders, $replacements, $contents->template()));
+});
+
+$app->template('LICENSE')->createWith(function (Contents $contents) {
+    return new Template\BasicTemplate(str_replace('{$tpl.CURRENT_YEAR}', date('Y'), $contents->template()));
+});
+
+$exitCode = $app->run($args);
+exit($exitCode);
