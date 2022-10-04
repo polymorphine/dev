@@ -1,0 +1,4 @@
+/.dev/
+/vendor/
+/composer.lock
+{original.content}
