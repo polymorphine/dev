@@ -3,7 +3,7 @@
 /*
  * This file is part of {package.name} package.
  *
- * (c) Shudd3r <q3.shudder@gmail.com>
+ * (c) {author.name} <{author.email}>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,4 +11,4 @@
 
 use Polymorphine\Dev\FixerFactory;
 
-return FixerFactory::createFor('{package.name}', __DIR__);
+return FixerFactory::createFor(__FILE__);

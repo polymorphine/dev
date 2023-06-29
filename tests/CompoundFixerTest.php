@@ -16,16 +16,14 @@ use Polymorphine\Dev\FixerFactory;
 use Polymorphine\Dev\Tests\Fixtures\FixerTestRunner;
 
 
-/**
- * @group integrated
- */
+/** @group integrated */
 class CompoundFixerTest extends TestCase
 {
     private FixerTestRunner $runner;
 
     protected function setUp(): void
     {
-        $config = FixerFactory::createFor('Polymorphine/Dev', __DIR__);
+        $config = FixerFactory::createFor(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cs-fixer.php.dist');
         $this->runner = FixerTestRunner::withConfig($config);
     }
 

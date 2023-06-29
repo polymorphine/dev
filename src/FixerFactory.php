@@ -18,15 +18,6 @@ use SplFileInfo;
 
 final class FixerFactory
 {
-    public const HEADER = <<<'EOF'
-        This file is part of {{name}} package.
-        
-        (c) Shudd3r <q3.shudder@gmail.com>
-        
-        This source file is subject to the MIT license that is bundled
-        with this source code in the file LICENSE.
-        EOF;
-
     private static array $rules = [
         '@Symfony'                              => true,
         'align_multiline_comment'               => true,
@@ -42,7 +33,6 @@ final class FixerFactory
         'explicit_string_variable'              => false,
         'final_internal_class'                  => true,
         'function_to_constant'                  => true,
-        'header_comment'                        => ['comment_type' => 'comment'],
         'heredoc_to_nowdoc'                     => true,
         'increment_style'                       => false,
         'list_syntax'                           => ['syntax' => 'short'],
@@ -83,15 +73,12 @@ final class FixerFactory
         'yoda_style'                            => false
     ];
 
-    /**
-     * @param string $packageName
-     * @param string $workingDir
-     *
-     * @return Config
-     */
-    public static function createFor(string $packageName, string $workingDir): Config
+    public static function createFor(string $launchFile): Config
     {
-        self::$rules['header_comment']['header'] = str_replace('{{name}}', $packageName, self::HEADER);
+        $workingDir = dirname($launchFile);
+
+        self::setHeaderFrom($launchFile);
+
         self::$rules['no_extra_blank_lines']['tokens'] = [
             'break', 'continue', 'extra', 'return', 'throw', 'parenthesis_brace_block',
             'square_brace_block', 'curly_brace_block'
@@ -133,5 +120,23 @@ final class FixerFactory
                 new Fixer\DeclareStrictFirstLineFixer(),
                 new Fixer\BraceAfterMultilineParamMethodFixer()
             ]);
+    }
+
+    private static function setHeaderFrom(string $filename): void
+    {
+        self::$rules['header_comment'] = false;
+
+        $contents    = file_get_contents($filename) ?: '';
+        $headerStart = strpos($contents, "\n/*\n");
+        $headerEnd   = strpos($contents, "\n */\n");
+        if (!$headerStart || !$headerEnd) { return; }
+
+        $header = substr($contents, $headerStart + 4, $headerEnd - $headerStart - 4);
+        if (!$header) { return; }
+
+        self::$rules['header_comment'] = [
+            'comment_type' => 'comment',
+            'header'       => str_replace([' * ', ' *'], '', $header)
+        ];
     }
 }
