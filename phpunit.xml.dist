@@ -8,6 +8,7 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <env name="DEV_TESTS_DIRECTORY" value=".dev/tests" force="true" />
     </php>
     <testsuites>
         <testsuite name="Polymorphine/Dev tests">
