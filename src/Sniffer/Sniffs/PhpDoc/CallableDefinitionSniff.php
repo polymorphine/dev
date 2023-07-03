@@ -17,13 +17,20 @@ use PHP_CodeSniffer\Files\File;
 
 final class CallableDefinitionSniff implements Sniff
 {
-    public string $syntax;
-    public bool   $includeClosure = true;
+    private const WARNING = 'Callable description should contain definition';
 
-    private $regexp = [
+    private const FORMAT_EXPLAIN = [
+        'short' => 'fn(ArgType,...) => ReturnType',
+        'long'  => 'function(ArgType,...): ReturnType'
+    ];
+
+    private const FORMAT_REGEXP = [
         'short' => '#fn\([?a-zA-Z\\\\, |]*\) => \??[a-zA-Z\\\\|]+#',
         'long'  => '#function\([?a-zA-Z\\\\, |]*\): \??[a-zA-Z\\\\|]+#'
     ];
+
+    public string $syntax         = 'both';
+    public bool   $includeClosure = true;
 
     public function register(): array
     {
@@ -38,25 +45,23 @@ final class CallableDefinitionSniff implements Sniff
             if ($tag !== '@param' && $tag !== '@return') { continue; }
 
             if (!$this->validDescription($tokens[$stackPtr + 2]['content'], $tag === '@param')) {
-                $phpcsFile->addWarning('Callable param description should contain definition', $stackPtr, 'Found');
+                $phpcsFile->addWarning($this->warningMessage(), $stackPtr, 'Found');
             }
         }
     }
 
-    private function validDescription(string $line, bool $variable = true): bool
+    private function validDescription(string $line, bool $forArgument): bool
     {
         if (!$this->isLambda($line)) { return true; }
 
-        $varStart         = $variable ? strpos($line, '$', 8) : 1;
+        $varStart         = $forArgument ? strpos($line, '$', 8) : 1;
         $descriptionStart = $varStart ? strpos($line, ' ', $varStart) : 0;
         $description      = $descriptionStart ? trim(substr($line, $descriptionStart)) : '';
         if (!$description) { return false; }
 
-        if (isset($this->syntax, $this->regexp[$this->syntax])) {
-            return (bool) preg_match($this->regexp[$this->syntax], $description);
-        }
-
-        foreach ($this->regexp as $syntax => $pattern) {
+        $selected = self::FORMAT_REGEXP[$this->syntax] ?? null;
+        $patterns = $selected ? [$selected] : array_values(self::FORMAT_REGEXP);
+        foreach ($patterns as $pattern) {
             if (preg_match($pattern, $description)) { return true; }
         }
 
@@ -75,6 +80,13 @@ final class CallableDefinitionSniff implements Sniff
             $type = substr($type, 0, -2);
         }
 
-        return $type === 'callable' || ($this->includeClosure && $type === 'Closure');
+        return $type === 'callable' || $this->includeClosure && $type === 'Closure';
+    }
+
+    private function warningMessage(): string
+    {
+        $selected = self::FORMAT_EXPLAIN[$this->syntax] ?? null;
+        $format   = $selected ?: implode('` or `', self::FORMAT_EXPLAIN);
+        return self::WARNING . ' [format: `' . $format . '`]';
     }
 }

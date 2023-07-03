@@ -20,6 +20,8 @@ use Throwable;
 
 final class RequiredForPublicApiSniff implements Sniff
 {
+    private const WARNING = 'Missing phpDoc comment for original public method signature';
+
     private array $tokens;
 
     public function register(): array
@@ -51,7 +53,7 @@ final class RequiredForPublicApiSniff implements Sniff
 
         foreach ($undocumented as [$methodName, $stackPtr]) {
             if (isset($ancestorMethods[$methodName])) { continue; }
-            $phpcsFile->addWarning('Missing phpDoc comment for original public method signature', $stackPtr, 'Missing');
+            $phpcsFile->addWarning(self::WARNING, $stackPtr, 'Missing');
         }
     }
 

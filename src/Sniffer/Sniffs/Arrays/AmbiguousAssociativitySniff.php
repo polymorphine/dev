@@ -17,6 +17,8 @@ use PHP_CodeSniffer\Files\File;
 
 class AmbiguousAssociativitySniff implements Sniff
 {
+    private const WARNING = 'Array should be either associative or list of values';
+
     private array $tokens;
 
     public function register(): array
@@ -28,7 +30,7 @@ class AmbiguousAssociativitySniff implements Sniff
     {
         $this->tokens = $phpcsFile->getTokens();
         if ($this->isValidArray($phpcsFile, $stackPtr)) { return; }
-        $phpcsFile->addWarning('Array should be either associative or list of values', $stackPtr, 'Found');
+        $phpcsFile->addWarning(self::WARNING, $stackPtr, 'Found');
     }
 
     private function isValidArray(File $file, int $idx): bool
@@ -58,7 +60,7 @@ class AmbiguousAssociativitySniff implements Sniff
                     break 2;
             }
         }
-        return $expected === T_DOUBLE_ARROW ? $this->isTrailingComma($idx) : true;
+        return $expected !== T_DOUBLE_ARROW || $this->isTrailingComma($idx);
     }
 
     private function isTrailingComma(int $idx): bool

@@ -15,7 +15,7 @@ use Polymorphine\Dev\Tests\SnifferTest;
 use Polymorphine\Dev\Sniffer\Sniffs\Arrays\AmbiguousAssociativitySniff;
 
 
-class InvalidMixedArrayTypeSniffTest extends SnifferTest
+class AmbiguousAssociativitySniffTest extends SnifferTest
 {
     public function testAssocArrayWithNonAssocValuesGivesWarning()
     {
