@@ -45,8 +45,8 @@ jobs:
         run: vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests
       - name: "Coding standard CodeSniffer checks"
         run: |
-          vendor/bin/phpcs --extensions=php --standard=${tpl.PHPCS} src
-          vendor/bin/phpcs --extensions=php --standard=${tpl.PHPCS} --ignore=*/code-samples/* tests
+          vendor/bin/phpcs --extensions=php --standard=${tpl.PHPCS} --colors src
+          vendor/bin/phpcs --extensions=php --standard=${tpl.PHPCS} --colors --ignore=*/code-samples/* tests
       - name: "Package skeleton validation"
         run: ${tpl.PHP_EXEC}polymorphine-skeleton check
       - name: "Run PhpUnit tests with coverage"

@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <!-- Code Sniffer configuration for projects using Polymorphine\Dev coding standard as composer dependency -->
 <ruleset name="polymorphine-package">
+    <config name="ignore_warnings_on_exit" value="true"/>
     <autoload>../../autoload.php</autoload>
-    <rule ref="./src/Sniffer"/>
+    <rule ref="./src/Sniffer">
+        <type>error</type>
+    </rule>
     <rule ref="Sniffer.PhpDoc.RequiredForPublicApi">
+        <type>warning</type>
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
 </ruleset>

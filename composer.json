@@ -34,8 +34,8 @@
     "scripts": {
         "test-cs": [
             "php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests",
-            "phpcs --extensions=php --standard=phpcs.xml.dist src",
-            "phpcs --extensions=php --standard=phpcs.xml.dist --ignore=*/code-samples/* tests"
+            "phpcs --extensions=php --standard=phpcs.xml.dist --colors src",
+            "phpcs --extensions=php --standard=phpcs.xml.dist --colors --ignore=*/code-samples/* tests"
         ],
         "test-php": "phpunit",
         "test-skeleton": "@php polymorphine-skeleton check"
