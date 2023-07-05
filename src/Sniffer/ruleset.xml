@@ -30,7 +30,4 @@
     <rule ref="PSR1.Methods.CamelCapsMethodName">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
-    <rule ref="Squiz.NamingConventions.ValidVariableName">
-        <exclude name="Squiz.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
-    </rule>
 </ruleset>

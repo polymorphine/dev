@@ -35,5 +35,11 @@ abstract class SnifferTest extends TestCase
         $this->assertEquals($expectedWarningLines, array_keys($fileWarnings));
     }
 
+    public function assertErrorLines(string $filename, array $expectedErrorLines): void
+    {
+        $fileErrors = $this->runner->sniff($filename)->getErrors();
+        $this->assertEquals($expectedErrorLines, array_keys($fileErrors));
+    }
+
     abstract protected function sniffer(): string;
 }
