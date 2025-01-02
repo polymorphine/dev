@@ -22,7 +22,7 @@ final class FixerTokens
      * @param string      $sourceFile File with php code
      * @param string|null $dumpFile
      */
-    public static function dumpSourceFile(string $sourceFile, string $dumpFile = null): void
+    public static function dumpSourceFile(string $sourceFile, ?string $dumpFile = null): void
     {
         self::dumpSourceCode(file_get_contents($sourceFile), $dumpFile);
     }

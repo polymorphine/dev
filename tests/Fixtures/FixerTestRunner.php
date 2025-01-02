@@ -55,7 +55,7 @@ class FixerTestRunner
      *
      * @return string
      */
-    public function fix(string $sourceCode, SplFileInfo $file = null): string
+    public function fix(string $sourceCode, ?SplFileInfo $file = null): string
     {
         $file ??= new SplFileInfo(__FILE__);
 

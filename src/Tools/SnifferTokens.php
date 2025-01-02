@@ -33,7 +33,7 @@ final class SnifferTokens
      *
      * @return Runner
      */
-    public static function runner(string $configFile = null): Runner
+    public static function runner(?string $configFile = null): Runner
     {
         $configFile = $configFile ?: dirname(dirname(__DIR__)) . '/phpcs.xml.dist';
         $runner     = new Runner();
@@ -62,7 +62,7 @@ final class SnifferTokens
      *
      * @throws Exceptions\DeepExitException
      */
-    public static function dumpSourceFile(string $sourceFile, string $dumpFile = null): void
+    public static function dumpSourceFile(string $sourceFile, ?string $dumpFile = null): void
     {
         $runner = self::runner();
         $runner->ruleset->populateTokenListeners();

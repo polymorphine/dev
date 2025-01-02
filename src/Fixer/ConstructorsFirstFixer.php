@@ -89,7 +89,7 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $returnType->isGivenKind(T_STRING) && isset($classTypes[$returnType->getContent()]);
     }
 
-    private function getMethodIdx(int $start, callable $condition = null, bool $expected = true): int
+    private function getMethodIdx(int $start, ?callable $condition = null, bool $expected = true): int
     {
         $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
         while ($idx && $condition && $condition($idx) !== $expected) {
