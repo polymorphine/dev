@@ -26,7 +26,7 @@ trait ExampleTrait
     public function getVariable()
     {
         return empty($this->variable)
-            ? (string) $this->variable = 'empty!' . 'string'
+            ? (string) $this->variable = 'empty!string'
             : $this->variable;
     }
 
