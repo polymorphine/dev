@@ -50,6 +50,6 @@ class SnifferTestRunner
 
     public function setProperties(array $properties): void
     {
-        $this->properties = $properties;
+        $this->properties = array_map(fn ($value) => ['scope' => 'sniff', 'value' => $value], $properties);
     }
 }
