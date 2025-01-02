@@ -52,7 +52,7 @@ trait FixerMethods
 
     private function codeLength(string $code): int
     {
-        return strlen(utf8_decode(ltrim($code, "\n")));
+        return mb_strlen(ltrim($code, "\n"));
     }
 
     private function indentationToken(int $length, int $lineBreaks = 0): Token
