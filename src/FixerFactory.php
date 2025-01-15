@@ -50,7 +50,7 @@ final class FixerFactory
         'no_useless_else'                       => true,
         'no_useless_return'                     => true,
         'non_printable_character'               => ['use_escape_sequences_in_strings' => true],
-        'ordered_class_elements'                => true,
+        'ordered_class_elements'                => ['order' => [], 'sort_algorithm' => 'none'],
         'ordered_imports'                       => false,
         'php_unit_strict'                       => false,
         'php_unit_method_casing'                => false,
@@ -82,6 +82,14 @@ final class FixerFactory
         self::$rules['no_extra_blank_lines']['tokens'] = [
             'break', 'continue', 'extra', 'return', 'throw', 'parenthesis_brace_block',
             'square_brace_block', 'curly_brace_block'
+        ];
+
+        self::$rules['ordered_class_elements']['order'] = [
+            'use_trait', 'case',
+            'constant_public', 'constant_protected', 'constant_private',
+            'property_public', 'property_protected', 'property_private',
+            'construct', 'destruct', 'magic', 'phpunit',
+            'method_public', 'method_protected', 'method_private'
         ];
 
         self::$rules['Polymorphine/double_line_before_class_definition']     = true;
