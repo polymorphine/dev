@@ -94,7 +94,7 @@ final class FixerFactory
 
         self::$rules['Polymorphine/double_line_before_class_definition']     = true;
         self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
-        self::$rules['Polymorphine/constructors_first']                      = true;
+        self::$rules['Polymorphine/named_constructors_first_static']         = true;
         self::$rules['Polymorphine/aligned_method_chain']                    = true;
         self::$rules['Polymorphine/aligned_assignments']                     = true;
         self::$rules['Polymorphine/aligned_array_values']                    = true;
@@ -119,7 +119,7 @@ final class FixerFactory
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),
                 new Fixer\NoTrailingCommaInMultilineArrayFixer(),
-                new Fixer\ConstructorsFirstFixer(),
+                new Fixer\NamedConstructorsFirstStaticFixer(),
                 new Fixer\AlignedMethodChainFixer(),
                 new Fixer\AlignedAssignmentsFixer(),
                 new Fixer\AlignedArrayValuesFixer(),

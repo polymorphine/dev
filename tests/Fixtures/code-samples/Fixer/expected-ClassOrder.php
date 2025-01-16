@@ -31,17 +31,17 @@ class ClassOrder
     {
     }
 
-    public static function instance(): self
-    {
-        return new self();
-    }
-
     public function setUpBeforeClass(): void
     {
     }
 
     private function setUp()
     {
+    }
+
+    public static function instance(): self
+    {
+        return new self();
     }
 
     public static function doPublicStatic(): void
