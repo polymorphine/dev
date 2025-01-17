@@ -21,9 +21,23 @@ class ClassOrder
 
     public static $publicStatic;
 
-    public ?string $publicValue = null;
-
     protected static $staticValue;
+
+    public static function instance(): self
+    {
+        return new self();
+    }
+
+    public static function doPublicStatic(): void
+    {
+    }
+
+    protected static function doProtectedStatic(): int
+    {
+        return 1;
+    }
+
+    public ?string $publicValue = null;
 
     private $value;
 
@@ -39,26 +53,12 @@ class ClassOrder
     {
     }
 
-    public static function instance(): self
-    {
-        return new self();
-    }
-
-    public static function doPublicStatic(): void
-    {
-    }
-
     public function doPublic(): void
     {
     }
 
     protected function doProtected()
     {
-    }
-
-    protected static function doProtectedStatic(): int
-    {
-        return 1;
     }
 
     private function doPrivate()

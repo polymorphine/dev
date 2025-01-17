@@ -38,10 +38,10 @@ class Some
 {
     public const VAR      = '20';
     public const VARIABLE = 'foo bar baz';
-    public $var = 10;
 
     public static $stat;
     public static $fooBar;
+    public $var = 10;
     protected $some = 23;
     protected $x    = true;
     private $test = 22;

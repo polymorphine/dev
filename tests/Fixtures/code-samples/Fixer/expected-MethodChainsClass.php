@@ -20,6 +20,11 @@ class MethodChainsClass implements ArrayAccess
 {
     public const TEST = 1;
 
+    public static function withSomething(Name $variable)
+    {
+        return new self('string', $variable);
+    }
+
     protected $inheritedValues = [
         'key'       => 'value',
         'longerKey' => 'another value'
@@ -34,11 +39,6 @@ class MethodChainsClass implements ArrayAccess
     {
         $this->something = $something;
         $this->variable  = $variable;
-    }
-
-    public static function withSomething(Name $variable)
-    {
-        return new self('string', $variable);
     }
 
     public function offsetExists($offset)
