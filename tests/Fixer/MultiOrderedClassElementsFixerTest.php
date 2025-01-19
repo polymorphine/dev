@@ -184,7 +184,7 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             'method_private', 'method_private_static'
         ];
 
-        return new MultiOrderedClassElementsFixer($srcOrder, $testOrder);
+        return new MultiOrderedClassElementsFixer(dirname(__DIR__, 2), $srcOrder, $testOrder);
     }
 
     protected function properties(): array

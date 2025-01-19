@@ -76,6 +76,7 @@ final class FixerFactory
     public static function createFor(string $launchFile): Config
     {
         $workingDir = dirname($launchFile);
+        $testsPath  = $workingDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
 
         self::setHeaderFrom($launchFile);
 
@@ -114,9 +115,8 @@ final class FixerFactory
         self::$rules['Polymorphine/declare_strict_first_line']               = true;
         self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
-        $excludeSamples = function (SplFileInfo $file) use ($workingDir) {
+        $excludeSamples = function (SplFileInfo $file) use ($testsPath) {
             $filePath   = $file->getPath();
-            $testsPath  = $workingDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
             $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
             return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
         };
@@ -130,7 +130,7 @@ final class FixerFactory
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),
                 new Fixer\NoTrailingCommaInMultilineArrayFixer(),
-                new Fixer\MultiOrderedClassElementsFixer($srcOrder, $testOrder),
+                new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
                 new Fixer\NamedConstructorsFirstStaticFixer(),
                 new Fixer\AlignedMethodChainFixer(),
                 new Fixer\AlignedAssignmentsFixer(),

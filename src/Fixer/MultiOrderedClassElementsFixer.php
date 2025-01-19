@@ -20,15 +20,18 @@ use SplFileInfo;
 
 class MultiOrderedClassElementsFixer implements FixerInterface
 {
+    private string                    $testPath;
     private OrderedClassElementsFixer $srcFixer;
     private OrderedClassElementsFixer $testFixer;
 
     /**
-     * @param array $srcOrder
-     * @param array $testOrder
+     * @param string $testPath
+     * @param array  $srcOrder
+     * @param array  $testOrder
      */
-    public function __construct(array $srcOrder, array $testOrder)
+    public function __construct(string $testPath, array $srcOrder, array $testOrder)
     {
+        $this->testPath  = $testPath;
         $this->srcFixer  = new OrderedClassElementsFixer();
         $this->testFixer = new OrderedClassElementsFixer();
 
@@ -58,7 +61,7 @@ class MultiOrderedClassElementsFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        $this->isTestClass($tokens)
+        strpos($file->getPathname(), $this->testPath) === 0 && $this->isTestClass($tokens)
             ? $this->testFixer->fix($file, $tokens)
             : $this->srcFixer->fix($file, $tokens);
     }
