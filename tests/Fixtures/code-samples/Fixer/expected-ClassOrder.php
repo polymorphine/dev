@@ -49,10 +49,6 @@ class ClassOrder
     {
     }
 
-    private function setUp()
-    {
-    }
-
     public function doPublic(): void
     {
     }
@@ -62,6 +58,10 @@ class ClassOrder
     }
 
     private function doPrivate()
+    {
+    }
+
+    private function setUp()
     {
     }
 }

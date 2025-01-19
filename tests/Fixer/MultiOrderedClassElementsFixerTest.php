@@ -28,19 +28,14 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
                 private $self;
             
                 /** someMethod phpDoc */
-                public function someMethod()
-                {
-                    //code...
-                }
+                public function someMethod() {}
             
                 public static function notConstructor(): SomeType
                 {
-                    //code without 'self' return type
                 }
             
                 final public static function staticConstructor(array $data): BaseExample
                 {
-                    //return new self()
                 }
             
                 /**
@@ -48,12 +43,10 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
                  */
                 public static function fromData(array $data): self
                 {
-                    //return new self()
                 }
             
                 public static function staticInterfaceConstructor(array $data): ExampleInterface
                 {
-                    //return new self()
                 }
             }
             
@@ -67,12 +60,10 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             
                 public static function notConstructor(): SomeType
                 {
-                    //code without 'self' return type
                 }
             
                 final public static function staticConstructor(array $data): BaseExample
                 {
-                    //return new self()
                 }
             
                 /**
@@ -80,20 +71,15 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
                  */
                 public static function fromData(array $data): self
                 {
-                    //return new self()
                 }
             
                 public static function staticInterfaceConstructor(array $data): ExampleInterface
                 {
-                    //return new self()
                 }
                 private $self;
             
                 /** someMethod phpDoc */
-                public function someMethod()
-                {
-                    //code...
-                }
+                public function someMethod() {}
             }
             
             CODE;
@@ -108,36 +94,33 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             
             class ExampleClassTest extends BaseExample implements ExampleInterface
             {
-                public static function notConstructor(): SomeType
-                {
-                    //code without 'self' return type
-                }
+                public static function notConstructor(): SomeType {}
             
                 private $self;
             
                 /** someMethod phpDoc */
-                public function someMethod()
-                {
-                    //code...
-                }
+                public function someMethod() {}
             
-                final public static function staticConstructor(array $data): BaseExample
-                {
-                    //return new self()
-                }
+                private function getTestedClass(): ExampleClass {}
+            
+                public static function tearDownAfterClass(): void {}
+            
+                protected function tearDown(): void {}
+            
+                private static function assertSomething(): void {}
+            
+                protected static function staticConstructor(array $data): BaseExample {}
+            
+                public static function setUpBeforeClass(): void {}
             
                 /**
                  * Static constructor with phpDoc
                  */
-                public static function fromData(array $data): self
-                {
-                    //return new self()
-                }
+                public static function fromData(array $data): self {}
             
-                public static function staticInterfaceConstructor(array $data): ExampleInterface
-                {
-                    //return new self()
-                }
+                public function test_Instantiation() {}
+            
+                public static function staticInterfaceConstructor(array $data): ExampleInterface {}
             }
             
             CODE;
@@ -150,33 +133,30 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             
                 private $self;
             
-                /** someMethod phpDoc */
-                public function someMethod()
-                {
-                    //code...
-                }
-                public static function notConstructor(): SomeType
-                {
-                    //code without 'self' return type
-                }
+                public static function setUpBeforeClass(): void {}
             
-                final public static function staticConstructor(array $data): BaseExample
-                {
-                    //return new self()
-                }
+                public static function tearDownAfterClass(): void {}
+            
+                protected function tearDown(): void {}
+            
+                /** someMethod phpDoc */
+                public function someMethod() {}
+            
+                public function test_Instantiation() {}
+                public static function notConstructor(): SomeType {}
             
                 /**
                  * Static constructor with phpDoc
                  */
-                public static function fromData(array $data): self
-                {
-                    //return new self()
-                }
+                public static function fromData(array $data): self {}
             
-                public static function staticInterfaceConstructor(array $data): ExampleInterface
-                {
-                    //return new self()
-                }
+                public static function staticInterfaceConstructor(array $data): ExampleInterface {}
+            
+                protected static function staticConstructor(array $data): BaseExample {}
+            
+                private function getTestedClass(): ExampleClass {}
+            
+                private static function assertSomething(): void {}
             }
             
             CODE;
@@ -187,23 +167,21 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
     protected function fixer(): FixerInterface
     {
         $srcOrder = [
-            'use_trait', 'case',
-            'constant_public', 'constant_protected', 'constant_private',
+            'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',
             'property_public_static', 'property_protected_static', 'property_private_static',
             'method_public_static', 'method_protected_static', 'method_private_static',
             'property_public', 'property_protected', 'property_private',
-            'construct', 'phpunit', 'magic', 'destruct',
-            'method_public', 'method_protected', 'method_private'
+            'construct', 'magic', 'method_public', 'destruct', 'method_protected', 'method_private'
         ];
 
         $testOrder = [
-            'use_trait', 'case',
-            'constant_public', 'constant_protected', 'constant_private',
+            'use_trait', 'constant_public', 'constant_protected', 'constant_private',
             'property_public_static', 'property_protected_static', 'property_private_static',
             'property_public', 'property_protected', 'property_private',
             'construct', 'phpunit', 'magic', 'destruct',
-            'method_public', 'method_protected', 'method_private',
-            'method_public_static', 'method_protected_static', 'method_private_static'
+            'method_public', 'method_public_static',
+            'method_protected', 'method_protected_static',
+            'method_private', 'method_private_static'
         ];
 
         return new MultiOrderedClassElementsFixer($srcOrder, $testOrder);
