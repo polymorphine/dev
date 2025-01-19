@@ -76,6 +76,9 @@ class MultiOrderedClassElementsFixer implements FixerInterface
     private function isTestClass(Tokens $tokens): bool
     {
         $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]);
-        return $classIdx && substr($tokens[$classIdx + 2]->getContent(), -4) === 'Test';
+        if (!$classIdx) { return false; }
+
+        $className = $tokens[$classIdx + 2]->getContent();
+        return substr($className, -4) === 'Test' || substr($className, -5) === 'Tests';
     }
 }
