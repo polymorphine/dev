@@ -23,7 +23,7 @@ class CallableDefinitionSniffTest extends SnifferTest
      * @param array $properties
      * @param int[] $expectedWarningLines
      */
-    public function testCallableParamDocWithoutDefinitionGivesWarning(array $properties, array $expectedWarningLines)
+    public function test_CallableParamDoc_WithoutDefinition_GivesWarning(array $properties, array $expectedWarningLines)
     {
         $this->setProperties($properties);
         $this->assertWarningLines('./tests/Fixtures/code-samples/Sniffs/PhpDocCallableDefinitions.php', $expectedWarningLines);

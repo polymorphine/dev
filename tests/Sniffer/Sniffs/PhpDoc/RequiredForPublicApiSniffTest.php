@@ -23,7 +23,7 @@ class RequiredForPublicApiSniffTest extends SnifferTest
      * @param string $filename
      * @param array  $warningLines
      */
-    public function testInterfaceWarnings(string $filename, array $warningLines)
+    public function test_Interface_Warnings(string $filename, array $warningLines)
     {
         $this->assertWarningLines($filename, $warningLines);
     }

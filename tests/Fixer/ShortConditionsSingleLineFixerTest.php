@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\ShortConditionsSingleLineFixer;
 
 class ShortConditionsSingleLineFixerTest extends FixerTest
 {
-    public function testShortConditionsAreTurnedIntoSingleLine()
+    public function test_ShortConditions_AreTurnedIntoSingleLine()
     {
         $code = <<<'CODE'
             <?php
@@ -38,7 +38,7 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testLongConditionsAreNotChanged()
+    public function test_LongConditions_AreNotChanged()
     {
         $code = <<<'CODE'
             <?php

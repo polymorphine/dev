@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\AlignedMethodChainFixer;
 
 class AlignedMethodChainFixerTest extends FixerTest
 {
-    public function testSingleLineChainCallsAreNotChanged()
+    public function test_SingleLineChainCalls_AreNotChanged()
     {
         $code = <<<'CODE'
             <?php
@@ -30,7 +30,7 @@ class AlignedMethodChainFixerTest extends FixerTest
         $this->assertSame($code, $this->runner->fix($code));
     }
 
-    public function testLineBreakChainCallsAreExpandedAndAligned()
+    public function test_LineBreakChainCalls_AreExpandedAndAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -56,7 +56,7 @@ class AlignedMethodChainFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testNestedMultilineChainsAreAligned()
+    public function test_NestedMultilineChains_AreAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -83,7 +83,7 @@ class AlignedMethodChainFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testCodeWithoutObjectOperatorIsSkipped()
+    public function test_CodeWithoutObjectOperator_IsSkipped()
     {
         $code = <<<'CODE'
             <?php

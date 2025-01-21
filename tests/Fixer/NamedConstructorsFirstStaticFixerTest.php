@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\NamedConstructorsFirstStaticFixer;
 
 class NamedConstructorsFirstStaticFixerTest extends FixerTest
 {
-    public function testStaticConstructorsAreMovedToBeFirstStaticMethods()
+    public function test_StaticConstructors_AreMovedToBeFirstStaticMethods()
     {
         $code = <<<'CODE'
             <?php
@@ -100,7 +100,7 @@ class NamedConstructorsFirstStaticFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testOnlyConstructorMethodsAreMoved()
+    public function test_OnlyConstructorMethods_AreMoved()
     {
         $code = <<<'CODE'
             <?php

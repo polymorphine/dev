@@ -19,7 +19,7 @@ abstract class SnifferTest extends TestCase
 {
     private SnifferTestRunner $runner;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->runner = new SnifferTestRunner($this->sniffer());
     }

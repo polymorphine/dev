@@ -18,7 +18,7 @@ use PhpCsFixer\Fixer\FixerInterface;
 
 class AlignedAssignmentsFixerTest extends FixerTest
 {
-    public function testVariableAssignmentsAreAligned()
+    public function test_VariableAssignments_AreAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -41,7 +41,7 @@ class AlignedAssignmentsFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testMixedKindVariableAssignmentsAreAlignedSeparately()
+    public function test_MixedKindVariableAssignments_AreAlignedSeparately()
     {
         $code = <<<'CODE'
             <?php
@@ -76,7 +76,7 @@ class AlignedAssignmentsFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testMultilineAssignmentIsNotAligned()
+    public function test_MultilineAssignment_IsNotAligned()
     {
         $code = <<<'CODE'
             <?php

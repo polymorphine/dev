@@ -18,7 +18,7 @@ use Polymorphine\Dev\Fixer\MultiOrderedClassElementsFixer;
 
 class MultiOrderedClassElementsFixerTest extends FixerTest
 {
-    public function testClassWithoutTestNameIsOrderedWithSrcConfig()
+    public function test_ClassWithoutTestName_IsOrderedWithSrcConfig()
     {
         $code = <<<'CODE'
             <?php
@@ -87,7 +87,7 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
         $this->assertSame($expected, $this->runner->fix($code));
     }
 
-    public function testClassWithTestNameIsOrderedWithTestConfig()
+    public function test_ClassWithTestName_IsOrderedWithTestConfig()
     {
         $code = <<<'CODE'
             <?php

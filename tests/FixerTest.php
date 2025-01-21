@@ -28,7 +28,7 @@ abstract class FixerTest extends TestCase
         $this->runner = new FixerTestRunner([$fixer]);
     }
 
-    public function testProperties()
+    public function test_Properties()
     {
         $fixer = $this->fixer();
         $this->assertFalse($fixer->isRisky());

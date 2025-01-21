@@ -17,7 +17,7 @@ use Polymorphine\Dev\Tools;
 
 class ToolsTest extends TestCase
 {
-    public function testDumpSourceCodeSnifferTokens()
+    public function test_DumpSourceCodeSnifferTokens()
     {
         $testFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
         $code     = '<?php declare(strict_types=1);';
@@ -26,7 +26,7 @@ class ToolsTest extends TestCase
         unlink($testFile);
     }
 
-    public function testDumpSourceFileFixerTokens()
+    public function test_DumpSourceFileFixerTokens()
     {
         $testSourceFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
         $testDumpFile   = tempnam(sys_get_temp_dir(), 'tmp_') . '.json';

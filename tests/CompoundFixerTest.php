@@ -33,7 +33,7 @@ class CompoundFixerTest extends TestCase
      * @param string $fileExpected
      * @param string $fileGiven
      */
-    public function testFixedFiles_MatchExpectations(string $fileExpected, string $fileGiven)
+    public function test_FixedFiles_MatchExpectations(string $fileExpected, string $fileGiven)
     {
         $sourceCode = file_get_contents($fileGiven);
         $this->assertSame(file_get_contents($fileExpected), $this->runner->fix($sourceCode));

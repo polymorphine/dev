@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\NoTrailingCommaInMultilineArrayFixer;
 
 class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
 {
-    public function testTrailingCommaIsRemovedFromMultilineArray()
+    public function test_TrailingComma_IsRemovedFromMultilineArray()
     {
         $code = <<<'CODE'
             <?php
