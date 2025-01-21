@@ -23,16 +23,6 @@ use SplFileInfo;
 
 class FixerTestRunner
 {
-    private array $fixers;
-
-    /**
-     * @param FixerInterface[] $fixers
-     */
-    public function __construct(array $fixers)
-    {
-        $this->fixers = $fixers;
-    }
-
     public static function withConfig(ConfigInterface $config): self
     {
         $fixerFactory = new FixerFactory();
@@ -45,6 +35,16 @@ class FixerTestRunner
             ->getFixers();
 
         return new self($fixers);
+    }
+
+    private array $fixers;
+
+    /**
+     * @param FixerInterface[] $fixers
+     */
+    public function __construct(array $fixers)
+    {
+        $this->fixers = $fixers;
     }
 
     /**

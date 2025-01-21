@@ -18,18 +18,18 @@ use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-final class ConstructorsFirstFixer implements FixerInterface
+final class NamedConstructorsFirstStaticFixer implements FixerInterface
 {
     private Tokens $tokens;
 
     public function getName(): string
     {
-        return 'Polymorphine/constructors_first';
+        return 'Polymorphine/named_constructors_first_static';
     }
 
     public function getDefinition(): FixerDefinitionInterface
     {
-        return new FixerDefinition('Moves constructor methods (including static named constructors) to the top.', []);
+        return new FixerDefinition('Moves named static constructor methods to the top.', []);
     }
 
     public function getPriority(): int
@@ -56,24 +56,16 @@ final class ConstructorsFirstFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $classIdx    = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
-        $isConstruct = fn ($idx) => $this->tokens[$idx + 2]->getContent() === '__construct';
-        $insertIdx   = $this->getMethodIdx($classIdx, $isConstruct, false);
-        if (!$insertIdx) { return; }
+        $classIdx  = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
+        $staticIdx = $this->getMethodIdx($classIdx, fn (int $idx) => $this->tokens[$idx - 2]->isGivenKind(T_STATIC));
+        if (!$staticIdx) { return; }
 
-        $construct = $this->getMethodIdx($classIdx, $isConstruct);
-        if ($insertIdx < $construct) {
-            $insertIdx = $this->moveMethod($construct, $insertIdx);
-        }
-
-        $classTypes          = $this->getClassTypes($classIdx);
-        $isStaticConstructor = fn (int $idx) => $this->isStaticConstructor($idx, $classTypes);
-
-        $insertIdx = $this->getMethodIdx($insertIdx, $isStaticConstructor, false);
+        $classTypes = $this->getClassTypes($classIdx);
+        $insertIdx  = $this->getMethodIdx($staticIdx, fn (int $idx) => !$this->isStaticConstructor($idx, $classTypes));
         if (!$insertIdx) { return; }
 
         $idx = $insertIdx;
-        while ($idx = $this->getMethodIdx($idx + 10, $isStaticConstructor)) {
+        while ($idx = $this->getMethodIdx($idx + 10, fn (int $idx) => $this->isStaticConstructor($idx, $classTypes))) {
             $insertIdx = $this->moveMethod($idx, $insertIdx);
         }
     }
@@ -89,10 +81,10 @@ final class ConstructorsFirstFixer implements FixerInterface
         return $returnType->isGivenKind(T_STRING) && isset($classTypes[$returnType->getContent()]);
     }
 
-    private function getMethodIdx(int $start, ?callable $condition = null, bool $expected = true): int
+    private function getMethodIdx(int $start, callable $condition): int
     {
         $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
-        while ($idx && $condition && $condition($idx) !== $expected) {
+        while ($idx && !$condition($idx)) {
             $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
         }
 

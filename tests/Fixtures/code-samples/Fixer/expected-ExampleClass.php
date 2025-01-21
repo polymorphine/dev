@@ -25,6 +25,24 @@ abstract class ExampleClass implements SomeInterface
 {
     public const CONSTANT = 'string';
 
+    /**
+     * Creates from array.
+     *
+     * @param array $arr
+     *
+     * @return MyClass
+     */
+    public static function fromArray(array $arr): self
+    {
+        return new self(implode('.', $arr));
+    }
+
+    // Non-constructor method - no return type
+    public static function withHelloString()
+    {
+        return new self('Hello World!');
+    }
+
     public array $field = [
         'key'   => 1,
         'other' => 'value'
@@ -42,25 +60,7 @@ abstract class ExampleClass implements SomeInterface
         $this->variable = $variable;
     }
 
-    /**
-     * Creates from array.
-     *
-     * @param array $arr
-     *
-     * @return MyClass
-     */
-    public static function fromArray(array $arr): self
-    {
-        return new self(implode('.', $arr));
-    }
-
     abstract public function somethingAbstract();
-
-    // Non-constructor method - no return type
-    public static function withHelloString()
-    {
-        return new self('Hello World!');
-    }
 
     public function getVariable()
     {

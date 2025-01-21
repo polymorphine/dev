@@ -50,7 +50,7 @@ final class FixerFactory
         'no_useless_else'                       => true,
         'no_useless_return'                     => true,
         'non_printable_character'               => ['use_escape_sequences_in_strings' => true],
-        'ordered_class_elements'                => true,
+        'ordered_class_elements'                => false,
         'ordered_imports'                       => false,
         'php_unit_strict'                       => false,
         'php_unit_method_casing'                => false,
@@ -76,6 +76,7 @@ final class FixerFactory
     public static function createFor(string $launchFile): Config
     {
         $workingDir = dirname($launchFile);
+        $testsPath  = $workingDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
 
         self::setHeaderFrom($launchFile);
 
@@ -84,9 +85,28 @@ final class FixerFactory
             'square_brace_block', 'curly_brace_block'
         ];
 
+        $srcOrder = [
+            'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',
+            'property_public_static', 'property_protected_static', 'property_private_static',
+            'method_public_static', 'method_protected_static', 'method_private_static',
+            'property_public', 'property_protected', 'property_private',
+            'construct', 'magic', 'method_public', 'destruct', 'method_protected', 'method_private'
+        ];
+
+        $testOrder = [
+            'use_trait', 'constant_public', 'constant_protected', 'constant_private',
+            'property_public_static', 'property_protected_static', 'property_private_static',
+            'property_public', 'property_protected', 'property_private',
+            'construct', 'phpunit', 'magic', 'destruct',
+            'method_public', 'method_public_static',
+            'method_protected', 'method_protected_static',
+            'method_private', 'method_private_static'
+        ];
+
         self::$rules['Polymorphine/double_line_before_class_definition']     = true;
         self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
-        self::$rules['Polymorphine/constructors_first']                      = true;
+        self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
+        self::$rules['Polymorphine/named_constructors_first_static']         = true;
         self::$rules['Polymorphine/aligned_method_chain']                    = true;
         self::$rules['Polymorphine/aligned_assignments']                     = true;
         self::$rules['Polymorphine/aligned_array_values']                    = true;
@@ -95,9 +115,8 @@ final class FixerFactory
         self::$rules['Polymorphine/declare_strict_first_line']               = true;
         self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
-        $excludeSamples = function (SplFileInfo $file) use ($workingDir) {
+        $excludeSamples = function (SplFileInfo $file) use ($testsPath) {
             $filePath   = $file->getPath();
-            $testsPath  = $workingDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
             $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
             return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
         };
@@ -111,7 +130,8 @@ final class FixerFactory
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),
                 new Fixer\NoTrailingCommaInMultilineArrayFixer(),
-                new Fixer\ConstructorsFirstFixer(),
+                new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
+                new Fixer\NamedConstructorsFirstStaticFixer(),
                 new Fixer\AlignedMethodChainFixer(),
                 new Fixer\AlignedAssignmentsFixer(),
                 new Fixer\AlignedArrayValuesFixer(),
