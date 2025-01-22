@@ -27,19 +27,14 @@ class CompoundFixerTest extends TestCase
         $this->runner = FixerTestRunner::withConfig($config);
     }
 
-    /**
-     * @dataProvider fileList
-     *
-     * @param string $fileExpected
-     * @param string $fileGiven
-     */
+    /** @dataProvider fileList */
     public function test_FixedFiles_MatchExpectations(string $fileExpected, string $fileGiven)
     {
         $sourceCode = file_get_contents($fileGiven);
         $this->assertSame(file_get_contents($fileExpected), $this->runner->fix($sourceCode));
     }
 
-    public function fileList(): array
+    public static function fileList(): iterable
     {
         $files = [];
         foreach (array_diff(scandir(__DIR__ . '/Fixtures/code-samples/Fixer'), ['..', '.']) as $file) {

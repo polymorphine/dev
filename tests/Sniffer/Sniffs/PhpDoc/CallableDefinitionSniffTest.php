@@ -17,19 +17,14 @@ use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\CallableDefinitionSniff;
 
 class CallableDefinitionSniffTest extends SnifferTest
 {
-    /**
-     * @dataProvider properties
-     *
-     * @param array $properties
-     * @param int[] $expectedWarningLines
-     */
+    /** @dataProvider properties */
     public function test_CallableParamDoc_WithoutDefinition_GivesWarning(array $properties, array $expectedWarningLines)
     {
         $this->setProperties($properties);
         $this->assertWarningLines('./tests/Fixtures/code-samples/Sniffs/PhpDocCallableDefinitions.php', $expectedWarningLines);
     }
 
-    public function properties(): array
+    public static function properties(): iterable
     {
         return [
             [['syntax' => 'both', 'includeClosure' => false], range(15, 18)],
