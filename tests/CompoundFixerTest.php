@@ -13,25 +13,23 @@ namespace Polymorphine\Dev\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Polymorphine\Dev\FixerFactory;
-use Polymorphine\Dev\Tests\Fixtures\FixerTestRunner;
 
 
 /** @group integrated */
 class CompoundFixerTest extends TestCase
 {
-    private FixerTestRunner $runner;
+    private static Fixtures\FixerTestRunner $runner;
 
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
         $config = FixerFactory::createFor(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cs-fixer.php.dist');
-        $this->runner = FixerTestRunner::withConfig($config);
+        self::$runner = Fixtures\FixerTestRunner::withConfig($config);
     }
 
     /** @dataProvider fileList */
     public function test_FixedFiles_MatchExpectations(string $fileExpected, string $fileGiven)
     {
-        $sourceCode = file_get_contents($fileGiven);
-        $this->assertSame(file_get_contents($fileExpected), $this->runner->fix($sourceCode));
+        self::assertSame(file_get_contents($fileExpected), self::$runner->fix(file_get_contents($fileGiven)));
     }
 
     public static function fileList(): iterable
