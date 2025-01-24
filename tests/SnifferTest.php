@@ -12,34 +12,29 @@
 namespace Polymorphine\Dev\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PHP_CodeSniffer\Files\File;
 use Polymorphine\Dev\Tests\Fixtures\SnifferTestRunner;
 
 
 abstract class SnifferTest extends TestCase
 {
-    private SnifferTestRunner $runner;
-
-    protected function setUp(): void
+    public function assertWarningLines(array $expectedWarningLines, string $filename, array $options = []): void
     {
-        $this->runner = new SnifferTestRunner($this->sniffer());
+        $file = $this->sniffedFile($filename, $options);
+        $this->assertEquals($expectedWarningLines, array_keys($file->getWarnings()));
     }
 
-    public function setProperties(array $properties): void
+    public function assertErrorLines(array $expectedErrorLines, string $filename, array $options = []): void
     {
-        $this->runner->setProperties($properties);
+        $file = $this->sniffedFile($filename, $options);
+        $this->assertEquals($expectedErrorLines, array_keys($file->getErrors()));
     }
 
-    public function assertWarningLines(string $filename, array $expectedWarningLines): void
-    {
-        $fileWarnings = $this->runner->sniff($filename)->getWarnings();
-        $this->assertEquals($expectedWarningLines, array_keys($fileWarnings));
-    }
+    abstract protected function sniffClass(): string;
 
-    public function assertErrorLines(string $filename, array $expectedErrorLines): void
+    private function sniffedFile(string $filename, array $options = []): File
     {
-        $fileErrors = $this->runner->sniff($filename)->getErrors();
-        $this->assertEquals($expectedErrorLines, array_keys($fileErrors));
+        $runner = new SnifferTestRunner($this->sniffClass(), $options);
+        return $runner->sniff('./tests/Fixtures/code-samples/Sniffs/' . $filename);
     }
-
-    abstract protected function sniffer(): string;
 }

@@ -24,7 +24,7 @@ class SnifferTestRunner
     private ?Config  $config;
     private array    $properties;
 
-    public function __construct(string $sniffClass)
+    public function __construct(string $sniffClass, array $options = [])
     {
         $runner = SnifferTokens::runner(__DIR__ . '/tests.phpcs.xml');
 
@@ -36,6 +36,7 @@ class SnifferTestRunner
         $code = Util\Common::getSniffCode($sniffClass);
         $this->ruleset->ruleset[$code]['properties'] = [];
         $this->properties = &$this->ruleset->ruleset[$code]['properties'];
+        $this->setProperties($options);
     }
 
     public function sniff(string $filename): Files\File
@@ -48,7 +49,7 @@ class SnifferTestRunner
         return $testFile;
     }
 
-    public function setProperties(array $properties): void
+    private function setProperties(array $properties): void
     {
         $this->properties = array_map(fn ($value) => ['scope' => 'sniff', 'value' => $value], $properties);
     }

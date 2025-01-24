@@ -18,22 +18,22 @@ use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\RequiredForPublicApiSniff;
 class RequiredForPublicApiSniffTest extends SnifferTest
 {
     /** @dataProvider classFileWarnings */
-    public function test_Interface_Warnings(string $filename, array $warningLines)
+    public function test_Interface_Warnings(array $warningLines, string $filename)
     {
-        $this->assertWarningLines('./tests/Fixtures/code-samples/Sniffs/' . $filename, $warningLines);
+        $this->assertWarningLines($warningLines, $filename);
     }
 
     public static function classFileWarnings(): iterable
     {
         return [
-            'interface' => ['PhpDocRequiredForInterfaceApi.php', [12]],
-            'class'     => ['PhpDocRequiredForClassApi.php', [14]],
-            'parent'    => ['PhpDocRequiredForParentApi.php', [8]],
-            'invalid'   => ['PhpDocRequiredForInvalidClass.php', [8]]
+            'interface' => [[12], 'PhpDocRequiredForInterfaceApi.php'],
+            'class'     => [[14], 'PhpDocRequiredForClassApi.php'],
+            'parent'    => [[8], 'PhpDocRequiredForParentApi.php'],
+            'invalid'   => [[8], 'PhpDocRequiredForInvalidClass.php']
         ];
     }
 
-    protected function sniffer(): string
+    protected function sniffClass(): string
     {
         return RequiredForPublicApiSniff::class;
     }
