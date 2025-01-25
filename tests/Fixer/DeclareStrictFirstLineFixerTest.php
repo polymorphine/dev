@@ -27,7 +27,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     public function test_FileWithDeclareInFirstLine_IsUnchanged()
@@ -39,7 +39,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     public function test_FileWithDifferentDeclare_IsUnchanged()
@@ -52,7 +52,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     public function test_DeclareNotInFirstLine_IsMoved()
@@ -72,7 +72,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_DeclareNotInFirstLine_IsMovedWIthFollowingWhitespace()
@@ -95,7 +95,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): FixerInterface

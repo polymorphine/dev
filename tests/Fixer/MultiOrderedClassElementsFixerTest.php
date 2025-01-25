@@ -84,7 +84,7 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_ClassWithTestName_IsOrderedWithTestConfig()
@@ -161,7 +161,7 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): FixerInterface

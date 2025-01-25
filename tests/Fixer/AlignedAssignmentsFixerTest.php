@@ -38,7 +38,7 @@ class AlignedAssignmentsFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_MixedKindVariableAssignments_AreAlignedSeparately()
@@ -73,7 +73,7 @@ class AlignedAssignmentsFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_MultilineAssignment_IsNotAligned()
@@ -89,7 +89,7 @@ class AlignedAssignmentsFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     protected function fixer(): FixerInterface

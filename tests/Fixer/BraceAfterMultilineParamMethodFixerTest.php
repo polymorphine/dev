@@ -28,7 +28,7 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE);
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     public function test_MultilineDefinition_BraceFromNextLine_IsFixed()
@@ -56,7 +56,7 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE, 'trait');
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_MultilineDefinition_MissingWhitespace_IsFixed()
@@ -83,7 +83,7 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE);
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_AbstractMultilineDefinition_DoesNotAffectNextMethod()
@@ -102,7 +102,7 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE);
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     protected function fixer(): BraceAfterMultilineParamMethodFixer

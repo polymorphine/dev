@@ -47,7 +47,7 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): NoTrailingCommaInMultilineArrayFixer

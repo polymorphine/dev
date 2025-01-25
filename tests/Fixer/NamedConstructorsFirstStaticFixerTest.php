@@ -97,7 +97,7 @@ class NamedConstructorsFirstStaticFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_OnlyConstructorMethods_AreMoved()
@@ -170,7 +170,7 @@ class NamedConstructorsFirstStaticFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): NamedConstructorsFirstStaticFixer

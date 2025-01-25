@@ -35,7 +35,7 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     public function test_LongConditions_AreNotChanged()
@@ -63,7 +63,7 @@ class ShortConditionsSingleLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     protected function fixer(): ShortConditionsSingleLineFixer
