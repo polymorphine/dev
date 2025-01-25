@@ -16,7 +16,7 @@ use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Exceptions;
 
-require_once dirname(dirname(__DIR__)) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+require_once dirname(__DIR__, 2) . '/vendor/squizlabs/php_codesniffer/autoload.php';
 if (!defined('PHP_CODESNIFFER_CBF')) {
     define('PHP_CODESNIFFER_CBF', false);
 }
@@ -35,7 +35,7 @@ final class SnifferTokens
      */
     public static function runner(?string $configFile = null): Runner
     {
-        $configFile = $configFile ?: dirname(dirname(__DIR__)) . '/phpcs.xml.dist';
+        $configFile = $configFile ?: dirname(__DIR__, 2) . '/phpcs.xml.dist';
         $runner     = new Runner();
         $runner->config = new Config(['-q', '--standard=' . $configFile]);
         $runner->init();
@@ -84,6 +84,6 @@ final class SnifferTokens
             $token = ['idx' => $id] + $token;
         }
 
-        self::json($tokens, $tokensFile ?: dirname(dirname(__DIR__)) . '/temp/tokens-dump.json');
+        self::json($tokens, $tokensFile ?: dirname(__DIR__, 2) . '/temp/tokens-dump.json');
     }
 }
