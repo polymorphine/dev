@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\BraceAfterFunctionFixer;
 
 class BraceAfterFunctionFixerTest extends FixerTest
 {
-    public function testFunctionBracesFromNextLineAreMoved()
+    public function test_FunctionBracesFromNextLine_AreMoved()
     {
         $code = <<<'CODE'
             <?php
@@ -38,10 +38,10 @@ class BraceAfterFunctionFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testMethodBracesFromNextLineAreMoved()
+    public function test_MethodBracesFromNextLine_AreMoved()
     {
         $code = <<<'CODE'
             <?php
@@ -66,10 +66,10 @@ class BraceAfterFunctionFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testUnusualMethodFormattingIsFixed()
+    public function test_UnusualMethodFormatting_IsFixed()
     {
         $code = <<<'CODE'
             <?php
@@ -102,7 +102,7 @@ class BraceAfterFunctionFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): BraceAfterFunctionFixer

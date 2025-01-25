@@ -18,12 +18,12 @@ use PhpCsFixer\ConfigInterface;
 
 class FixerFactoryTest extends TestCase
 {
-    public function testConfigInstantiation()
+    public function test_ConfigInstantiation()
     {
         $this->assertInstanceOf(ConfigInterface::class, FixerFactory::createFor(__FILE__));
     }
 
-    public function testConfigFinder_IgnoresCodeSamples()
+    public function test_ConfigFinder_IgnoresCodeSamples()
     {
         $finder = FixerFactory::createFor($this->packagePath('cs-fixer.php.dist'))->getFinder();
 
@@ -35,7 +35,7 @@ class FixerFactoryTest extends TestCase
         }
     }
 
-    public function testHeaderIsReadFromLaunchFile()
+    public function test_Header_IsReadFromLaunchFile()
     {
         $expectedHeader = <<<'HEADER'
             This file is part of Polymorphine/Dev package.

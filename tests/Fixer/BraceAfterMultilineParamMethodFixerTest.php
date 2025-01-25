@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\BraceAfterMultilineParamMethodFixer;
 
 class BraceAfterMultilineParamMethodFixerTest extends FixerTest
 {
-    public function testSingleLineDefinition_BraceFromNextLine_IsNotChanged()
+    public function test_SingleLineDefinition_BraceFromNextLine_IsNotChanged()
     {
         $code = $this->wrap(<<<'CODE'
             
@@ -28,10 +28,10 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE);
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testMultilineDefinition_BraceFromNextLine_IsFixed()
+    public function test_MultilineDefinition_BraceFromNextLine_IsFixed()
     {
         $code = $this->wrap(<<<'CODE'
             
@@ -56,10 +56,10 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE, 'trait');
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testMultilineDefinition_MissingWhitespace_IsFixed()
+    public function test_MultilineDefinition_MissingWhitespace_IsFixed()
     {
         $code = $this->wrap(<<<'CODE'
             
@@ -83,10 +83,10 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE);
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testAbstractMultilineDefinition_DoesNotAffectNextMethod()
+    public function test_AbstractMultilineDefinition_DoesNotAffectNextMethod()
     {
         $code = $this->wrap(<<<'CODE'
 
@@ -102,7 +102,7 @@ class BraceAfterMultilineParamMethodFixerTest extends FixerTest
             
             CODE);
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     protected function fixer(): BraceAfterMultilineParamMethodFixer

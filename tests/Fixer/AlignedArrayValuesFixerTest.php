@@ -18,7 +18,7 @@ use PhpCsFixer\Fixer\FixerInterface;
 
 class AlignedArrayValuesFixerTest extends FixerTest
 {
-    public function testNonAssociativeArraysAreNotChanged()
+    public function test_NonAssociativeArrays_AreNotChanged()
     {
         $code = <<<'CODE'
             <?php
@@ -30,10 +30,10 @@ class AlignedArrayValuesFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testSingleLineArraysAreNotChanged()
+    public function test_SingleLineArrays_AreNotChanged()
     {
         $code = <<<'CODE'
             <?php
@@ -42,10 +42,10 @@ class AlignedArrayValuesFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testMultilineArraysAreAligned()
+    public function test_MultilineArrays_AreAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -71,10 +71,10 @@ class AlignedArrayValuesFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testNotExclusivelyMultilineArraysAreNotChanged()
+    public function test_NotExclusivelyMultilineArrays_AreNotChanged()
     {
         $code = <<<'CODE'
             <?php
@@ -88,7 +88,7 @@ class AlignedArrayValuesFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     protected function fixer(): FixerInterface

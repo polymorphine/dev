@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\AlignedMethodChainFixer;
 
 class AlignedMethodChainFixerTest extends FixerTest
 {
-    public function testSingleLineChainCallsAreNotChanged()
+    public function test_SingleLineChainCalls_AreNotChanged()
     {
         $code = <<<'CODE'
             <?php
@@ -27,10 +27,10 @@ class AlignedMethodChainFixerTest extends FixerTest
 
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testLineBreakChainCallsAreExpandedAndAligned()
+    public function test_LineBreakChainCalls_AreExpandedAndAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -53,10 +53,10 @@ class AlignedMethodChainFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testNestedMultilineChainsAreAligned()
+    public function test_NestedMultilineChains_AreAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -80,10 +80,10 @@ class AlignedMethodChainFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testCodeWithoutObjectOperatorIsSkipped()
+    public function test_CodeWithoutObjectOperator_IsSkipped()
     {
         $code = <<<'CODE'
             <?php
@@ -92,7 +92,7 @@ class AlignedMethodChainFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
     protected function fixer(): AlignedMethodChainFixer

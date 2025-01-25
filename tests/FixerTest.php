@@ -20,15 +20,7 @@ use SplFileInfo;
 
 abstract class FixerTest extends TestCase
 {
-    protected FixerTestRunner $runner;
-
-    protected function setUp(): void
-    {
-        $fixer = $this->fixer();
-        $this->runner = new FixerTestRunner([$fixer]);
-    }
-
-    public function testProperties()
+    public function test_Properties()
     {
         $fixer = $this->fixer();
         $this->assertFalse($fixer->isRisky());
@@ -40,7 +32,22 @@ abstract class FixerTest extends TestCase
         $this->assertSame($properties['priority'], $fixer->getPriority());
     }
 
+    public function assertFixed(string $code, string $expected): void
+    {
+        $this->assertSame($expected, $this->fixerTestRunner()->fix($code));
+    }
+
+    public function assertUnchanged(string $code): void
+    {
+        $this->assertFixed($code, $code);
+    }
+
     abstract protected function fixer(): FixerInterface;
 
     abstract protected function properties(): array;
+
+    private function fixerTestRunner(): FixerTestRunner
+    {
+        return new FixerTestRunner([$this->fixer()]);
+    }
 }

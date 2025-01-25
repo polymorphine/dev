@@ -17,12 +17,12 @@ use Polymorphine\Dev\Sniffer\Sniffs\Arrays\AmbiguousAssociativitySniff;
 
 class AmbiguousAssociativitySniffTest extends SnifferTest
 {
-    public function testAssocArrayWithNonAssocValuesGivesWarning()
+    public function test_AssocArray_WithNonAssocValues_GivesWarning()
     {
-        $this->assertWarningLines('./tests/Fixtures/code-samples/Sniffs/InvalidArrays.php', [5, 20, 22, 27]);
+        $this->assertWarningLines([5, 20, 22, 27], 'InvalidArrays.php');
     }
 
-    protected function sniffer(): string
+    protected function sniffClass(): string
     {
         return AmbiguousAssociativitySniff::class;
     }

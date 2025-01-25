@@ -17,31 +17,25 @@ use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\CallableDefinitionSniff;
 
 class CallableDefinitionSniffTest extends SnifferTest
 {
-    /**
-     * @dataProvider properties
-     *
-     * @param array $properties
-     * @param int[] $expectedWarningLines
-     */
-    public function testCallableParamDocWithoutDefinitionGivesWarning(array $properties, array $expectedWarningLines)
+    /** @dataProvider warningsForProperties */
+    public function test_CallableParamDoc_WithoutDefinition_GivesWarning(array $warningLines, array $properties)
     {
-        $this->setProperties($properties);
-        $this->assertWarningLines('./tests/Fixtures/code-samples/Sniffs/PhpDocCallableDefinitions.php', $expectedWarningLines);
+        $this->assertWarningLines($warningLines, 'PhpDocCallableDefinitions.php', $properties);
     }
 
-    public function properties(): array
+    public static function warningsForProperties(): iterable
     {
         return [
-            [['syntax' => 'both', 'includeClosure' => false], range(15, 18)],
-            [['syntax' => 'both', 'includeClosure' => true], range(15, 22)],
-            [['syntax' => 'short', 'includeClosure' => false], array_merge(range(15, 18), [27, 28, 31])],
-            [['syntax' => 'long', 'includeClosure' => false], array_merge(range(15, 18), [23, 24], [33])],
-            [['syntax' => 'short', 'includeClosure' => true], array_merge(range(15, 22), range(27, 31))],
-            [['syntax' => 'long', 'includeClosure' => true], array_merge(range(15, 26), [32, 33, 34])]
+            'short+long closure(-)' => [range(15, 18), ['syntax' => 'both', 'includeClosure' => false]],
+            'short+long closure(+)' => [range(15, 22), ['syntax' => 'both', 'includeClosure' => true]],
+            'short closure (-)'     => [array_merge(range(15, 18), [27, 28, 31]), ['syntax' => 'short', 'includeClosure' => false]],
+            'long closure (-)'      => [array_merge(range(15, 18), [23, 24], [33]), ['syntax' => 'long', 'includeClosure' => false]],
+            'short closure (+)'     => [array_merge(range(15, 22), range(27, 31)), ['syntax' => 'short', 'includeClosure' => true]],
+            'long closure (+)'      => [array_merge(range(15, 26), [32, 33, 34]), ['syntax' => 'long', 'includeClosure' => true]]
         ];
     }
 
-    protected function sniffer(): string
+    protected function sniffClass(): string
     {
         return CallableDefinitionSniff::class;
     }

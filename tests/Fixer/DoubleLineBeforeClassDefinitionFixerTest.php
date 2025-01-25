@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\DoubleLineBeforeClassDefinitionFixer;
 
 class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
 {
-    public function testWhitespaceIsExpandedIntoTwoEmptyLinesBeforeClassDefinition()
+    public function test_WhitespaceBeforeClassDefinition_IsExpandedIntoTwoEmptyLines()
     {
         $code = <<<'CODE'
             <?php
@@ -60,10 +60,10 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testTwoEmptyLinesAreInsertedBeforeClassDefinition()
+    public function test_TwoEmptyLinesBeforeClassDefinition_AreInserted()
     {
         $code = <<<'CODE'
             <?php
@@ -89,7 +89,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): DoubleLineBeforeClassDefinitionFixer

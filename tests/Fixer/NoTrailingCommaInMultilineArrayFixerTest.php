@@ -17,7 +17,7 @@ use Polymorphine\Dev\Fixer\NoTrailingCommaInMultilineArrayFixer;
 
 class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
 {
-    public function testTrailingCommaIsRemovedFromMultilineArray()
+    public function test_TrailingComma_IsRemovedFromMultilineArray()
     {
         $code = <<<'CODE'
             <?php
@@ -47,7 +47,7 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): NoTrailingCommaInMultilineArrayFixer

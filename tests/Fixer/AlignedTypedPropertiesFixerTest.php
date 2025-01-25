@@ -18,7 +18,7 @@ use PhpCsFixer\Fixer\FixerInterface;
 
 class AlignedTypedPropertiesFixerTest extends FixerTest
 {
-    public function testPropertiesAreAligned()
+    public function test_Properties_AreAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -88,7 +88,7 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): FixerInterface

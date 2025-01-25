@@ -18,7 +18,7 @@ use PhpCsFixer\Fixer\FixerInterface;
 
 class DeclareStrictFirstLineFixerTest extends FixerTest
 {
-    public function testFileWithoutDeclareIsUnchanged()
+    public function test_FileWithoutDeclare_IsUnchanged()
     {
         $code = <<<'CODE'
             <?php
@@ -27,10 +27,10 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testFileWithDeclareInFirstLineIsUnchanged()
+    public function test_FileWithDeclareInFirstLine_IsUnchanged()
     {
         $code = <<<'CODE'
             <?php declare(strict_types=1);
@@ -39,10 +39,10 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testFileWithDifferentDeclareIsUnchanged()
+    public function test_FileWithDifferentDeclare_IsUnchanged()
     {
         $code = <<<'CODE'
             <?php
@@ -52,10 +52,10 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($code, $this->runner->fix($code));
+        $this->assertUnchanged($code);
     }
 
-    public function testDeclareNotInFirstLineIsMoved()
+    public function test_DeclareNotInFirstLine_IsMoved()
     {
         $code = <<<'CODE'
             <?php
@@ -72,10 +72,10 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
-    public function testDeclareNotInFirstLineIsMovedWIthFollowingWhitespace()
+    public function test_DeclareNotInFirstLine_IsMovedWIthFollowingWhitespace()
     {
         $code = <<<'CODE'
             <?php
@@ -95,7 +95,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertSame($expected, $this->runner->fix($code));
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): FixerInterface
