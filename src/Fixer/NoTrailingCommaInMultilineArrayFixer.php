@@ -14,9 +14,8 @@ namespace Polymorphine\Dev\Fixer;
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
-use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Tokens;
-use PhpCsFixer\Tokenizer\TokensAnalyzer;
+use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
 
 
@@ -54,13 +53,36 @@ final class NoTrailingCommaInMultilineArrayFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        $tokensAnalyzer = new TokensAnalyzer($tokens);
-
         for ($idx = $tokens->count() - 1; $idx >= 0; --$idx) {
-            if ($tokensAnalyzer->isArray($idx) && $tokensAnalyzer->isArrayMultiLine($idx)) {
-                $this->fixArray($tokens, $idx);
-            }
+            if (!$this->isMultilineArray($tokens, $idx)) { continue; }
+            $this->fixArray($tokens, $idx);
         }
+    }
+
+    private function isMultilineArray(Tokens $tokens, int $idx): bool
+    {
+        $isArray = $tokens[$idx]->isGivenKind([T_ARRAY, CT::T_ARRAY_SQUARE_BRACE_OPEN]);
+        if (!$isArray) { return false; }
+
+        $openBrace = $tokens[$idx]->isGivenKind(T_ARRAY) ? $tokens->getNextMeaningfulToken($idx) : $idx;
+        $blockType = Tokens::detectBlockType($tokens[$openBrace]);
+        if (!$blockType || !$blockType['isStart']) { return false; }
+
+        $endIndex = $tokens->findBlockEnd($blockType['type'], $openBrace);
+        for ($index = $openBrace + 1; $index < $endIndex; ++$index) {
+            $token     = $tokens[$index];
+            $blockType = Tokens::detectBlockType($token);
+
+            if ($blockType && $blockType['isStart']) {
+                $index = $tokens->findBlockEnd($blockType['type'], $index);
+                continue;
+            }
+
+            $isLineBreak = $token->isWhitespace() && strpos($token->getContent(), "\n") !== false;
+            if ($isLineBreak) { return true; }
+        }
+
+        return false;
     }
 
     private function fixArray(Tokens $tokens, int $idx): void
