@@ -86,12 +86,12 @@ final class AlignedMethodChainFixer implements FixerInterface
 
     private function isStartOfMultilineChain(int $idx): bool
     {
-        $next = ($this->tokens[$idx + 2]->getContent() === '(') ? $this->findClosing($idx + 2) + 1 : $idx + 2;
+        $next = $this->tokens[$idx + 2]->getContent() === '(' ? $this->findClosing($idx + 2) + 1 : $idx + 2;
         if ($this->tokens[$next]->isWhitespace() && $this->tokens[$next + 1]->isGivenKind(T_OBJECT_OPERATOR)) {
             return true;
         }
 
-        return $this->tokens[$next]->isGivenKind(T_OBJECT_OPERATOR) ? $this->isStartOfMultilineChain($next) : false;
+        return $this->tokens[$next]->isGivenKind(T_OBJECT_OPERATOR) && $this->isStartOfMultilineChain($next);
     }
 
     private function indentationLength(int $idx): int

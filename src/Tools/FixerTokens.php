@@ -51,6 +51,6 @@ final class FixerTokens
             ];
         }
 
-        self::json($data, $dumpFile ?: dirname(dirname(__DIR__)) . '/temp/tokens-dump.json');
+        self::json($data, $dumpFile ?: dirname(__DIR__, 2) . '/temp/tokens-dump.json');
     }
 }

@@ -78,7 +78,7 @@ final class ArrayContext
         $last = $this->tokens->getPrevTokenOfKind($lineEnd, [[T_DOUBLE_ARROW], [CT::T_ARRAY_SQUARE_BRACE_CLOSE]]);
         if ($this->tokens[$last]->isGivenKind(CT::T_ARRAY_SQUARE_BRACE_CLOSE)) {
             $continueFrom = $this->tokens->findBlockStart(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $last);
-            return $continueFrom < $firstArrow ? true : $this->isMultipleAssign($firstArrow, $continueFrom);
+            return $continueFrom < $firstArrow || $this->isMultipleAssign($firstArrow, $continueFrom);
         }
 
         return $firstArrow !== $last;
