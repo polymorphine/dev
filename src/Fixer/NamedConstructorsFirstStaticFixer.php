@@ -21,6 +21,8 @@ use SplFileInfo;
 final class NamedConstructorsFirstStaticFixer implements FixerInterface
 {
     private Tokens $tokens;
+    private array  $classTypes;
+    private int    $classEnd;
 
     public function getName(): string
     {
@@ -54,23 +56,30 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        $this->tokens = $tokens;
+        $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
 
-        $classIdx  = $this->tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
-        $staticIdx = $this->getMethodIdx($classIdx, fn (int $idx) => $this->tokens[$idx - 2]->isGivenKind(T_STATIC));
+        $this->tokens     = $tokens;
+        $this->classTypes = $this->classInstanceTypes($classIdx);
+        $this->classEnd   = $this->classBodyEnd($classIdx);
+
+        $this->moveStaticConstructors($classIdx);
+    }
+
+    private function moveStaticConstructors(int $startIdx): void
+    {
+        $staticIdx = $this->getMethodIdx($startIdx, fn (int $idx) => $this->tokens[$idx - 2]->isGivenKind(T_STATIC));
         if (!$staticIdx) { return; }
 
-        $classTypes = $this->getClassTypes($classIdx);
-        $insertIdx  = $this->getMethodIdx($staticIdx, fn (int $idx) => !$this->isStaticConstructor($idx, $classTypes));
+        $insertIdx = $this->getMethodIdx($staticIdx, fn (int $idx) => !$this->isStaticConstructor($idx));
         if (!$insertIdx) { return; }
 
         $idx = $insertIdx;
-        while ($idx = $this->getMethodIdx($idx + 10, fn (int $idx) => $this->isStaticConstructor($idx, $classTypes))) {
+        while ($idx = $this->getMethodIdx($idx + 10, fn (int $idx) => $this->isStaticConstructor($idx))) {
             $insertIdx = $this->moveMethod($idx, $insertIdx);
         }
     }
 
-    private function isStaticConstructor(int $idx, array $classTypes): bool
+    private function isStaticConstructor(int $idx): bool
     {
         $static = $this->tokens[$idx - 2]->isGivenKind(T_STATIC) && $this->tokens[$idx - 4]->isGivenKind(T_PUBLIC);
         if (!$static) { return false; }
@@ -78,13 +87,13 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
         $openBrace  = $this->tokens->getNextTokenOfKind($idx + 4, ['{']);
         $returnType = $this->tokens[$this->tokens->getPrevMeaningfulToken($openBrace)];
 
-        return $returnType->isGivenKind(T_STRING) && isset($classTypes[$returnType->getContent()]);
+        return $returnType->isGivenKind(T_STRING) && isset($this->classTypes[$returnType->getContent()]);
     }
 
     private function getMethodIdx(int $start, callable $condition): int
     {
         $idx = $this->tokens->getNextTokenOfKind($start, [[T_FUNCTION]]);
-        while ($idx && !$condition($idx)) {
+        while ($idx && (!$this->isMethod($idx) || !$condition($idx))) {
             $idx = $this->tokens->getNextTokenOfKind($idx, [[T_FUNCTION]]);
         }
 
@@ -97,6 +106,13 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
         return $this->tokens->getNonEmptySibling($idx, 1);
     }
 
+    private function isMethod(int $idx): bool
+    {
+        if ($idx > $this->classEnd) { return false; }
+        $idx = $this->tokens->getNextMeaningfulToken($idx);
+        return $this->tokens[$idx]->isGivenKind(T_STRING);
+    }
+
     private function moveMethod(int $methodIdx, int $insertIdx): int
     {
         $methodTokens = $this->extractMethod($methodIdx);
@@ -106,6 +122,7 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
         $methodTokens[0] = $topIndent;
 
         $this->tokens->insertAt($insertIdx, Tokens::fromArray($methodTokens));
+        $this->classEnd += count($methodTokens);
 
         return $insertIdx + count($methodTokens);
     }
@@ -125,19 +142,25 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
         return $methodTokens;
     }
 
-    private function getClassTypes(int $class): array
+    private function classInstanceTypes(int $classIdx): array
     {
-        $classTypes = ['self', $this->tokens[$class]->getContent()];
+        $classTypes = ['self', 'static', $this->tokens[$classIdx]->getContent()];
 
-        if ($this->tokens[$class + 2]->isGivenKind(T_EXTENDS)) {
-            $class = $class + 4;
-            $classTypes[] = $this->tokens[$class]->getContent();
+        if ($this->tokens[$classIdx + 2]->isGivenKind(T_EXTENDS)) {
+            $classIdx = $classIdx + 4;
+            $classTypes[] = $this->tokens[$classIdx]->getContent();
         }
 
-        if ($this->tokens[$class + 2]->isGivenKind(T_IMPLEMENTS)) {
-            $classTypes[] = $this->tokens[$class + 4]->getContent();
+        if ($this->tokens[$classIdx + 2]->isGivenKind(T_IMPLEMENTS)) {
+            $classTypes[] = $this->tokens[$classIdx + 4]->getContent();
         }
 
         return array_flip($classTypes);
+    }
+
+    private function classBodyEnd(int $classIdx): int
+    {
+        $classBody = $this->tokens->getNextTokenOfKind($classIdx, ['{']);
+        return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $classBody);
     }
 }
