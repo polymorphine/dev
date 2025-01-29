@@ -208,6 +208,43 @@ class NamedConstructorsFirstStaticFixerTest extends FixerTest
         $this->assertUnchanged($code);
     }
 
+    public function test_MultipleClassesInSingleFile_AreReordered()
+    {
+        $code = <<<'CODE'
+            <?php
+            class ExampleClass
+            {
+                public static function someMethod(): void {}
+                public static function instanceExample(): self {}
+            }
+            
+            class AnotherClass
+            {
+                public static function someMethod(): void {}
+                public static function instanceAnother(): self {}
+            }
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            class ExampleClass
+            {
+                public static function instanceExample(): self {}
+                public static function someMethod(): void {}
+            }
+            
+            class AnotherClass
+            {
+                public static function instanceAnother(): self {}
+                public static function someMethod(): void {}
+            }
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
     protected function fixer(): NamedConstructorsFirstStaticFixer
     {
         return new NamedConstructorsFirstStaticFixer();

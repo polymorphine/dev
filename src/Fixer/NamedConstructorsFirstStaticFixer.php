@@ -56,13 +56,19 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]) + 2;
+        $classIdx = $tokens->getNextTokenOfKind($this->classEnd ?? 0, [[T_CLASS]]) + 2;
 
         $this->tokens     = $tokens;
         $this->classTypes = $this->classInstanceTypes($classIdx);
         $this->classEnd   = $this->classBodyEnd($classIdx);
 
         $this->moveStaticConstructors($classIdx);
+
+        if ($tokens->getNextTokenOfKind($this->classEnd, [[T_CLASS]])) {
+            $this->fix($file, $tokens);
+        }
+
+        unset($this->classEnd, $this->classTypes);
     }
 
     private function moveStaticConstructors(int $startIdx): void
