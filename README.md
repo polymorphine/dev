@@ -8,7 +8,7 @@
 
 - [PHPUnit](https://github.com/sebastianbergmann/phpunit) testing library.
 - Combination of [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
-  and [CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) with custom
+  and [CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer) with custom
   settings added as dev dependency of Polymorphine packages.
 - Package skeleton scripted with [Skeletons](https://github.com/shudd3r/skeletons) engine.
 
