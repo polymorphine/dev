@@ -12,7 +12,7 @@ Detailed description (optional)...
 <<<original.content}
 ### Installation with [Composer](https://getcomposer.org/)
 ```bash
-composer require{original.content} {package.name.composer}
+composer {original.content}require{original.content} {package.name.composer}{original.content}
 ```
 {original.content>>>
 
