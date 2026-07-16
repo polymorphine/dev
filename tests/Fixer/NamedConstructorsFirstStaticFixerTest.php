@@ -173,6 +173,78 @@ class NamedConstructorsFirstStaticFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
+    public function test_AnonymousFunctions_AreIgnored()
+    {
+        $code = <<<'CODE'
+            <?php declare(strict_types=1);
+            
+            class Stream implements StreamInterface
+            {
+                private $resource;
+            
+                public function __construct($resource)
+                {
+                    $this->resource = $resource;
+                }
+            
+                public static function fromResourceUri(string $streamUri, $mode = 'r'): self
+                {
+                    set_error_handler(function () use ($mode) {
+                        throw new InvalidArgumentException('Invalid stream resource mode');
+                    }, E_WARNING);
+                    $resource = fopen($streamUri, $mode);
+                    restore_error_handler();
+            
+                    return new self($resource);
+                }
+            
+                public static function fromBodyString(string $body): self {}
+            
+                public function doSomething(): string {}
+            }
+            
+            CODE;
+
+        $this->assertUnchanged($code);
+    }
+
+    public function test_MultipleClassesInSingleFile_AreReordered()
+    {
+        $code = <<<'CODE'
+            <?php
+            class ExampleClass
+            {
+                public static function someMethod(): void {}
+                public static function instanceExample(): self {}
+            }
+            
+            class AnotherClass
+            {
+                public static function someMethod(): void {}
+                public static function instanceAnother(): self {}
+            }
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            class ExampleClass
+            {
+                public static function instanceExample(): self {}
+                public static function someMethod(): void {}
+            }
+            
+            class AnotherClass
+            {
+                public static function instanceAnother(): self {}
+                public static function someMethod(): void {}
+            }
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
     protected function fixer(): NamedConstructorsFirstStaticFixer
     {
         return new NamedConstructorsFirstStaticFixer();
