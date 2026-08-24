@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+/**
+ * PHP_CodeSniffer detects violations of a defined coding standard.
+ *
+ * @author    Greg Sherwood <gsherwood@squiz.net>
+ * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
+ */
+
+$scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+require_once $scriptRoot . DIRECTORY_SEPARATOR . 'vendor/squizlabs/php_codesniffer/autoload.php';
+
+$runner = new PHP_CodeSniffer\Runner();
+$_SERVER['argv'] = [__FILE__, '--version'];
+$runner->runPHPCS();
+
+$standard = $scriptRoot === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
+$args     = [__FILE__, '--extensions=php', '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard, '--colors'];
+
+$_SERVER['argv'] = [...$args, 'src'];
+$exitCode = $runner->runPHPCS();
+
+$_SERVER['argv'] = [...$args, '--ignore=*/code-samples/*', 'tests'];
+$exitCode = $exitCode | $runner->runPHPCS();
+exit($exitCode);

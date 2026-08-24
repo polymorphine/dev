@@ -44,9 +44,7 @@ jobs:
       - name: "Coding standard Php-CS-Fixer checks"
         run: vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests
       - name: "Coding standard CodeSniffer checks"
-        run: |
-          vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --colors src
-          vendor/bin/phpcs --extensions=php --standard=phpcs.xml.dist --colors --ignore=*/code-samples/* tests
+        run: php polymorphine-phpcs
       - name: "Package skeleton validation"
         run: php polymorphine-skeleton check
       - name: "Run PhpUnit tests with coverage"
