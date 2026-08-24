@@ -19,26 +19,33 @@ use Shudd3r\Skeletons\Templates\Contents;
 use Shudd3r\Skeletons\Templates\Template;
 
 // This script should be executed from package root directory
-$rootDirectory = getcwd();
-if (!file_exists($rootDirectory . '/vendor/autoload.php')) {
-    fwrite(STDERR, 'Cannot find vendor/autoload.php file in package root directory');
-    die(1);
+$projectDirectory = getcwd();
+if (!file_exists($projectDirectory . '/composer.json')) {
+    fwrite(STDERR, <<<'MSG'
+        Cannot find `composer.json` in current directory.
+        Run the script from project's root directory.
+        MSG);
+    exit(1);
 }
 
-if (!file_exists($rootDirectory . '/composer.json')) {
-    fwrite(STDERR, 'Cannot find composer.json file in package root directory');
-    die(1);
+$scriptRoot = $projectDirectory === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+if (!file_exists($scriptRoot . '/vendor/autoload.php')) {
+    fwrite(STDERR, <<<'MSG'
+        Cannot find `vendor/autoload.php` in script's root directory.
+        Make sure you installed it with Composer.
+        MSG);
+    exit(1);
 }
 
-require_once $rootDirectory . '/vendor/autoload.php';
+require_once $scriptRoot . '/vendor/autoload.php';
 
 $args = new InputArgs($argv ?? []);
 
 $skeleton = new LocalDirectory(__DIR__ . '/template');
-$package  = new LocalDirectory($rootDirectory);
+$package  = new LocalDirectory($projectDirectory);
 $app      = new Application($package, $skeleton);
 
-$app->backup(new LocalDirectory($rootDirectory . '/.dev/.skeleton-backup'));
+$app->backup(new LocalDirectory($projectDirectory . '/.dev/.skeleton-backup'));
 
 $app->replacement('package.name')->add(new Replacement\PackageName());
 $app->replacement('repository.name')->add(new Replacement\RepositoryName('package.name'));
@@ -58,7 +65,7 @@ $app->replacement('author.email')
     ->validate(fn (string $value) => $value === filter_var($value, FILTER_VALIDATE_EMAIL));
 
 $isUpdate = $args->command() === 'update';
-$isSelf   = $rootDirectory === __DIR__;
+$isSelf   = $projectDirectory === __DIR__;
 
 $app->template('composer.json')->createWith(function (Contents $contents) use ($isSelf, $isUpdate) {
     $placeholders = ['{$tpl.REQUIRE_DEV}', '{$tpl.PHP_EXEC}', '{$tpl.PHPCS}'];
