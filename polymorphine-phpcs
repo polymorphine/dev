@@ -18,19 +18,41 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-$scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
-require_once $scriptRoot . DIRECTORY_SEPARATOR . 'vendor/squizlabs/php_codesniffer/autoload.php';
+function runScript(PHP_CodeSniffer\Runner $runner, array $args): int
+{
+    $_SERVER['argv'] = [__FILE__, ...$args];
+    return $runner->runPHPCS();
+}
 
-$runner = new PHP_CodeSniffer\Runner();
-$_SERVER['argv'] = [__FILE__, '--version'];
-$runner->runPHPCS();
+$exitCode = 0;
+if (!isset($argv[1])) {
+    $scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+    require_once $scriptRoot . DIRECTORY_SEPARATOR . 'vendor/squizlabs/php_codesniffer/autoload.php';
+    if ($scriptRoot !== __DIR__) {
+        require_once getcwd() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+    }
 
-$standard = $scriptRoot === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
-$args     = [__FILE__, '--extensions=php', '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard, '--colors'];
+    $standard = $scriptRoot === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
+    $args     = ['--extensions=php', '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard, '--colors'];
 
-$_SERVER['argv'] = [...$args, 'src'];
-$exitCode = $runner->runPHPCS();
+    $runner = new PHP_CodeSniffer\Runner();
+    $exitCode = runScript($runner, ['--version'])
+        | runScript($runner, [...$args, 'src'])
+        | runScript($runner, [...$args, '--ignore=*/code-samples/*', 'tests']);
+    exit($exitCode);
+}
 
-$_SERVER['argv'] = [...$args, '--ignore=*/code-samples/*', 'tests'];
-$exitCode = $exitCode | $runner->runPHPCS();
+$scriptRoot = dirname(__DIR__, 3);
+require_once $scriptRoot . '/vendor/squizlabs/php_codesniffer/autoload.php';
+
+if ($argv[1] === '-') {
+    $cwd = explode('=', $argv[2])[1];
+    require_once $cwd . '/vendor/autoload.php';
+
+    $standard = $cwd === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
+    $argv[2] = '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard;
+}
+
+$runner   = new PHP_CodeSniffer\Runner();
+$exitCode = runScript($runner, $argv);
 exit($exitCode);
