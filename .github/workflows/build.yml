@@ -11,10 +11,10 @@ jobs:
         php-versions: ['7.4']
     env:
       extensions: pcov, dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
-      key: cache-v3
+      key: cache-v6
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: "Setup PHP extensions cache environment"
         id: cache-env
         uses: shivammathur/cache-extensions@v1
@@ -23,7 +23,7 @@ jobs:
           extensions: ${{ env.extensions }}
           key: ${{ env.key }}
       - name: "Cache PHP extensions"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -36,7 +36,7 @@ jobs:
           extensions: ${{ env.extensions }}
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Install Composer dependencies"
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: highest
           composer-options: --prefer-stable
@@ -64,15 +64,15 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: ['8.4']
+        php-versions: ['8.5']
     env:
       extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
-      key: cache-v3
+      key: cache-v6
     steps:
       - name: "Turn off git EOL conversion"
         run: git config --global core.autocrlf false
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: "Setup PHP extensions cache environment"
         id: cache-env
         uses: shivammathur/cache-extensions@v1
@@ -81,7 +81,7 @@ jobs:
           extensions: ${{ env.extensions }}
           key: ${{ env.key }}
       - name: "Cache PHP extensions"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -94,7 +94,7 @@ jobs:
           extensions: ${{ env.extensions }}
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Install Composer dependencies"
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: highest
           composer-options: --prefer-stable
@@ -108,13 +108,13 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-latest']
-        php-versions: ['8.0', '8.1', '8.2', '8.3']
+        php-versions: ['8.0', '8.1', '8.2', '8.3', '8.4']
     env:
       extensions: dom, json, libxml, mbstring, pdo_sqlite, soap, xml, xmlwriter
-      key: cache-v3
+      key: cache-v6
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: "Setup PHP extensions cache environment"
         id: cache-env
         uses: shivammathur/cache-extensions@v1
@@ -123,7 +123,7 @@ jobs:
           extensions: ${{ env.extensions }}
           key: ${{ env.key }}
       - name: "Cache PHP extensions"
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -136,7 +136,7 @@ jobs:
           extensions: ${{ env.extensions }}
           ini-values: assert.exception=1, zend.assertions=1
       - name: "Install Composer dependencies"
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: highest
           composer-options: --prefer-stable
