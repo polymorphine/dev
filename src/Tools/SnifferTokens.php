@@ -27,7 +27,7 @@ final class SnifferTokens
     use ArrayDump;
 
     /**
-     * @param string|null $configFile
+     * @param null|string $configFile
      *
      * @throws Exceptions\DeepExitException
      *
@@ -63,7 +63,7 @@ final class SnifferTokens
 
     /**
      * @param string      $sourceCode Php code
-     * @param string|null $dumpFile
+     * @param null|string $dumpFile
      */
     public static function dumpSourceCode(string $sourceCode, ?string $dumpFile = null): void
     {
@@ -76,7 +76,7 @@ final class SnifferTokens
 
     /**
      * @param string      $sourceFile File with php code
-     * @param string|null $dumpFile
+     * @param null|string $dumpFile
      *
      * @throws Exceptions\DeepExitException
      */
@@ -87,7 +87,7 @@ final class SnifferTokens
 
     /**
      * @param Files\File  $tokens     Processed php code file
-     * @param string|null $tokensFile
+     * @param null|string $tokensFile
      */
     public static function dump(Files\File $tokens, ?string $tokensFile = null): void
     {

@@ -18,7 +18,7 @@ abstract class ExampleClass
  implements SomeInterface {
 
     const CONSTANT = 'string';
-    private int $variable = 2000;
+    private string $variable = '2000';
 
     public array $field = array(
         'key' => 1,
@@ -70,11 +70,11 @@ abstract class ExampleClass
     /**
      * MyClass constructor.
      *
-     * @param string $variable
+     * @param string|null $variable
      */
-    public function __construct(string $variable = '')
+    public function __construct(string $variable = null)
     {
-        $this->variable = $variable;
+        $this->variable = $variable ?? 'test';
     }
 
     public function fixer(

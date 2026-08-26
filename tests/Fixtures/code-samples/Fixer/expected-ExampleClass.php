@@ -47,17 +47,17 @@ abstract class ExampleClass implements SomeInterface
         'key'   => 1,
         'other' => 'value'
     ];
-    private int  $variable = 2000;
-    private bool $bool     = true;
+    private string $variable = '2000';
+    private bool   $bool     = true;
 
     /**
      * MyClass constructor.
      *
-     * @param string $variable
+     * @param null|string $variable
      */
-    public function __construct(string $variable = '')
+    public function __construct(?string $variable = null)
     {
-        $this->variable = $variable;
+        $this->variable = $variable ?? 'test';
     }
 
     abstract public function somethingAbstract();
