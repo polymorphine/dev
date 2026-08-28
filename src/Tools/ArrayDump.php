@@ -14,8 +14,9 @@ namespace Polymorphine\Dev\Tools;
 
 trait ArrayDump
 {
-    private static function json(array $data, string $filename): void
+    private static function json(array $data, ?string $filename = null): void
     {
+        $filename ??= dirname(__DIR__, 2) . '/.dev/tokens-dump.json';
         file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }

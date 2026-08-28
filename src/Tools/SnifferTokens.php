@@ -44,6 +44,24 @@ final class SnifferTokens
     }
 
     /**
+     * @param string $sourceFile
+     *
+     * @throws Exceptions\DeepExitException
+     *
+     * @return Files\File
+     */
+    public static function tokenizedFile(string $sourceFile): Files\File
+    {
+        $runner = self::runner();
+        $runner->ruleset->populateTokenListeners();
+
+        $testFile = new Files\LocalFile($sourceFile, $runner->ruleset, $runner->config);
+        $testFile->process();
+
+        return $testFile;
+    }
+
+    /**
      * @param string      $sourceCode Php code
      * @param string|null $dumpFile
      */
@@ -64,13 +82,7 @@ final class SnifferTokens
      */
     public static function dumpSourceFile(string $sourceFile, ?string $dumpFile = null): void
     {
-        $runner = self::runner();
-        $runner->ruleset->populateTokenListeners();
-
-        $testFile = new Files\LocalFile($sourceFile, $runner->ruleset, $runner->config);
-        $testFile->process();
-
-        self::dump($testFile, $dumpFile);
+        self::dump(self::tokenizedFile($sourceFile), $dumpFile);
     }
 
     /**
@@ -84,6 +96,6 @@ final class SnifferTokens
             $token = ['idx' => $id] + $token;
         }
 
-        self::json($tokens, $tokensFile ?: dirname(__DIR__, 2) . '/temp/tokens-dump.json');
+        self::json($tokens, $tokensFile);
     }
 }

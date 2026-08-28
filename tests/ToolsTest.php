@@ -28,15 +28,20 @@ class ToolsTest extends TestCase
 
     public function test_DumpSourceFileFixerTokens()
     {
-        $testSourceFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
-        $testDumpFile   = tempnam(sys_get_temp_dir(), 'tmp_') . '.json';
+        $directory      = sys_get_temp_dir();
+        $testSourceFile = tempnam($directory, 'tmp_') . '.php';
+        $testDumpFileA  = tempnam($directory, 'tmp_1') . '.json';
+        $testDumpFileB  = tempnam($directory, 'tmp_2') . '.json';
 
         $code = '<?php declare(strict_types=1);';
         file_put_contents($testSourceFile, $code);
 
-        Tools\FixerTokens::dumpSourceFile($testSourceFile, $testDumpFile);
-        $this->assertTrue(file_exists($testDumpFile));
+        Tools\FixerTokens::dumpSourceFile($testSourceFile, $testDumpFileA);
+        Tools\FixerTokens::dumpSourceCode($code, $testDumpFileB);
+        $this->assertTrue(file_exists($testDumpFileA));
+        $this->assertSame(file_get_contents($testDumpFileA), file_get_contents($testDumpFileB));
         unlink($testSourceFile);
-        unlink($testDumpFile);
+        unlink($testDumpFileA);
+        unlink($testDumpFileB);
     }
 }

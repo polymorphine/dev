@@ -19,12 +19,20 @@ final class FixerTokens
     use ArrayDump;
 
     /**
+     * @param string $sourceFile File with php code
+     */
+    public static function tokenizedFile(string $sourceFile): Tokens
+    {
+        return Tokens::fromCode(file_get_contents($sourceFile));
+    }
+
+    /**
      * @param string      $sourceFile File with php code
      * @param string|null $dumpFile
      */
     public static function dumpSourceFile(string $sourceFile, ?string $dumpFile = null): void
     {
-        self::dumpSourceCode(file_get_contents($sourceFile), $dumpFile);
+        self::dump(self::tokenizedFile($sourceFile), $dumpFile);
     }
 
     /**
@@ -51,6 +59,6 @@ final class FixerTokens
             ];
         }
 
-        self::json($data, $dumpFile ?: dirname(__DIR__, 2) . '/temp/tokens-dump.json');
+        self::json($data, $dumpFile);
     }
 }
