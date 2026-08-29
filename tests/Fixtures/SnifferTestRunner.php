@@ -31,7 +31,10 @@ class SnifferTestRunner
         $this->ruleset = $runner->ruleset;
         $this->config  = $runner->config;
 
-        $this->ruleset->sniffs[$sniffClass] = true;
+        foreach ($this->ruleset->sniffs as $name => $config) {
+            if ($name === $sniffClass) { continue; }
+            unset($this->ruleset->sniffs[$name]);
+        }
 
         $code = Util\Common::getSniffCode($sniffClass);
         $this->ruleset->ruleset[$code]['properties'] = [];
