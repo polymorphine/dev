@@ -44,4 +44,21 @@ class ToolsTest extends TestCase
         unlink($testDumpFileA);
         unlink($testDumpFileB);
     }
+
+    /** @dataProvider phpDocLines */
+    public function test_TypesFromPhpDocLine_AreReduced(string $line, string $reduced)
+    {
+        $line = new Tools\PhpDocTypeLine($line);
+        $this->assertSame($reduced, $line->reducedType());
+    }
+
+    public static function phpDocLines(): array
+    {
+        return [
+            ['callable(): Test Short explanation', 'T'],
+            ['Foo|array<not, reducable>> commented type', 'T>'],
+            ['Some\Type<array<int>>', 'T'],
+            ['null|array<int, array<int, callable(array{foo: null|int, bar: \\Bar\\Baz\F99}, int): array<int>>> Type: Overkill', 'T']
+        ];
+    }
 }
