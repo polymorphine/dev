@@ -25,7 +25,7 @@ class TypeDefinitionSniffTest extends SnifferTest
 
     public function test_ArrayParamDoc_WithoutDefinition_GivesWarning()
     {
-        $warnings = array_fill_keys(range(10, 17), 'Sniffer.PhpDoc.TypeDefinition.FoundArray');
+        $warnings = array_fill_keys(array_merge(range(13, 21), [28]), 'Sniffer.PhpDoc.TypeDefinition.FoundArray');
         $this->assertWarningLines($warnings, 'PhpDocArrayDefinitions.php');
     }
 

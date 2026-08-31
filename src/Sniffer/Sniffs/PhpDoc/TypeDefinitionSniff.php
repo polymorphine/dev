@@ -13,6 +13,7 @@ namespace Polymorphine\Dev\Sniffer\Sniffs\PhpDoc;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
+use Polymorphine\Dev\Sniffer\Tokens;
 use Polymorphine\Dev\Tools\PhpDocTypeLine;
 
 
@@ -34,6 +35,8 @@ final class TypeDefinitionSniff implements Sniff
         Malformed type definition - check matching `<>` brackets
         WARNING;
 
+    private Tokens $tokens;
+
     public function register(): array
     {
         return [T_CLASS, T_TRAIT, T_INTERFACE];
@@ -41,29 +44,51 @@ final class TypeDefinitionSniff implements Sniff
 
     public function process(File $phpcsFile, $stackPtr): void
     {
-        $tokens = $phpcsFile->getTokens();
-        while ($stackPtr = $phpcsFile->findNext([T_DOC_COMMENT_TAG], ++$stackPtr)) {
-            $tag = $tokens[$stackPtr]['content'];
-            if ($tag !== '@param' && $tag !== '@return') { continue; }
+        $this->tokens = new Tokens($phpcsFile->getTokens());
+        while ($stackPtr = $this->tokens->findNext($stackPtr, ['T_DOC_COMMENT_TAG'])) {
+            $typeTag = in_array($this->tokens->content($stackPtr), ['@param', '@return', '@var'], true);
+            if (!$typeTag) { continue; }
 
-            $phpDoc = new PhpDocTypeLine($tokens[$stackPtr + 2]['content']);
+            $phpDoc = new PhpDocTypeLine($this->typeDoc($stackPtr + 2));
             $type   = $phpDoc->reducedType();
+            if ($type === 'T') { continue; }
 
-            if ($this->contains($type, 'callable', 'Closure')) {
+            if ($this->containsAny($type, 'callable', 'Closure')) {
                 $phpcsFile->addWarning(self::MSG_INVALID_CALLBACK, $stackPtr, 'FoundCallback');
-            } elseif ($this->contains($type, '[]', 'array', 'list')) {
+            } elseif ($this->containsAny($type, '[]', 'array', 'list')) {
                 $phpcsFile->addWarning(self::MSG_INVALID_ARRAY, $stackPtr, 'FoundArray');
-            } elseif ($type !== 'T') {
+            } else {
                 $phpcsFile->addWarning(self::MSG_MALFORMED_TYPE, $stackPtr, 'FoundMalformed');
             }
         }
     }
 
-    private function contains(string $text, string ...$values): bool
+    private function typeDoc(int $idx): string
     {
-        foreach ($values as $value) {
-            if (strpos($text, $value) !== false) { return true; }
+        $end     = $this->endingIdx($idx);
+        $content = $this->tokens->content($idx);
+        if ($end <= $idx) { return $content; }
+
+        while ($idx = $this->tokens->findNext($idx, ['T_DOC_COMMENT_STRING'], $end)) {
+            $content .= substr($content, -1) === ',' ? ' ' : '';
+            $content .= $this->tokens->content($idx);
         }
-        return false;
+        return $content;
+    }
+
+    private function endingIdx(int $idx): ?int
+    {
+        $found = $this->tokens->findNext($idx, ['T_DOC_COMMENT_CLOSE_TAG', 'T_DOC_COMMENT_STAR']);
+        if ($found === null) { return $idx; }
+
+        $isEmptyLine = $this->tokens->content($found + 1) === "\n";
+        $isNextTag   = !$isEmptyLine && $this->tokens->isType($found + 2, 'T_DOC_COMMENT_TAG');
+        return $isEmptyLine || $isNextTag ? $this->tokens->findPrev($found, ["\n"]) : $this->endingIdx($found);
+    }
+
+    private function containsAny(string $text, string ...$values): bool
+    {
+        $isFound = fn (bool $found, string $value) => $found || strpos($text, $value) !== false;
+        return array_reduce($values, $isFound, false);
     }
 }
