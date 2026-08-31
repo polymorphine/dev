@@ -14,14 +14,13 @@ namespace Polymorphine\Dev\Tools;
 
 class PhpDocTypeLine
 {
-    private const REGEXP_SEPARATOR = '#([^,:]) .+#';
+    private const REGEXP_TYPE_ONLY = '#([^,:]) .+#';
     private const REGEXP_NS_TYPES  = '#(^|[^a-zA-Z])(?:[a-zA-Z0-9]*\\\\)+[a-zA-Z0-9]+#';
     private const REGEXP_NAMES     = '#(^|[^a-zA-Z])([a-zA-Z0-9\-_]+)#';
     private const REGEXP_ARRAY     = '#(^|[^a-zA-Z])(?:array|list)<(T(?:, T)?)>#';
     private const REGEXP_ASSOC     = '#(^|[^a-zA-Z])array{(T: T(?:, T: T)*)}#';
     private const REGEXP_CALLBACKS = '#(^|[^a-zA-Z])(?:callable|Closure)(\(T?(?:, T)*(\.\.\.)?\): T)#';
-
-    private const COMPLEX_DEF_TYPES = ['list', 'array', 'callable', 'Closure'];
+    private const REGEXP_UNREDUCED = '#(^|[^a-zA-Z0-9\-_])(?:list|array|callable|Closure)($|[^a-zA-Z0-9\-_])#';
 
     private string $typeDeclaration;
 
@@ -38,7 +37,7 @@ class PhpDocTypeLine
      */
     public function reducedType(): string
     {
-        $isolatedTypeLine  = preg_replace(self::REGEXP_SEPARATOR, '$1', $this->typeDeclaration);
+        $isolatedTypeLine  = preg_replace(self::REGEXP_TYPE_ONLY, '$1', $this->typeDeclaration);
         $removedNamespaces = preg_replace(self::REGEXP_NS_TYPES, '$1T', $isolatedTypeLine);
         $reducedTypeNames  = preg_replace_callback(self::REGEXP_NAMES, [$this, 'replace'], $removedNamespaces);
         return $this->reduceComplexTypes($reducedTypeNames);
@@ -49,7 +48,7 @@ class PhpDocTypeLine
         $string = preg_replace_callback(self::REGEXP_ARRAY, [$this, 'replace'], $line);
         $string = preg_replace_callback(self::REGEXP_ASSOC, [$this, 'replace'], $string);
         $string = preg_replace_callback(self::REGEXP_CALLBACKS, [$this, 'replace'], $string);
-        $string = str_replace(['T<T>', 'T|', '|T'], ['T', '', ''], $string);
+        $string = str_replace(['<T, T', 'T<T>', 'T|', '|T'], ['<T', 'T', '', ''], $string);
         return $string === $line ? $string : $this->reduceComplexTypes($string);
     }
 
@@ -60,9 +59,7 @@ class PhpDocTypeLine
      */
     private function replace(array $matches): string
     {
-        foreach (self::COMPLEX_DEF_TYPES as $type) {
-            if (strpos($matches[2], $type) !== false) { return $matches[0]; }
-        }
-        return $matches[1] . 'T';
+        $containsUnreducedType = preg_match(self::REGEXP_UNREDUCED, $matches[2]) !== 1;
+        return $containsUnreducedType ? $matches[1] . 'T' : $matches[0];
     }
 }

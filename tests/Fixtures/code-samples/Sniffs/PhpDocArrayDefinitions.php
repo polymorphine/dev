@@ -13,11 +13,10 @@ class PhpDocArrayDefinitions
      * @param null|array $array wrong definition
      * @param Type[] $array wrong definition
      * @param Namespaced\Type[] $array wrong definition
-     * @param array $array wrong definition
+     * @param array<int, Foo[]> $array wrong definition
      * @return array<Type...> wrong definition
-     * @return array<test_value> wrong definition
      */
-    public function incorrectCallbacks()
+    public function incorrectArrays()
     {
     }
 
@@ -27,7 +26,7 @@ class PhpDocArrayDefinitions
      * @param arrays $value not array
      * @param int     $numberVariable
      * @param bool|arrayable $param
-     * @param arrays\Foo  $param  Unknown param
+     * @param arrays\Foo<\test>  $param  Unknown param
      * @return int
      */
     public function ignoredPhpDocs(): void
@@ -35,10 +34,11 @@ class PhpDocArrayDefinitions
     }
 
     /**
-     * @return array<bool>: correct definition
-     * @return array<test,anything>: correct definition
+     * @return array<bool> correct definition
+     * @return array<test_value> correct definition
+     * @return array<test, anything> correct definition
      */
-    public function correctReturnCallbacks(): array
+    public function correctReturnArrays(): array
     {
     }
 
@@ -51,7 +51,7 @@ class PhpDocArrayDefinitions
      *
      * @return array<string, mixed>
      */
-    public function correctParamCallback(callable $function, Closure $closure): array
+    public function correctParamArrays(callable $function, Closure $closure): array
     {
     }
 }
