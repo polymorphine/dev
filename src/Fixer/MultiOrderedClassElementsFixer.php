@@ -25,9 +25,9 @@ class MultiOrderedClassElementsFixer implements FixerInterface
     private OrderedClassElementsFixer $testFixer;
 
     /**
-     * @param string $testPath
-     * @param array  $srcOrder
-     * @param array  $testOrder
+     * @param string        $testPath
+     * @param array<string> $srcOrder
+     * @param array<string> $testOrder
      */
     public function __construct(string $testPath, array $srcOrder, array $testOrder)
     {

@@ -28,7 +28,7 @@ final class FixerTokens
 
     /**
      * @param string      $sourceFile File with php code
-     * @param string|null $dumpFile
+     * @param null|string $dumpFile
      */
     public static function dumpSourceFile(string $sourceFile, ?string $dumpFile = null): void
     {
@@ -37,7 +37,7 @@ final class FixerTokens
 
     /**
      * @param string      $sourceCode Php code
-     * @param string|null $dumpFile
+     * @param null|string $dumpFile
      */
     public static function dumpSourceCode(string $sourceCode, ?string $dumpFile = null): void
     {
@@ -46,7 +46,7 @@ final class FixerTokens
 
     /**
      * @param Tokens      $tokens   Processed php code tokens
-     * @param string|null $dumpFile
+     * @param null|string $dumpFile
      */
     public static function dump(Tokens $tokens, ?string $dumpFile = null): void
     {

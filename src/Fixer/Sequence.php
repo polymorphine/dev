@@ -22,9 +22,9 @@ final class Sequence
     public array $tokenIds;
 
     /**
-     * @param Tokens $tokens
-     * @param int    $idx      First element in the sequence
-     * @param array  $tokenIds Ordered list of meaningful tokens
+     * @param Tokens     $tokens
+     * @param int        $idx      First element in the sequence
+     * @param array<int> $tokenIds Ordered list of meaningful tokens
      */
     public function __construct(Tokens $tokens, int $idx, array $tokenIds = [])
     {

@@ -40,7 +40,7 @@ class FixerTestRunner
     private array $fixers;
 
     /**
-     * @param FixerInterface[] $fixers
+     * @param array<FixerInterface> $fixers
      */
     public function __construct(array $fixers)
     {

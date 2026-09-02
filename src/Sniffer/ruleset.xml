@@ -8,11 +8,7 @@
 -->
 <ruleset name="Polymorphine" namespace="Polymorphine\Dev\Sniffer">
     <description>Custom Polymorphine Sniffs for style errors that need to be fixed manually.</description>
-    <rule ref="Sniffer.PhpDoc.CallableDefinition">
-        <properties>
-            <property name="syntax" value="short"/>
-        </properties>
-    </rule>
+    <rule ref="Sniffer.PhpDoc.TypeDefinition"/>
     <arg name="tab-width" value="4"/>
     <rule ref="Generic.Files.LineEndings">
         <properties>

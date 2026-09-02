@@ -21,12 +21,20 @@ abstract class SnifferTest extends TestCase
     public function assertWarningLines(array $expectedWarningLines, string $filename, array $options = []): void
     {
         $file = $this->sniffedFile($filename, $options);
+        if (!isset($expectedWarningLines[0])) {
+            $this->assertReportCodes($expectedWarningLines, $file->getWarnings());
+            $expectedWarningLines = array_keys($expectedWarningLines);
+        }
         $this->assertEquals($expectedWarningLines, array_keys($file->getWarnings()));
     }
 
     public function assertErrorLines(array $expectedErrorLines, string $filename, array $options = []): void
     {
         $file = $this->sniffedFile($filename, $options);
+        if (!isset($expectedErrorLines[0])) {
+            $this->assertReportCodes($expectedErrorLines, $file->getErrors());
+            $expectedErrorLines = array_keys($expectedErrorLines);
+        }
         $this->assertEquals($expectedErrorLines, array_keys($file->getErrors()));
     }
 
@@ -36,5 +44,18 @@ abstract class SnifferTest extends TestCase
     {
         $runner = new SnifferTestRunner($this->sniffClass(), $options);
         return $runner->sniff('./tests/Fixtures/code-samples/Sniffs/' . $filename);
+    }
+
+    private function assertReportCodes(array $errorCodes, array $reportList): void
+    {
+        foreach ($reportList as $line => $column) {
+            $codes = [];
+            foreach ($column as $warnings) {
+                foreach ($warnings as $warning) {
+                    $codes[] = $warning['source'];
+                }
+            }
+            $this->assertContains($errorCodes[$line] ?? [], $codes, 'Line: ' . $line);
+        }
     }
 }
