@@ -26,12 +26,19 @@ class Tokens
 
     /**
      * @param int $idx
+     * @param int $endIdx
      *
      * @return string
      */
-    public function content(int $idx): string
+    public function content(int $idx, int $endIdx = 0): string
     {
-        return $this->tokens[$idx]['content'] ?? '';
+        $endIdx  = max($endIdx, $idx);
+        $content = '';
+        while ($idx <= $endIdx && $value = $this->tokens[$idx]['content'] ?? '') {
+            $content .= $value;
+            $idx++;
+        }
+        return $content;
     }
 
     /**
@@ -47,35 +54,35 @@ class Tokens
 
     /**
      * @param int           $idx
-     * @param array<string> $types T_NAME code or content strings
-     * @param int           $end   Index where searching should stop (expected to be higher than $idx)
+     * @param array<string> $types  T_NAME code or content strings
+     * @param int           $endIdx Index where searching should stop (expected to be higher than $idx)
      *
      * @return null|int
      */
-    public function findNext(int $idx, array $types, int $end = 0): ?int
+    public function findNext(int $idx, array $types, int $endIdx = 0): ?int
     {
-        return $this->scanFor($idx, $types, 1, $end);
+        return $this->scanFor($idx, $types, 1, $endIdx ? max($endIdx, $idx) : count($this->tokens));
     }
 
     /**
      * @param int           $idx
-     * @param array<string> $types T_NAME code or content strings
-     * @param int           $end   Index where searching should stop (expected to be lower than $idx)
+     * @param array<string> $types  T_NAME code or content strings
+     * @param int           $endIdx Index where searching should stop (expected to be lower than $idx)
      *
      * @return null|int
      */
-    public function findPrev(int $idx, array $types, int $end = 0): ?int
+    public function findPrev(int $idx, array $types, int $endIdx = 0): ?int
     {
-        return $this->scanFor($idx, $types, -1, $end);
+        return $this->scanFor($idx, $types, -1, min($endIdx, $idx));
     }
 
-    private function scanFor(int $idx, array $types, int $step, int $end): ?int
+    private function scanFor(int $idx, array $types, int $step, int $endIdx): ?int
     {
         $contentTypes = array_filter($types, fn (string $type): bool => substr($type, 0, 2) !== 'T_');
         $typeNames    = array_diff($types, $contentTypes);
 
-        while (($idx = $idx + $step) && ($token = $this->tokens[$idx] ?? null)) {
-            $isEndReached = $end && ($step > 0 ? $idx >= $end : $idx <= $end);
+        while ($token = $this->tokens[$idx += $step] ?? null) {
+            $isEndReached = ($endIdx - $idx) * $step < 0;
             if ($isEndReached) { return null; }
             $isTypeFound    = in_array($token['type'], $typeNames, true);
             $isContentFound = !$isTypeFound && in_array($token['content'], $contentTypes, true);
