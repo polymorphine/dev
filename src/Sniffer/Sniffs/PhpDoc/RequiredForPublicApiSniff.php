@@ -13,6 +13,7 @@ namespace Polymorphine\Dev\Sniffer\Sniffs\PhpDoc;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
+use Polymorphine\Dev\Sniffer\Tokens;
 use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
@@ -20,9 +21,9 @@ use Throwable;
 
 final class RequiredForPublicApiSniff implements Sniff
 {
-    private const WARNING = 'Missing phpDoc comment for original public method signature';
+    private const MSG_MISSING_PHPDOC = 'Missing phpDoc comment for original public method signature';
 
-    private array $tokens;
+    private Tokens $tokens;
 
     public function register(): array
     {
@@ -31,48 +32,42 @@ final class RequiredForPublicApiSniff implements Sniff
 
     public function process(File $phpcsFile, $stackPtr): void
     {
-        $this->tokens = $phpcsFile->getTokens();
+        $this->tokens = new Tokens($phpcsFile->getTokens());
 
-        $isInterface = $this->tokens[$stackPtr]['code'] === T_INTERFACE;
-        $isOrigin    = $isInterface || $this->tokens[$stackPtr]['code'] === T_TRAIT;
-        $className   = $isOrigin ? null : $this->getClassName($stackPtr, $phpcsFile);
+        $isInterface = $this->tokens->isType($stackPtr, 'T_INTERFACE');
+        $isOrigin    = $isInterface || $this->tokens->isType($stackPtr, 'T_TRAIT');
+        $className   = $isOrigin ? null : $this->className($stackPtr);
 
         $undocumented = [];
-        while ($stackPtr = $phpcsFile->findNext([T_FUNCTION], ++$stackPtr)) {
-            if (!$isInterface && !$this->isApi($stackPtr)) { continue; }
+        while ($stackPtr = $this->tokens->findNext($stackPtr, ['T_FUNCTION'])) {
+            $isApi = $isInterface || $this->tokens->isType($stackPtr - 2, 'T_PUBLIC');
+            if (!$isApi) { continue; }
 
-            $lineBreak    = $this->previousLineBreak($stackPtr);
-            $isDocumented = $this->tokens[$lineBreak - 1]['code'] === T_DOC_COMMENT_CLOSE_TAG;
+            $lineBreak    = $this->tokens->findPrev($stackPtr, ["\n"]);
+            $isDocumented = $this->tokens->isType($lineBreak - 1, 'T_DOC_COMMENT_CLOSE_TAG');
             if ($isDocumented) { continue; }
 
-            $undocumented[] = [$this->tokens[$stackPtr + 2]['content'], $stackPtr];
+            $undocumented[$stackPtr] = $this->tokens->content($stackPtr + 2);
         }
 
         if (!$undocumented) { return; }
         $ancestorMethods = $className ? $this->getAncestorMethods($className) : [];
 
-        foreach ($undocumented as [$methodName, $stackPtr]) {
+        foreach ($undocumented as $stackPtr => $methodName) {
             if (isset($ancestorMethods[$methodName])) { continue; }
-            $phpcsFile->addWarning(self::WARNING, $stackPtr, 'Missing');
+            $phpcsFile->addWarning(self::MSG_MISSING_PHPDOC, $stackPtr, 'Missing');
         }
     }
 
-    private function getClassName(int $idx, File $file): string
+    private function className(int $idx): string
     {
-        $className = $this->tokens[$idx + 2]['content'];
+        $className = $this->tokens->content($idx + 2);
+        $nsBegin   = $this->tokens->findNext(0, ['T_NAMESPACE'], $idx);
+        if (!$nsBegin) { return $className; }
 
-        $idx = $file->findNext([T_NAMESPACE], 0, $idx);
-        if (!$idx) { return $className; }
-        $namespaceEnd = $file->findNext([T_SEMICOLON], $idx);
-
-        $idx       = $idx + 2;
-        $namespace = [];
-        while ($idx < $namespaceEnd) {
-            $namespace[] = $this->tokens[$idx]['content'];
-            $idx++;
-        }
-
-        return implode('', $namespace) . '\\' . $className;
+        $nsEnd     = $this->tokens->findNext($nsBegin, ['T_SEMICOLON']);
+        $namespace = $this->tokens->content($nsBegin + 2, $nsEnd - 1);
+        return $namespace . '\\' . $className;
     }
 
     private function getAncestorMethods(string $class): array
@@ -99,19 +94,5 @@ final class RequiredForPublicApiSniff implements Sniff
             $methods[] = $method->getName();
         }
         return array_flip($methods);
-    }
-
-    private function previousLineBreak(int $idx): int
-    {
-        $previousLine = $this->tokens[$idx]['line'] - 1;
-        while ($this->tokens[$idx]['line'] !== $previousLine) {
-            $idx--;
-        }
-        return $idx;
-    }
-
-    private function isApi(int $idx): bool
-    {
-        return $this->tokens[$idx - 2]['code'] === T_PUBLIC;
     }
 }
