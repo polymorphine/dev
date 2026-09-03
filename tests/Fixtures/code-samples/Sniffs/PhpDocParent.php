@@ -3,7 +3,7 @@
 namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
-class PhpDocRequiredForParentApi
+class PhpDocParent
 {
     public function overriddenMethodA() {}
     /** Documented */

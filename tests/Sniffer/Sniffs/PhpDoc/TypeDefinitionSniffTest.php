@@ -20,19 +20,19 @@ class TypeDefinitionSniffTest extends SnifferTest
     public function test_CallableParamDoc_WithoutDefinition_GivesWarning()
     {
         $warnings = array_fill_keys(range(10, 28), 'Sniffer.PhpDoc.TypeDefinition.FoundCallback');
-        $this->assertWarningLines($warnings, 'PhpDocCallableDefinitions.php');
+        $this->assertWarningLines($warnings, 'PhpDocTypeCallable.php');
     }
 
     public function test_ArrayParamDoc_WithoutDefinition_GivesWarning()
     {
         $warnings = array_fill_keys(array_merge(range(13, 21), [28]), 'Sniffer.PhpDoc.TypeDefinition.FoundArray');
-        $this->assertWarningLines($warnings, 'PhpDocArrayDefinitions.php');
+        $this->assertWarningLines($warnings, 'PhpDocTypeArray.php');
     }
 
     public function test_MalformedTypeParamDoc_GivesWarning()
     {
         $warnings = array_fill_keys(range(10, 17), 'Sniffer.PhpDoc.TypeDefinition.FoundMalformed');
-        $this->assertWarningLines($warnings, 'PhpDocMalformedDefinitions.php');
+        $this->assertWarningLines($warnings, 'PhpDocTypeMalformed.php');
     }
 
     protected function sniffClass(): string

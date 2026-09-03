@@ -7,7 +7,7 @@ use Exception;
 use Closure;
 
 
-class PhpDocArrayDefinitions
+class PhpDocTypeArray
 {
     /**
      * @param array $array wrong definition

@@ -3,7 +3,7 @@
 namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
-class PhpDocRequiredForClassApi extends PhpDocRequiredForParentApi implements PhpDocRequiredForInterfaceApi
+class PhpDocClass extends PhpDocParent implements PhpDocInterface
 {
     public $value;
 
@@ -13,6 +13,6 @@ class PhpDocRequiredForClassApi extends PhpDocRequiredForParentApi implements Ph
     public function originalMethodWithDoc() {}
     public function originalMethodWithoutDoc() {}
     public function interfaceMethodA(int $value): bool { return true; }
-    public function interfaceMethodB(array $test): PhpDocRequiredForInterfaceApi { return $this; }
+    public function interfaceMethodB(array $test): PhpDocInterface { return $this; }
     public static function staticConstructor(): self { return new self(); }
 }

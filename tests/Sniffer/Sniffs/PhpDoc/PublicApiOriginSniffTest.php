@@ -12,10 +12,10 @@
 namespace Polymorphine\Dev\Tests\Sniffer\Sniffs\PhpDoc;
 
 use Polymorphine\Dev\Tests\SnifferTest;
-use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\RequiredForPublicApiSniff;
+use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\PublicApiOriginSniff;
 
 
-class RequiredForPublicApiSniffTest extends SnifferTest
+class PublicApiOriginSniffTest extends SnifferTest
 {
     /** @dataProvider classFileWarnings */
     public function test_Interface_Warnings(array $warningLines, string $filename)
@@ -26,15 +26,15 @@ class RequiredForPublicApiSniffTest extends SnifferTest
     public static function classFileWarnings(): iterable
     {
         return [
-            'interface' => [[12], 'PhpDocRequiredForInterfaceApi.php'],
-            'class'     => [[14], 'PhpDocRequiredForClassApi.php'],
-            'parent'    => [[8], 'PhpDocRequiredForParentApi.php'],
-            'invalid'   => [[8], 'PhpDocRequiredForInvalidClass.php']
+            'interface' => [[12], 'PhpDocInterface.php'],
+            'class'     => [[14], 'PhpDocClass.php'],
+            'parent'    => [[8], 'PhpDocParent.php'],
+            'invalid'   => [[8], 'PhpDocInvalidClass.php']
         ];
     }
 
     protected function sniffClass(): string
     {
-        return RequiredForPublicApiSniff::class;
+        return PublicApiOriginSniff::class;
     }
 }

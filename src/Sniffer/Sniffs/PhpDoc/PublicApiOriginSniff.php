@@ -19,7 +19,7 @@ use ReflectionMethod;
 use Throwable;
 
 
-final class RequiredForPublicApiSniff implements Sniff
+final class PublicApiOriginSniff implements Sniff
 {
     private const MSG_MISSING_PHPDOC = 'Missing phpDoc comment for original public method signature';
 

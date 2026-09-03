@@ -4,7 +4,7 @@ namespace Some\NamespaceX;
 
 use Closure;
 
-class PhpDocCallableDefinitions
+class PhpDocTypeCallable
 {
     /**
      * @param callable $callback not definition
