@@ -18,16 +18,22 @@ use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\PublicApiOriginSniff;
 class PublicApiOriginSniffTest extends SnifferTest
 {
     /** @dataProvider classFileWarnings */
-    public function test_Interface_Warnings(array $warningLines, string $filename)
+    public function test_MissingPhpDocForOriginalApi_ReportsWarnings(array $warningLines, string $filename)
     {
         $this->assertWarningLines($warningLines, $filename);
+    }
+
+    public function test_MissingRequiredPhpDocForOriginalApi_ReportsErrors()
+    {
+        $this->assertErrorLines([19], 'PhpDocClass.php');
+        $this->assertErrorLines([13], 'PhpDocInterface.php');
     }
 
     public static function classFileWarnings(): iterable
     {
         return [
             'interface' => [[12], 'PhpDocInterface.php'],
-            'class'     => [[14], 'PhpDocClass.php'],
+            'class'     => [[18], 'PhpDocClass.php'],
             'parent'    => [[8], 'PhpDocParent.php'],
             'invalid'   => [[8], 'PhpDocInvalidClass.php']
         ];

@@ -55,7 +55,9 @@ final class PublicApiOriginSniff implements Sniff
 
         foreach ($undocumented as $stackPtr => $methodName) {
             if (isset($ancestorMethods[$methodName])) { continue; }
-            $phpcsFile->addWarning(self::MSG_MISSING_PHPDOC, $stackPtr, 'Missing');
+            $this->extendedDefinitionRequired($stackPtr)
+                ? $phpcsFile->addError(self::MSG_MISSING_PHPDOC, $stackPtr, 'Required')
+                : $phpcsFile->addWarning(self::MSG_MISSING_PHPDOC, $stackPtr, 'Missing');
         }
     }
 
@@ -94,5 +96,11 @@ final class PublicApiOriginSniff implements Sniff
             $methods[] = $method->getName();
         }
         return array_flip($methods);
+    }
+
+    private function extendedDefinitionRequired(int $idx): bool
+    {
+        $endIdx = $this->tokens->findNext($idx, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
+        return $this->tokens->findNext($idx, ['array', 'callable', 'Closure'], $endIdx) !== null;
     }
 }
