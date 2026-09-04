@@ -40,12 +40,10 @@ final class PublicApiOriginSniff implements Sniff
 
         $undocumented = [];
         while ($stackPtr = $this->tokens->findNext($stackPtr, ['T_FUNCTION'])) {
-            $isApi = $isInterface || $this->tokens->isType($stackPtr - 2, 'T_PUBLIC');
-            if (!$isApi) { continue; }
-
             $lineBreak    = $this->tokens->findPrev($stackPtr, ["\n"]);
+            $isPublic     = $this->tokens->findNext($lineBreak, ['T_PUBLIC'], $stackPtr - 2) !== null;
             $isDocumented = $this->tokens->isType($lineBreak - 1, 'T_DOC_COMMENT_CLOSE_TAG');
-            if ($isDocumented) { continue; }
+            if (!$isInterface && !$isPublic || $isDocumented) { continue; }
 
             $undocumented[$stackPtr] = $this->tokens->content($stackPtr + 2);
         }
@@ -92,7 +90,7 @@ final class PublicApiOriginSniff implements Sniff
     {
         $methods = [];
         foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->isStatic() || $method->isFinal()) { continue; }
+            if ($method->isFinal()) { continue; }
             $methods[] = $method->getName();
         }
         return array_flip($methods);

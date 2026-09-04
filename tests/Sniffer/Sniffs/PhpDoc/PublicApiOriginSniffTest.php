@@ -25,7 +25,7 @@ class PublicApiOriginSniffTest extends SnifferTest
 
     public function test_MissingRequiredPhpDocForOriginalApi_ReportsErrors()
     {
-        $this->assertErrorLines([19], 'PhpDocClass.php');
+        $this->assertErrorLines([12, 21], 'PhpDocClass.php');
         $this->assertErrorLines([13], 'PhpDocInterface.php');
     }
 
@@ -33,8 +33,8 @@ class PublicApiOriginSniffTest extends SnifferTest
     {
         return [
             'interface' => [[12], 'PhpDocInterface.php'],
-            'class'     => [[18], 'PhpDocClass.php'],
-            'parent'    => [[8], 'PhpDocParent.php'],
+            'class'     => [[20], 'PhpDocClass.php'],
+            'parent'    => [[8, 10], 'PhpDocParent.php'],
             'invalid'   => [[8], 'PhpDocInvalidClass.php']
         ];
     }

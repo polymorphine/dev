@@ -7,7 +7,9 @@ use Closure;
 
 class PhpDocClass extends PhpDocParent implements PhpDocInterface
 {
-    public static function staticConstructor(): self { return new self(); }
+    public static function parentConstructorNoDoc(): self { return new self(); }
+
+    public static function staticConstructor(callable $foo): self { return new self(); }
 
     public $value;
 
