@@ -43,13 +43,19 @@ class Tokens
 
     /**
      * @param int    $idx
-     * @param string $type T_NAME code string
+     * @param string ...$types T_NAME code or content strings
      *
-     * @return bool
+     * @return bool true if one of provided types is matched
      */
-    public function isType(int $idx, string $type): bool
+    public function isType(int $idx, string ...$types): bool
     {
-        return ($this->tokens[$idx]['type'] ?? null) === $type;
+        $token = $this->tokens[$idx] ?? null;
+        if (!$token) { return false; }
+        foreach ($types as $type) {
+            $value = substr($type, 0, 2) === 'T_' ? $token['type'] : $token['content'];
+            if ($value === $type) { return true; }
+        }
+        return false;
     }
 
     /**
@@ -78,15 +84,8 @@ class Tokens
 
     private function scanFor(int $idx, array $types, int $step, int $endIdx): ?int
     {
-        $contentTypes = array_filter($types, fn (string $type): bool => substr($type, 0, 2) !== 'T_');
-        $typeNames    = array_diff($types, $contentTypes);
-
-        while ($token = $this->tokens[$idx += $step] ?? null) {
-            $isEndReached = ($endIdx - $idx) * $step < 0;
-            if ($isEndReached) { return null; }
-            $isTypeFound    = in_array($token['type'], $typeNames, true);
-            $isContentFound = !$isTypeFound && in_array($token['content'], $contentTypes, true);
-            if ($isTypeFound || $isContentFound) { return $idx; }
+        while (($endIdx - $idx += $step) * $step >= 0) {
+            if ($this->isType($idx, ...$types)) { return $idx; }
         }
         return null;
     }
