@@ -42,12 +42,12 @@ class Tokens
     }
 
     /**
-     * @param int    $idx
-     * @param string ...$types T_NAME code or content strings
+     * @param int           $idx
+     * @param array<string> $types T_NAME code or content strings
      *
      * @return bool true if one of provided types is matched
      */
-    public function isType(int $idx, string ...$types): bool
+    public function isType(int $idx, array $types): bool
     {
         $token = $this->tokens[$idx] ?? null;
         if (!$token) { return false; }
@@ -85,7 +85,7 @@ class Tokens
     private function scanFor(int $idx, array $types, int $step, int $endIdx): ?int
     {
         while (($endIdx - $idx += $step) * $step >= 0) {
-            if ($this->isType($idx, ...$types)) { return $idx; }
+            if ($this->isType($idx, $types)) { return $idx; }
         }
         return null;
     }

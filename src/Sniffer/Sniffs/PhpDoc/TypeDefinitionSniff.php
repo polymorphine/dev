@@ -82,7 +82,7 @@ final class TypeDefinitionSniff implements Sniff
         if ($found === null) { return $idx; }
 
         $isEmptyLine = $this->tokens->content($found + 1) === "\n";
-        $isNextTag   = !$isEmptyLine && $this->tokens->isType($found + 2, 'T_DOC_COMMENT_TAG');
+        $isNextTag   = !$isEmptyLine && $this->tokens->isType($found + 2, ['T_DOC_COMMENT_TAG']);
         return $isEmptyLine || $isNextTag ? $this->tokens->findPrev($found, ["\n"]) : $this->endingIdx($found);
     }
 

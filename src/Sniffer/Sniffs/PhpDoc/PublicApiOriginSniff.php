@@ -34,32 +34,25 @@ final class PublicApiOriginSniff implements Sniff
     {
         $this->tokens = new Tokens($phpcsFile->getTokens());
 
-        $isInterface = $this->tokens->isType($stackPtr, 'T_INTERFACE');
-        $isOrigin    = $isInterface || $this->tokens->isType($stackPtr, 'T_TRAIT');
-        $className   = $isOrigin ? null : $this->className($stackPtr);
+        $isOrigin    = $this->tokens->isType($stackPtr, ['T_TRAIT', 'T_INTERFACE']);
+        $originalApi = $isOrigin ? [] : $this->definedMethods($this->fullClassName($stackPtr));
 
-        $undocumented = [];
         while ($stackPtr = $this->tokens->findNext($stackPtr, ['T_FUNCTION'])) {
+            $methodName = $this->tokens->content($stackPtr + 2);
+            if (isset($originalApi[$methodName])) { continue; }
             $lineBreak    = $this->tokens->findPrev($stackPtr, ["\n"]);
             $isPublic     = $this->tokens->findNext($lineBreak, ['T_PUBLIC'], $stackPtr - 2) !== null;
-            $isDocumented = $this->tokens->isType($lineBreak - 1, 'T_DOC_COMMENT_CLOSE_TAG');
-            if (!$isInterface && !$isPublic || $isDocumented) { continue; }
+            $isDocumented = $this->tokens->isType($lineBreak - 1, ['T_DOC_COMMENT_CLOSE_TAG']);
+            if (!$isPublic || $isDocumented) { continue; }
 
-            $undocumented[$stackPtr] = $this->tokens->content($stackPtr + 2);
-        }
-
-        if (!$undocumented) { return; }
-        $ancestorMethods = $className ? $this->getAncestorMethods($className) : [];
-
-        foreach ($undocumented as $stackPtr => $methodName) {
-            if (isset($ancestorMethods[$methodName])) { continue; }
-            $this->extendedDefinitionRequired($stackPtr)
+            $endIdx = $this->tokens->findNext($stackPtr, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
+            $this->tokens->findNext($stackPtr, ['array', 'callable', 'Closure'], $endIdx) !== null
                 ? $phpcsFile->addError(self::MSG_MISSING_PHPDOC, $stackPtr, 'Required')
                 : $phpcsFile->addWarning(self::MSG_MISSING_PHPDOC, $stackPtr, 'Missing');
         }
     }
 
-    private function className(int $idx): string
+    private function fullClassName(int $idx): string
     {
         $className = $this->tokens->content($idx + 2);
         $nsBegin   = $this->tokens->findNext(0, ['T_NAMESPACE'], $idx);
@@ -70,35 +63,29 @@ final class PublicApiOriginSniff implements Sniff
         return $namespace . '\\' . $className;
     }
 
-    private function getAncestorMethods(string $class): array
+    private function definedMethods(string $class): array
     {
         try {
             $reflection = new ReflectionClass($class);
             $parent     = $reflection->getParentClass();
-            $methods    = $parent ? $this->getMethods($parent) : [];
+            $methods    = $parent ? $this->publicMethodNames($parent) : [];
             $interfaces = $reflection->getInterfaces();
         } catch (Throwable $e) {
             return [];
         }
         foreach ($interfaces as $interface) {
-            $methods += $this->getMethods($interface);
+            $methods += $this->publicMethodNames($interface);
         }
         return $methods;
     }
 
-    private function getMethods(ReflectionClass $class): array
+    private function publicMethodNames(ReflectionClass $class): array
     {
         $methods = [];
         foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             if ($method->isFinal()) { continue; }
-            $methods[] = $method->getName();
+            $methods[$method->getName()] = true;
         }
-        return array_flip($methods);
-    }
-
-    private function extendedDefinitionRequired(int $idx): bool
-    {
-        $endIdx = $this->tokens->findNext($idx, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
-        return $this->tokens->findNext($idx, ['array', 'callable', 'Closure'], $endIdx) !== null;
+        return $methods;
     }
 }
