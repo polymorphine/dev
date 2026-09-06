@@ -46,19 +46,22 @@ class ToolsTest extends TestCase
     }
 
     /** @dataProvider phpDocLines */
-    public function test_TypesFromPhpDocLine_AreReduced(string $line, string $reduced)
+    public function test_TypesFromPhpDocLine_AreReduced(string $line, string $reduced, string $simplified, string $var)
     {
         $line = new Tools\PhpDocTypeLine($line);
         $this->assertSame($reduced, $line->reducedType());
+        $this->assertSame($simplified, $line->simplifiedType());
+        $this->assertSame($var, $line->variableName());
     }
 
     public static function phpDocLines(): array
     {
         return [
-            ['callable(): Test Short explanation', 'T'],
-            ['Foo|array<not, reducable>> commented type', 'T>'],
-            ['Some\Type<array<int>>', 'T'],
-            ['null|array<int, array<int, callable(array{foo: null|int, bar: \\Bar\\Baz\F99}, int): array<int>>> Type: Overkill', 'T']
+            ['callable(): Test $variable Short explanation', 'T', 'callable', '$variable'],
+            ['Foo|array<not, reduceable>> $foo commented type', 'T>', 'Foo|array>', '$foo'],
+            ['Some\\Type<array<int>>', 'T', 'Some\\Type', ''],
+            ['null|array<int, array<int, callable(array{foo: null|int, bar: \\Bar\\Baz\\F99}, int): ' .
+             'array<int>>> $type: Overkill', 'T', '?array', '$type:']
         ];
     }
 }

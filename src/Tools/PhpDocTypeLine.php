@@ -15,6 +15,7 @@ namespace Polymorphine\Dev\Tools;
 class PhpDocTypeLine
 {
     private const REGEXP_TYPE_ONLY = '#([^,:]) .+#';
+    private const REGEXP_TOP_ONLY  = '#({[^{]+?}|<[^<]+?>|\([^(]*?\): [^ |()<>{}]+)#';
     private const REGEXP_NS_TYPES  = '#(^|[^a-zA-Z])(?:[a-zA-Z0-9]*\\\\)+[a-zA-Z0-9]+#';
     private const REGEXP_NAMES     = '#(^|[^a-zA-Z])([a-zA-Z0-9\-_]+)#';
     private const REGEXP_ARRAY     = '#(^|[^a-zA-Z])(?:array|list)<(T(?:, T)?)>#';
@@ -33,6 +34,29 @@ class PhpDocTypeLine
     }
 
     /**
+     * @return string Extracted variable name (for example: `$variable`)
+     */
+    public function variableName(): string
+    {
+        $varStart = strpos($this->typeDeclaration, '$');
+        if ($varStart === false) { return ''; }
+
+        $varEnd = strpos($this->typeDeclaration, ' ', $varStart);
+        return $varEnd
+            ? substr($this->typeDeclaration, $varStart, $varEnd - $varStart)
+            : substr($this->typeDeclaration, $varStart);
+    }
+
+    /**
+     * @return string Simplified type used in method signature
+     */
+    public function simplifiedType(): string
+    {
+        $typeLine = preg_replace(self::REGEXP_TYPE_ONLY, '$1', $this->typeDeclaration);
+        return str_replace('null|', '?', $this->removeNestedTypes($typeLine));
+    }
+
+    /**
      * @return string Valid type declaration should be reduced to `T` value
      */
     public function reducedType(): string
@@ -41,6 +65,12 @@ class PhpDocTypeLine
         $removedNamespaces = preg_replace(self::REGEXP_NS_TYPES, '$1T', $isolatedTypeLine);
         $reducedTypeNames  = preg_replace_callback(self::REGEXP_NAMES, [$this, 'replace'], $removedNamespaces);
         return $this->reduceComplexTypes($reducedTypeNames);
+    }
+
+    private function removeNestedTypes(string $line): string
+    {
+        $reduced = preg_replace(self::REGEXP_TOP_ONLY, '', $line);
+        return $reduced !== $line ? $this->removeNestedTypes($reduced) : $reduced;
     }
 
     private function reduceComplexTypes(string $line): string
