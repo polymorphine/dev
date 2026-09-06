@@ -23,14 +23,16 @@ class PhpDocTypeLine
     private const REGEXP_CALLBACKS = '#(^|[^a-zA-Z])(?:callable|Closure)(\(T?(?:, T)*(\.\.\.)?\): T)#';
     private const REGEXP_UNREDUCED = '#(^|[^a-zA-Z0-9\-_])(?:list|array|callable|Closure)($|[^a-zA-Z0-9\-_])#';
 
-    private string $typeDeclaration;
+    private string $type;
+    private string $doc;
 
     /**
      * @param string $typeDeclaration Comment line after @param or @return tag
      */
     public function __construct(string $typeDeclaration)
     {
-        $this->typeDeclaration = $typeDeclaration;
+        $this->type = preg_replace(self::REGEXP_TYPE_ONLY, '$1', $typeDeclaration);
+        $this->doc  = trim(substr($typeDeclaration, strlen($this->type)));
     }
 
     /**
@@ -38,13 +40,7 @@ class PhpDocTypeLine
      */
     public function variableName(): string
     {
-        $varStart = strpos($this->typeDeclaration, '$');
-        if ($varStart === false) { return ''; }
-
-        $varEnd = strpos($this->typeDeclaration, ' ', $varStart);
-        return $varEnd
-            ? substr($this->typeDeclaration, $varStart, $varEnd - $varStart)
-            : substr($this->typeDeclaration, $varStart);
+        return ($this->doc[0] ?? '') !== '$' ? '' : (explode(' ', $this->doc, 2) + ['', null])[0];
     }
 
     /**
@@ -52,8 +48,7 @@ class PhpDocTypeLine
      */
     public function simplifiedType(): string
     {
-        $typeLine = preg_replace(self::REGEXP_TYPE_ONLY, '$1', $this->typeDeclaration);
-        return str_replace('null|', '?', $this->removeNestedTypes($typeLine));
+        return str_replace('null|', '?', $this->removeNestedTypes($this->type));
     }
 
     /**
@@ -61,8 +56,7 @@ class PhpDocTypeLine
      */
     public function reducedType(): string
     {
-        $isolatedTypeLine  = preg_replace(self::REGEXP_TYPE_ONLY, '$1', $this->typeDeclaration);
-        $removedNamespaces = preg_replace(self::REGEXP_NS_TYPES, '$1T', $isolatedTypeLine);
+        $removedNamespaces = preg_replace(self::REGEXP_NS_TYPES, '$1T', $this->type);
         $reducedTypeNames  = preg_replace_callback(self::REGEXP_NAMES, [$this, 'replace'], $removedNamespaces);
         return $this->reduceComplexTypes($reducedTypeNames);
     }

@@ -10,4 +10,7 @@
         <type>warning</type>
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
+    <rule ref="Sniffer.PhpDoc.ValidTags">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
 </ruleset>
