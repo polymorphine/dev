@@ -3,11 +3,12 @@
 namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
-interface PhpDocRequiredForInterfaceApi
+interface PhpDocInterface
 {
     /**
      * Whatever - no content check
      */
     public function interfaceMethodA(int $value): bool;
-    public function interfaceMethodB(array $test): self;
+    public function shouldBeDocumented(bool $foo): void;
+    public function methodRequiresDoc(array $test): self;
 }

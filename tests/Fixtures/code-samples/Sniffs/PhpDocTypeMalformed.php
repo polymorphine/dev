@@ -4,7 +4,7 @@ namespace Some\NamespaceX;
 
 use Closure;
 
-class PhpDocMalformedDefinitions
+class PhpDocTypeMalformed
 {
     /**
      * @param Foo<temp, value>> $foo wrong definition

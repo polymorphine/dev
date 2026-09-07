@@ -3,7 +3,7 @@
 namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
-class PhpDocRequiredForInvalidClass extends NotExistingParent
+class PhpDocInvalidClass extends NotExistingParent
 {
     public function undocumentedMethod() {}
     /** Documented */

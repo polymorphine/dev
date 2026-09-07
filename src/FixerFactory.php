@@ -73,6 +73,14 @@ final class FixerFactory
         'yoda_style'                            => false
     ];
 
+    /**
+     * @param string $launchFile Pathname of a project file called by cs-fixer app for Configuration
+     *                           File should contain project header with LICENSE reference
+     *
+     * @return Config
+     *
+     * @see cs-fixer.php.dist
+     */
     public static function createFor(string $launchFile): Config
     {
         $workingDir = dirname($launchFile);

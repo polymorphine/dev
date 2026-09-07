@@ -6,8 +6,11 @@
     <rule ref="./src/Sniffer">
         <type>error</type>
     </rule>
-    <rule ref="Sniffer.PhpDoc.RequiredForPublicApi">
+    <rule ref="Sniffer.PhpDoc.PublicApiOrigin">
         <type>warning</type>
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Sniffer.PhpDoc.ValidTags">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
 </ruleset>
