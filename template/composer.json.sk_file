@@ -55,6 +55,6 @@
         "test-php": "phpunit",
         "test-skeleton": "{$tpl.PHP_EXEC}polymorphine-skeleton check"
     },
-    "script-descriptions": null,
-    "script-aliases": null
+    "scripts-descriptions": null,
+    "scripts-aliases": null
 }
