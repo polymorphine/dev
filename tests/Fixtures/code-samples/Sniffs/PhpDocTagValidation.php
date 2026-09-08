@@ -16,7 +16,7 @@ interface PhpDocTagValidation
      *
      * @return mixed
      */
-    public function correctPhpDoc(iterable $iterable, Foo\Bar $foobar, $another);
+    public function incorrectOrderPhpDoc(iterable $iterable, Foo\Bar $foobar, $another);
 
     /**
      * @param null|int $integer Argument description
@@ -41,4 +41,21 @@ interface PhpDocTagValidation
      * @param callable(Foo): Test $function correct definition
      */
     public function missingRequiredReturn(callable $function, Foo\Bar $another): array;
+
+    /**
+     * @param array{
+     *            callback: Closure(string): void,
+     *            index: int
+     *        } $methodParam Variable multiline definition
+     *
+     * @throws Exception
+     *
+     * @return array{
+     *             strict_comparison: bool,
+     *             strict_param: bool,
+     *             string_implicit_backslashes: array{single_quoted: string},
+     *             sniff_class: Sniff
+     *         } Return type definition
+     */
+    public function multilineArrayDefinition(array $methodParam): array;
 }

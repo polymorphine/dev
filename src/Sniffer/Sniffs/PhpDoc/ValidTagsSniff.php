@@ -54,7 +54,7 @@ final class ValidTagsSniff implements Sniff
         $order   = array_flip(array_keys($types));
         $current = 0;
         while ($idx = $this->tokens->findNext($idx, ['@param', '@return'], $end)) {
-            $phpDoc  = new PhpDocTypeLine($this->tokens->content($idx + 2));
+            $phpDoc  = new PhpDocTypeLine($this->tokens->typeDoc($idx));
             $varName = $phpDoc->variableName() ?: '@return';
 
             if (!isset($types[$varName])) {

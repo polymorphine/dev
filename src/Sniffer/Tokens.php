@@ -82,11 +82,41 @@ class Tokens
         return $this->scanFor($idx, $types, -1, min($endIdx, $idx));
     }
 
+    /**
+     * @param int $idx index of phpDoc tag like @param, @return, @var etc
+     *
+     * @return string Single line tag content
+     */
+    public function typeDoc(int $idx): string
+    {
+        $isTypeTag   = $this->isType($idx, ['@param', '@return', '@var']);
+        $containsDoc = $isTypeTag && $this->isType($idx + 2, ['T_DOC_COMMENT_STRING']);
+        if (!$containsDoc) { return ''; }
+
+        $endIdx  = $this->endingIdx($idx + 2);
+        $content = '';
+        while ($idx = $this->findNext($idx, ['T_DOC_COMMENT_STRING'], $endIdx)) {
+            $content .= substr($content, -1) === ',' ? ' ' : '';
+            $content .= $this->content($idx);
+        }
+        return $content;
+    }
+
     private function scanFor(int $idx, array $types, int $step, int $endIdx): ?int
     {
         while (($endIdx - $idx += $step) * $step >= 0) {
             if ($this->isType($idx, $types)) { return $idx; }
         }
         return null;
+    }
+
+    private function endingIdx(int $idx): int
+    {
+        $found = $this->findNext($idx, ['T_DOC_COMMENT_CLOSE_TAG', 'T_DOC_COMMENT_STAR']);
+        if ($found === null) { return $idx; }
+
+        $isEndLine = $this->isType($found, ['T_DOC_COMMENT_CLOSE_TAG']) || $this->isType($found + 1, ["\n"]);
+        $isNextTag = $this->isType($found + 2, ['T_DOC_COMMENT_TAG']);
+        return $isEndLine || $isNextTag ? $this->findPrev($found, ['T_DOC_COMMENT_STRING']) : $this->endingIdx($found);
     }
 }
