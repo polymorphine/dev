@@ -63,7 +63,7 @@ final class ValidTagsSniff implements Sniff
             }
 
             if ($order[$varName] < $current) {
-                $phpcsFile->addWarning(self::MSG_WRONG_ORDER, $idx, 'ArgumnetOrder');
+                $phpcsFile->addWarning(self::MSG_WRONG_ORDER, $idx, 'ArgumentOrder');
             }
 
             $type = $types[$varName] !== '' ? $phpDoc->simplifiedType() : '';
@@ -77,8 +77,8 @@ final class ValidTagsSniff implements Sniff
         }
 
         foreach ($types as $varName => $type) {
-            $requiredTypes = ['array', 'callable', 'Closure'];
-            $isRequired    = in_array(str_replace('?', '', $type), $requiredTypes, true);
+            $requiredTypes = ['callable', 'Closure', 'array', 'iterable', 'Traversable', 'Iterator', 'Generator'];
+            $isRequired    = in_array(trim($type, '?\\'), $requiredTypes, true);
             if (!$isRequired) { continue; }
 
             $message = sprintf(self::MSG_MISSING_PHPDOC, $varName === '@return' ? '@return' : '@param ' . $varName);

@@ -45,8 +45,9 @@ final class PublicApiOriginSniff implements Sniff
             $isDocumented = $this->tokens->isType($lineBreak - 1, ['T_DOC_COMMENT_CLOSE_TAG']);
             if (!$isPublic || $isDocumented) { continue; }
 
-            $endIdx = $this->tokens->findNext($stackPtr, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
-            $this->tokens->findNext($stackPtr, ['array', 'callable', 'Closure'], $endIdx) !== null
+            $endIdx   = $this->tokens->findNext($stackPtr, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
+            $required = ['array', 'iterable', 'Traversable', 'Iterator', 'Generator', 'callable', 'Closure'];
+            $this->tokens->findNext($stackPtr, $required, $endIdx) !== null
                 ? $phpcsFile->addError(self::MSG_MISSING_PHPDOC, $stackPtr, 'Required')
                 : $phpcsFile->addWarning(self::MSG_MISSING_PHPDOC, $stackPtr, 'Missing');
         }

@@ -14,14 +14,17 @@ namespace Polymorphine\Dev\Tools;
 
 class PhpDocTypeLine
 {
+    private const ITERABLES = 'list|iterable|Traversable|Iterator|Generator';
+    private const UNREDUCED = self::ITERABLES . '|callable|Closure';
+
     private const REGEXP_TYPE_ONLY = '#([^,:]) .+#';
     private const REGEXP_TOP_ONLY  = '#({[^{]+?}|<[^<]+?>|\([^(]*?\): [^ |()<>{}]+)#';
     private const REGEXP_NS_TYPES  = '#(^|[^a-zA-Z])(?:[a-zA-Z0-9]*\\\\)+[a-zA-Z0-9]+#';
     private const REGEXP_NAMES     = '#(^|[^a-zA-Z])([a-zA-Z0-9\-_]+)#';
-    private const REGEXP_ARRAY     = '#(^|[^a-zA-Z])(?:array|list)<(T(?:, T)?)>#';
+    private const REGEXP_ARRAY     = '#(^|[^a-zA-Z])(?:array|' . self::ITERABLES . ')<(T(?:, T)?)>#';
     private const REGEXP_ASSOC     = '#(^|[^a-zA-Z])array{(T: T(?:, T: T)*)}#';
     private const REGEXP_CALLBACKS = '#(^|[^a-zA-Z])(?:callable|Closure)(\(T?(?:, T)*(\.\.\.)?\): T)#';
-    private const REGEXP_UNREDUCED = '#(^|[^a-zA-Z0-9\-_])(?:list|array|callable|Closure)($|[^a-zA-Z0-9\-_])#';
+    private const REGEXP_UNREDUCED = '#(^|[^a-zA-Z0-9\-_])(?:array|' . self::UNREDUCED . ')($|[^a-zA-Z0-9\-_])#';
 
     private string $type;
     private string $doc;

@@ -11,4 +11,5 @@ interface PhpDocInterface
     public function interfaceMethodA(int $value): bool;
     public function shouldBeDocumented(bool $foo): void;
     public function methodRequiresDoc(array $test): self;
+    public function requiredDoc(): \Generator;
 }

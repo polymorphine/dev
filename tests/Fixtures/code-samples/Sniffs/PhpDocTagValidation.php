@@ -25,7 +25,7 @@ interface PhpDocTagValidation
      *
      * @return mixed
      */
-    public function correctPhpDoc(?int $integer, Foo\Bar $foobar, $another): void;
+    public function correctPhpDoc(?int $integer, Foo\Bar $foobar, $another, \Generator $generator): void;
 
     /**
      * @param callable(Foo): Test $function correct definition
@@ -33,9 +33,9 @@ interface PhpDocTagValidation
      * @param int $unexpected Type not in method signature
      * @param list<string> $type List
      *
-     * @return array<string, mixed>
+     * @return iterable<string, mixed>
      */
-    public function correctParamCallback(callable $function, Closure $closure, array $type): array;
+    public function correctParamCallback(callable $function, Closure $closure, array $type): iterable;
 
     /**
      * @param callable(Foo): Test $function correct definition

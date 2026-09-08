@@ -3,6 +3,7 @@
 namespace Some\NamespaceX;
 
 use BrokenNamingConventions\Sniffs\Category\Sniff;
+use Generator;
 use Exception;
 use Closure;
 
@@ -11,9 +12,10 @@ class PhpDocTypeArray
 {
     /**
      * @param array $array wrong definition
+     * @param iterable $array wrong definition
      * @param array<> $array wrong definition
      * @param array{Foo} $array wrong definition
-     * @param null|array $array wrong definition
+     * @param null|Iterator $array wrong definition
      * @param Type[] $array wrong definition
      * @param Namespaced\Type[] $array wrong definition
      * @param array<int, Foo[]> $array wrong definition
@@ -44,6 +46,8 @@ class PhpDocTypeArray
 
     /**
      * @return array<bool> correct definition
+     * @return array<bool> correct definition
+     * @return \Traversable<string, int> correct definition
      * @return array<test_value> correct definition
      * @return array<test, anything> correct definition
      */
@@ -54,9 +58,9 @@ class PhpDocTypeArray
     /**
      * @param array<int> $array correct definition
      * @param array<int, string> $array correct definition
-     * @param array<sting> $array correct definition
+     * @param list<sting> $array correct definition
      * @param array<string, mixed> $array correct definition
-     * @param array<int> $array correct definition
+     * @param Generator<int> $array correct definition
      *
      * @return array<string, mixed>
      */

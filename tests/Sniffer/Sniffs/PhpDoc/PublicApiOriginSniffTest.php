@@ -25,15 +25,15 @@ class PublicApiOriginSniffTest extends SnifferTest
 
     public function test_MissingRequiredPhpDocForOriginalApi_ReportsErrors()
     {
-        $this->assertErrorLines([12, 21], 'PhpDocClass.php');
-        $this->assertErrorLines([13], 'PhpDocInterface.php');
+        $this->assertErrorLines([13, 22, 29], 'PhpDocClass.php');
+        $this->assertErrorLines([13, 14], 'PhpDocInterface.php');
     }
 
     public static function classFileWarnings(): iterable
     {
         return [
             'interface' => [[12], 'PhpDocInterface.php'],
-            'class'     => [[20], 'PhpDocClass.php'],
+            'class'     => [[21], 'PhpDocClass.php'],
             'parent'    => [[8, 10], 'PhpDocParent.php'],
             'invalid'   => [[8], 'PhpDocInvalidClass.php']
         ];

@@ -19,6 +19,9 @@ use Polymorphine\Dev\Tools\PhpDocTypeLine;
 
 final class TypeDefinitionSniff implements Sniff
 {
+    private const CALLBACKS = ['callable', 'Closure'];
+    private const ITERABLES = ['[]', 'array', 'list', 'iterable', 'Traversable', 'Iterator', 'Generator'];
+
     private const MSG_INVALID_CALLBACK = <<<'WARNING'
         Callable type definition should contain typed signature
         format: `callable(ArgType, ...): ReturnType` or
@@ -50,9 +53,9 @@ final class TypeDefinitionSniff implements Sniff
             $type   = $phpDoc->reducedType();
             if ($type === 'T') { continue; }
 
-            if ($this->containsAny($type, 'callable', 'Closure')) {
+            if ($this->containsAny($type, self::CALLBACKS)) {
                 $phpcsFile->addWarning(self::MSG_INVALID_CALLBACK, $stackPtr, 'FoundCallback');
-            } elseif ($this->containsAny($type, '[]', 'array', 'list')) {
+            } elseif ($this->containsAny($type, self::ITERABLES)) {
                 $phpcsFile->addWarning(self::MSG_INVALID_ARRAY, $stackPtr, 'FoundArray');
             } else {
                 $phpcsFile->addWarning(self::MSG_MALFORMED_TYPE, $stackPtr, 'FoundMalformed');
@@ -60,7 +63,7 @@ final class TypeDefinitionSniff implements Sniff
         }
     }
 
-    private function containsAny(string $text, string ...$values): bool
+    private function containsAny(string $text, array $values): bool
     {
         $isFound = fn (bool $found, string $value) => $found || strpos($text, $value) !== false;
         return array_reduce($values, $isFound, false);
