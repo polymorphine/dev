@@ -19,6 +19,9 @@ use Polymorphine\Dev\Tools\PhpDocTypeLine;
 
 final class ValidTagsSniff implements Sniff
 {
+    private const TYPE_REQUIRED = ['callable', 'Closure', 'array', 'iterable', 'Traversable', 'Iterator', 'Generator'];
+    private const TYPE_TOKENS   = ['T_STRING', 'T_CALLABLE', 'T_NULLABLE', 'T_NS_SEPARATOR'];
+
     private const MSG_INVALID_PHPDOC = 'Invalid phpDoc tags for method signature';
     private const MSG_MISSING_PHPDOC = 'Missing required phpDoc for %s type signature';
     private const MSG_UNEXPECTED_VAR = 'Unknown variable definition';
@@ -50,9 +53,9 @@ final class ValidTagsSniff implements Sniff
 
     private function validateTags(File $phpcsFile, int $idx, int $end, array $types): void
     {
-        $start   = $idx;
-        $order   = array_flip(array_keys($types));
-        $current = 0;
+        $start = $idx;
+        $order = array_flip(array_keys($types));
+        $prev  = 0;
         while ($idx = $this->tokens->findNext($idx, ['@param', '@return'], $end)) {
             $phpDoc  = new PhpDocTypeLine($this->tokens->typeDoc($idx));
             $varName = $phpDoc->variableName() ?: '@return';
@@ -62,22 +65,20 @@ final class ValidTagsSniff implements Sniff
                 continue;
             }
 
-            if ($order[$varName] < $current) {
+            if ($order[$varName] < $prev) {
                 $phpcsFile->addWarning(self::MSG_WRONG_ORDER, $idx, 'ArgumentOrder');
             }
 
-            $type = $types[$varName] !== '' ? $phpDoc->simplifiedType() : '';
-            if ($types[$varName] !== $type) {
+            if ($types[$varName] && $types[$varName] !== $phpDoc->simplifiedType()) {
                 $phpcsFile->addError(self::MSG_INVALID_PHPDOC, $idx, 'Invalid');
             }
 
             unset($types[$varName]);
-            $current = $order[$varName];
+            $prev = $order[$varName];
         }
 
         foreach ($types as $varName => $type) {
-            $requiredTypes = ['callable', 'Closure', 'array', 'iterable', 'Traversable', 'Iterator', 'Generator'];
-            $isRequired    = in_array(trim($type, '?\\'), $requiredTypes, true);
+            $isRequired = $type && in_array(trim($type, '?\\'), self::TYPE_REQUIRED, true);
             if (!$isRequired) { continue; }
 
             $message = sprintf(self::MSG_MISSING_PHPDOC, $varName === '@return' ? '@return' : '@param ' . $varName);
@@ -103,11 +104,11 @@ final class ValidTagsSniff implements Sniff
 
     private function typeString(int $idx, $max): string
     {
-        $start = $this->tokens->findNext($idx, ['T_STRING', 'T_CALLABLE', 'T_NULLABLE', 'T_NS_SEPARATOR'], $max);
+        $start = $this->tokens->findNext($idx, self::TYPE_TOKENS, $max);
         if (!$start) { return ''; }
 
         $idx = $start;
-        while ($this->tokens->isType($idx + 1, ['T_STRING', 'T_CALLABLE', 'T_NULLABLE', 'T_NS_SEPARATOR'])) {
+        while ($this->tokens->isType($idx + 1, self::TYPE_TOKENS)) {
             $idx++;
         }
         return $idx === $start ? $this->tokens->content($idx) : $this->tokens->content($start, $idx);

@@ -26,6 +26,7 @@ class ValidTagsSniffTest extends SnifferTest
     public function test_InvalidPhpDoc_ReportErrors()
     {
         $errors = [
+            15 => 'Sniffer.PhpDoc.ValidTags.Invalid',
             26 => 'Sniffer.PhpDoc.ValidTags.Invalid',
             21 => 'Sniffer.PhpDoc.ValidTags.Required',
             33 => 'Sniffer.PhpDoc.ValidTags.Unexpected',

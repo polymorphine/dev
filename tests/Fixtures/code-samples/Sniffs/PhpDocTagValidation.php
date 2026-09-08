@@ -12,11 +12,11 @@ interface PhpDocTagValidation
     /**
      * @param iterable $iterable Argument description
      * @param mixed $another
-     * @param Foo\Bar $foobar Should be valid
+     * @param Foo\Baz $foobar Should be valid
      *
      * @return mixed
      */
-    public function incorrectOrderPhpDoc(iterable $iterable, Foo\Bar $foobar, $another);
+    public function incorrectOrderAndInvalidPhpDoc(iterable $iterable, Foo\Bar $foobar, $another);
 
     /**
      * @param null|int $integer Argument description
