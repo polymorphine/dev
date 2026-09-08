@@ -13,7 +13,7 @@ class PhpDocTypeCallable
      * @param Closure $callback   not definition
      * @return Closure() not definition
      * @param Closure: Test $noDescription
-     * @param callable    $spacedCallback Closure(Type): null|array
+     * @param pure-callable    $spacedCallback Closure(Type): null|array
      * @return callable callable(Type) => bool
      * @param Closure  $short  fn(\typeOne, ?int) => Namespace\SomeOtherType
      * @return Closure  fn(Something\NameSpace) => Type
@@ -73,7 +73,7 @@ class PhpDocTypeCallable
      * @param callable(null|Foo): Test $function correct definition
      * @param callable(Foo, Bar): Namespaced\Test $function correct definition
      * @param callable(Foo, int...): \Test $function correct definition
-     * @param null|callable(): Test $function correct definition
+     * @param null|pure-callable(): Test $function correct definition
      * @param callable(null|Foo, int): null|Test $function correct definition
      * @param Closure(): void $closure correct definition
      * @param Some\Type|Closure(Foo): Test $closure correct definition

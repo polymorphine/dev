@@ -20,6 +20,7 @@ class PhpDocTypeLine
     private const REGEXP_TYPE_ONLY = '#([^,:]) .+#';
     private const REGEXP_TOP_ONLY  = '#({[^{]+?}|<[^<]+?>|\([^(]*?\): [^ |()<>{}]+)#';
     private const REGEXP_NS_TYPES  = '#(^|[^a-zA-Z])(?:[a-zA-Z0-9]*\\\\)+[a-zA-Z0-9]+#';
+    private const REGEXP_EXT_TYPES = '#(^|[^a-zA-Z])([a-zA-Z\-]+)-(int|array|' . self::UNREDUCED . ')#';
     private const REGEXP_NAMES     = '#(^|[^a-zA-Z])([a-zA-Z0-9\-_]+)#';
     private const REGEXP_ARRAY     = '#(^|[^a-zA-Z])(?:array|' . self::ITERABLES . ')<(T(?:, T)?)>#';
     private const REGEXP_ASSOC     = '#(^|[^a-zA-Z])array{(T: T(?:, T: T)*)}#';
@@ -51,7 +52,8 @@ class PhpDocTypeLine
      */
     public function simplifiedType(): string
     {
-        return str_replace('null|', '?', $this->removeNestedTypes($this->type));
+        $type = preg_replace(self::REGEXP_EXT_TYPES, '$1$3', $this->removeNestedTypes($this->type));
+        return str_replace(['null|', '?list', 'list'], ['?', '?array', 'array'], $type);
     }
 
     /**
@@ -60,7 +62,8 @@ class PhpDocTypeLine
     public function reducedType(): string
     {
         $removedNamespaces = preg_replace(self::REGEXP_NS_TYPES, '$1T', $this->type);
-        $reducedTypeNames  = preg_replace_callback(self::REGEXP_NAMES, [$this, 'replace'], $removedNamespaces);
+        $reducedExtNames   = preg_replace(self::REGEXP_EXT_TYPES, '$1$3', $removedNamespaces);
+        $reducedTypeNames  = preg_replace_callback(self::REGEXP_NAMES, [$this, 'replace'], $reducedExtNames);
         return $this->reduceComplexTypes($reducedTypeNames);
     }
 

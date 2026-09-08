@@ -12,7 +12,7 @@ class PhpDocTypeArray
 {
     /**
      * @param array $array wrong definition
-     * @param iterable $array wrong definition
+     * @param not-empty-iterable $array wrong definition
      * @param array<> $array wrong definition
      * @param array{Foo} $array wrong definition
      * @param null|Iterator $array wrong definition
@@ -58,7 +58,7 @@ class PhpDocTypeArray
     /**
      * @param array<int> $array correct definition
      * @param array<int, string> $array correct definition
-     * @param list<sting> $array correct definition
+     * @param non-empty-list<sting> $array correct definition
      * @param array<string, mixed> $array correct definition
      * @param Generator<int> $array correct definition
      *

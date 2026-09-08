@@ -67,7 +67,6 @@ final class ValidTagsSniff implements Sniff
             }
 
             $type = $types[$varName] !== '' ? $phpDoc->simplifiedType() : '';
-            $type = str_replace(['?list', 'list'], ['?array', 'array'], $type);
             if ($types[$varName] !== $type) {
                 $phpcsFile->addError(self::MSG_INVALID_PHPDOC, $idx, 'Invalid');
             }
