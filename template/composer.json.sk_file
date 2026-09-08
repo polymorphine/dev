@@ -1,8 +1,13 @@
 {
     "name": "{package.name.composer}",
     "description": "{package.description}",
-    "type": null,
     "license": "MIT",
+    "type": null,
+    "abandoned": null,
+    "version": null,
+    "keywords": null,
+    "readme": null,
+    "time": null,
     "authors": [
         {
             "name": "{author.name}",
@@ -11,12 +16,22 @@
             "role": null
         }
     ],
-    "minimum-stability": null,
-    "prefer-stable": null,
+    "homepage": null,
+    "support": null,
+    "funding": null,
+    "source": null,
+    "dist": null,
     "require": {
         "php": null
     },
     "require-dev": {$tpl.REQUIRE_DEV},
+    "replace": null,
+    "conflict": null,
+    "provide": null,
+    "suggest": null,
+    "repositories": null,
+    "minimum-stability": null,
+    "prefer-stable": null,
     "autoload": {
         "psr-4": {
             "{namespace.src.esc}\\": "src/"
@@ -28,6 +43,10 @@
         }
     },
     "bin": null,
+    "archive": null,
+    "php-ext": null,
+    "config": null,
+    "extra": null,
     "scripts": {
         "test-cs": [
             "php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests",
@@ -35,5 +54,7 @@
         ],
         "test-php": "phpunit",
         "test-skeleton": "{$tpl.PHP_EXEC}polymorphine-skeleton check"
-    }
+    },
+    "script-descriptions": null,
+    "script-aliases": null
 }
