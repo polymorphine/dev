@@ -50,9 +50,9 @@ final class TypeDefinitionSniff implements Sniff
             if (!$typeTag = $tokens->typeDoc($stackPtr)) { continue; }
 
             $phpDoc = new PhpDocTypeLine($typeTag);
-            $type   = $phpDoc->reducedType();
-            if ($type === 'T') { continue; }
+            if ($phpDoc->reducedType() === 'T') { continue; }
 
+            $type = $phpDoc->simplifiedType();
             if ($this->containsAny($type, self::CALLBACKS)) {
                 $phpcsFile->addWarning(self::MSG_INVALID_CALLBACK, $stackPtr, 'FoundCallback');
             } elseif ($this->containsAny($type, self::ITERABLES)) {

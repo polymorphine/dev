@@ -14,7 +14,7 @@ class PhpDocTypeArray
      * @param array $array wrong definition
      * @param not-empty-iterable $array wrong definition
      * @param array<> $array wrong definition
-     * @param array{Foo} $array wrong definition
+     * @param array{string: callable()} $array wrong definition
      * @param null|Iterator $array wrong definition
      * @param Type[] $array wrong definition
      * @param Namespaced\Type[] $array wrong definition
