@@ -55,6 +55,11 @@ class PhpDocTypeArray
     {
     }
 
+    /** @return list<string> */
+    public function correctSingleLineReturnArray(): array
+    {
+    }
+
     /**
      * @param array<int> $array correct definition
      * @param array<int, string> $array correct definition

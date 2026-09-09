@@ -35,7 +35,7 @@ class PhpDocTypeLine
      */
     public function __construct(string $typeDeclaration)
     {
-        $this->type = preg_replace(self::REGEXP_TYPE_ONLY, '$1', $typeDeclaration);
+        $this->type = preg_replace(self::REGEXP_TYPE_ONLY, '$1', trim($typeDeclaration));
         $this->doc  = trim(substr($typeDeclaration, strlen($this->type)));
     }
 
