@@ -23,14 +23,14 @@ final class TypeDefinitionSniff implements Sniff
     private const ITERABLES = ['[]', 'array', 'list', 'iterable', 'Traversable', 'Iterator', 'Generator'];
 
     private const MSG_INVALID_CALLBACK = <<<'WARNING'
-        Callable type definition should contain typed signature
+        Type definitions for callables should contain typed signature
         format: `callable(ArgType, ...): ReturnType` or
                 `Closure(ArgType, ...): ReturnType`
         WARNING;
 
     private const MSG_INVALID_ARRAY = <<<'WARNING'
-        Array type definition should contain internal type-hints
-        format: `array<keyType, valueType>` or `array<valueType>` or
+        Type definitions for array & known iterables should contain internal type-hints
+        format: `array<keyType, valueType>`, `iterable<valueType>`,
                 `array{keyName: valueType, ...}` or `list<valueType>`
         WARNING;
 
