@@ -29,7 +29,6 @@ To run project tests you could use these composer scripts - see
 [`composer.json`](composer.json) to learn equivalent tool commands called
 directly.
 
-> [!NOTE]
 > Calling these tools from project's root directory would require path to
 > `bin` directory, like `vendor/bin/phpunit` instead of `phpunit`. Unless
 > installed globally, there's no point registering executable paths for
@@ -100,7 +99,6 @@ one of the inspections in `Settings > PHP > Quality Tools > PHP_CodeSniffer`:
 - Limit file extensions to `php`
 - Set current **project root directory** as a `Custom` coding standard
 
-> [!NOTE]
 > Setting project root directory as a custom coding standard is a workaround
 > for a globally installed script to find project's root directory (as current
 > working directory is not available when called by IDE).
@@ -111,11 +109,10 @@ one of the inspections in `Settings > PHP > Quality Tools > PHP_CodeSniffer`:
   like: `callable`, `Closure`, `array`, `iterable`, `Traversable`, `Iterator`
   and `Generator`. 
   
-  > [!NOTE]
   > **Original method** is the one that introduces new signature - it doesn't
-  override parent's method nor provides implementation for method defined by
-  an interface. In case of traits every public method is considered original
-  API.
+  > override parent's method nor provides implementation for method defined by
+  > an interface. In case of traits every public method is considered original
+  > API.
 - PhpDoc's `@param` and `@return` tags can be omitted unless documenting one
   of composite types - for example:
     ```php
