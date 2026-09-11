@@ -18,41 +18,87 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-function runScript(PHP_CodeSniffer\Runner $runner, array $args): int
-{
-    $_SERVER['argv'] = [__FILE__, ...$args];
-    return $runner->runPHPCS();
+// Checks for $argv[1] are workarounds for PhpStorm inspection that either sends file content
+// through STDIN ($argv[1] = '-') or checks for version number ($argv[1] = '--version')
+$commandType = $argv[1] ?? null;
+$codeSniffer = new PhpCSScript();
+
+switch ($commandType) {
+    case '--version':
+        $exitCode = $codeSniffer->versionCheck($argv);
+        break;
+    case '-':
+        $exitCode = $codeSniffer->fileInspection($argv);
+        break;
+    default:
+        $exitCode = $commandType ? $codeSniffer->fileCheck($argv) : $codeSniffer->projectScan();
+        if (!$exitCode) {
+            echo '--- Done (OK) ---';
+        }
 }
 
-$exitCode = 0;
-if (!isset($argv[1])) {
-    $scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
-    require_once $scriptRoot . DIRECTORY_SEPARATOR . 'vendor/squizlabs/php_codesniffer/autoload.php';
-    if ($scriptRoot !== __DIR__) {
-        require_once getcwd() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+exit($exitCode);
+
+
+class PhpCSScript
+{
+    private PHP_CodeSniffer\Runner $runner;
+    private bool                   $selfCheck;
+
+    public function __construct()
+    {
+        $scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+        require_once $this->path($scriptRoot, 'vendor/squizlabs/php_codesniffer/autoload.php');
+
+        $this->runner    = new PHP_CodeSniffer\Runner();
+        $this->selfCheck = $scriptRoot === __DIR__;
     }
 
-    $standard = $scriptRoot === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
-    $args     = ['--extensions=php', '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard, '--colors'];
+    public function projectScan(): int
+    {
+        $standard = $this->path(__DIR__, $this->selfCheck ? 'phpcs.xml.dist' : 'phpcs.xml');
+        $args     = ['--extensions=php', '--standard=' . $standard, '--colors', '--ignore=*/code-samples/*'];
+        $this->selfCheck || $this->includeProjectAutoload(getcwd());
+        return $this->runScript(['--version']) | $this->runScript([...$args, 'src', 'tests']);
+    }
 
-    $runner = new PHP_CodeSniffer\Runner();
-    $exitCode = runScript($runner, ['--version'])
-        | runScript($runner, [...$args, 'src'])
-        | runScript($runner, [...$args, '--ignore=*/code-samples/*', 'tests']);
-    exit($exitCode);
+    public function versionCheck(array $args): int
+    {
+        return $this->runScript($args);
+    }
+
+    public function fileInspection(array $args): int
+    {
+        // PhpStorm provides project root as working directory as a CLI option path to standard ruleset
+        $cwd      = explode('=', $args[2])[1];
+        $standard = $this->path(__DIR__, $cwd === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml');
+        $args[2]  = '--standard=' . $standard;
+        $this->includeProjectAutoload($cwd);
+        return $this->runScript($args);
+    }
+
+    public function fileCheck(array $args): int
+    {
+        $cwd      = getcwd();
+        $standard = $this->path(__DIR__, $this->selfCheck ? 'phpcs.xml.dist' : 'phpcs.xml');
+        $args     = ['--extensions=php', '--standard=' . $standard, '--colors', '--ignore=*/code-samples/*', $args[1]];
+        $this->includeProjectAutoload($cwd);
+        return $this->runScript($args);
+    }
+
+    private function runScript(array $args): int
+    {
+        $_SERVER['argv'] = [__FILE__, ...$args];
+        return $this->runner->runPHPCS();
+    }
+
+    private function includeProjectAutoload(string $projectRoot): void
+    {
+        require_once $this->path($projectRoot, 'vendor/autoload.php');
+    }
+
+    private function path(string $root, string $path): string
+    {
+        return $root . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    }
 }
-
-$scriptRoot = dirname(__DIR__, 3);
-require_once $scriptRoot . '/vendor/squizlabs/php_codesniffer/autoload.php';
-
-if ($argv[1] === '-') {
-    $cwd = explode('=', $argv[2])[1];
-    require_once $cwd . '/vendor/autoload.php';
-
-    $standard = $cwd === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
-    $argv[2] = '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard;
-}
-
-$runner   = new PHP_CodeSniffer\Runner();
-$exitCode = runScript($runner, $argv);
-exit($exitCode);
