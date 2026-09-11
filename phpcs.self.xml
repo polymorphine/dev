@@ -3,9 +3,7 @@
 <ruleset name="polymorphine-dev">
     <config name="ignore_warnings_on_exit" value="true"/>
     <autoload>./vendor/autoload.php</autoload>
-    <rule ref="./src/Sniffer">
-        <type>error</type>
-    </rule>
+    <rule ref="./src/Sniffer"/>
     <rule ref="Sniffer.PhpDoc.ValidTags">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>

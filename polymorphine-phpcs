@@ -18,11 +18,14 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
+$scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+require_once PhpCSScript::path($scriptRoot, 'vendor/squizlabs/php_codesniffer/autoload.php');
+
+$codeSniffer = new PhpCSScript(new PHP_CodeSniffer\Runner(), $scriptRoot === __DIR__);
+
 // Checks for $argv[1] are workarounds for PhpStorm inspection that either sends file content
 // through STDIN ($argv[1] = '-') or checks for version number ($argv[1] = '--version')
 $commandType = $argv[1] ?? null;
-$codeSniffer = new PhpCSScript();
-
 switch ($commandType) {
     case '--version':
         $exitCode = $codeSniffer->versionCheck($argv);
@@ -32,9 +35,7 @@ switch ($commandType) {
         break;
     default:
         $exitCode = $commandType ? $codeSniffer->fileCheck($argv) : $codeSniffer->projectScan();
-        if (!$exitCode) {
-            echo '--- Done (OK) ---';
-        }
+        $exitCode = $exitCode ?: '--- Done (OK) ---';
 }
 
 exit($exitCode);
@@ -42,24 +43,24 @@ exit($exitCode);
 
 class PhpCSScript
 {
+    public static function path(string $root, string $path): string
+    {
+        return $root . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    }
+
     private PHP_CodeSniffer\Runner $runner;
     private bool                   $selfCheck;
 
-    public function __construct()
+    public function __construct(PHP_CodeSniffer\Runner $runner, bool $selfCheck)
     {
-        $scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
-        require_once $this->path($scriptRoot, 'vendor/squizlabs/php_codesniffer/autoload.php');
-
-        $this->runner    = new PHP_CodeSniffer\Runner();
-        $this->selfCheck = $scriptRoot === __DIR__;
+        $this->runner    = $runner;
+        $this->selfCheck = $selfCheck;
     }
 
     public function projectScan(): int
     {
-        $standard = $this->path(__DIR__, $this->selfCheck ? 'phpcs.xml.dist' : 'phpcs.xml');
-        $args     = ['--extensions=php', '--standard=' . $standard, '--colors', '--ignore=*/code-samples/*'];
         $this->selfCheck || $this->includeProjectAutoload(getcwd());
-        return $this->runScript(['--version']) | $this->runScript([...$args, 'src', 'tests']);
+        return $this->runScript(['--version']) | $this->runScript([$this->standard(), 'src', 'tests']);
     }
 
     public function versionCheck(array $args): int
@@ -70,20 +71,15 @@ class PhpCSScript
     public function fileInspection(array $args): int
     {
         // PhpStorm provides project root as working directory as a CLI option path to standard ruleset
-        $cwd      = explode('=', $args[2])[1];
-        $standard = $this->path(__DIR__, $cwd === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml');
-        $args[2]  = '--standard=' . $standard;
-        $this->includeProjectAutoload($cwd);
+        $this->includeProjectAutoload(explode('=', $args[2])[1]);
+        $args[2] = $this->standard();
         return $this->runScript($args);
     }
 
     public function fileCheck(array $args): int
     {
-        $cwd      = getcwd();
-        $standard = $this->path(__DIR__, $this->selfCheck ? 'phpcs.xml.dist' : 'phpcs.xml');
-        $args     = ['--extensions=php', '--standard=' . $standard, '--colors', '--ignore=*/code-samples/*', $args[1]];
-        $this->includeProjectAutoload($cwd);
-        return $this->runScript($args);
+        $this->includeProjectAutoload(getcwd());
+        return $this->runScript([$this->standard(), $args[1]]);
     }
 
     private function runScript(array $args): int
@@ -92,13 +88,13 @@ class PhpCSScript
         return $this->runner->runPHPCS();
     }
 
-    private function includeProjectAutoload(string $projectRoot): void
+    private function standard(): string
     {
-        require_once $this->path($projectRoot, 'vendor/autoload.php');
+        return '--standard=' . self::path(__DIR__, $this->selfCheck ? 'phpcs.self.xml' : 'phpcs.xml');
     }
 
-    private function path(string $root, string $path): string
+    private function includeProjectAutoload(string $projectRoot): void
     {
-        return $root . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+        require_once self::path($projectRoot, 'vendor/autoload.php');
     }
 }

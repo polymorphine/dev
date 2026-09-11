@@ -35,7 +35,7 @@ final class SnifferTokens
      */
     public static function runner(?string $configFile = null): Runner
     {
-        $configFile = $configFile ?: dirname(__DIR__, 2) . '/phpcs.xml.dist';
+        $configFile = $configFile ?: dirname(__DIR__, 2) . '/phpcs.self.xml';
         $runner     = new Runner();
         $runner->config = new Config(['-q', '--standard=' . $configFile]);
         $runner->init();
