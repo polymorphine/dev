@@ -1,0 +1,97 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace PhpCsFixer;
+
+use Composer\XdebugHandler\XdebugHandler;
+use PhpCsFixer\Console\Application;
+use ErrorException;
+
+$argv or die('CLI script executable');
+
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+set_error_handler(static function(int $severity, string $message, string $file, int $line): bool {
+    if ($severity & error_reporting()) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    }
+    return true;
+});
+
+if (PHP_VERSION_ID === 80000) {
+    fwrite(STDERR, 'PHP CS Fixer is not able run on PHP 8.0.0 due to bug in PHP tokenizer');
+    exit(1);
+}
+
+$scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+require_once CSFixerScript::path($scriptRoot, 'vendor/autoload.php');
+
+// Restart if xdebug is loaded, unless the environment variable PHP_CS_FIXER_ALLOW_XDEBUG is set.
+$xdebug = new XdebugHandler('PHP_CS_FIXER');
+$xdebug->check();
+unset($xdebug);
+
+$CSFixer = new CSFixerScript(new Application());
+
+// Command types that are not executed directly by `runScript` are customized sets of CLI arguments
+$commandType = $argv[1] ?? null;
+switch ($commandType) {
+    case '--version':
+    case 'list-sets':
+    case 'fix':
+        $exitCode = $CSFixer->runScript($argv);
+        break;
+    case '--fix': // simplified fix command with predefined set of cli options
+        $exitCode = $CSFixer->fixFiles($argv);
+        break;
+    default:
+        $exitCode = $CSFixer->checkFiles($argv);
+}
+
+exit($exitCode);
+
+
+class CSFixerScript
+{
+    private const CLI_ARGS = ['--dry-run', '-v', '--config=cs-fixer.php.dist', '--path-mode=intersection', 'fix'];
+
+    public static function path(string $root, string $path): string
+    {
+        return $root . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    }
+
+    private Application $runner;
+
+    public function __construct(Application $runner)
+    {
+        $this->runner = $runner;
+    }
+
+    public function checkFiles(array $args): int
+    {
+        // Check either single file or entire project
+        $files = count($args) > 1 ? [$args[1]] : ['src', 'tests'];
+        return $this->runScript([$args[0], ...self::CLI_ARGS, ...$files]);
+    }
+
+    public function fixFiles(array $args): int
+    {
+        // Fix either single file or entire project
+        $files = count($args) > 2 ? [$args[2]] : ['src', 'tests'];
+        return $this->runScript([$args[0], ...array_slice(self::CLI_ARGS, 1), ...$files]);
+    }
+
+    public function runScript(array $args): int
+    {
+        $_SERVER['argv'] = $args;
+        return $this->runner->run();
+    }
+}
