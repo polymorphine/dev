@@ -20,13 +20,13 @@ class FixerSetupTest extends TestCase
 {
     public function test_ConfigInstantiation()
     {
-        $this->assertInstanceOf(ConfigInterface::class, FixerSetup::createFor(__FILE__));
+        $this->assertInstanceOf(ConfigInterface::class, FixerSetup::config(dirname(__DIR__)));
     }
 
-    public function test_ConfigFinder_IgnoresCodeSamples()
+    public function test_ConfigFinder_IgnoresTestCodeSamples()
     {
         FixerSetup::usingTempPath('');
-        $finder = FixerSetup::createFor($this->packagePath('cs-fixer.php.dist'))->getFinder();
+        $finder = FixerSetup::config(dirname(__DIR__))->getFinder();
 
         $ignoredFiles = $this->packagePath('tests/Fixtures/code-samples/');
         foreach ($finder as $file) {
@@ -34,14 +34,14 @@ class FixerSetupTest extends TestCase
         }
     }
 
-    public function test_ConfigFinder_ForTempFile_IgnoresCodeSamples()
+    public function test_ConfigFinder_ForTempFile_IgnoresTestCodeSamples()
     {
         $tempPath = 'tests/Fixtures/PHP CS Fixertemp_folder6/';
         FixerSetup::usingTempPath($this->packagePath($tempPath . 'SomePath/AnyFile.php'));
-        $finder = FixerSetup::createFor($this->packagePath('cs-fixer.php.dist'))->getFinder();
+        $finder = FixerSetup::config(dirname(__DIR__))->getFinder();
 
-        $ignoredFile  = $this->packagePath($tempPath . 'tests/code-samples/IgnoredTmpFile.php');
-        $acceptedFile = $this->packagePath($tempPath . 'tests/FixedTmpFile.php');
+        $ignoredFile  = $this->packagePath($tempPath . 'tests/code-samples/IgnoredFile.php');
+        $acceptedFile = $this->packagePath($tempPath . 'tests/UsedFile.php');
         foreach ($finder as $file) {
             $acceptedFile = $file->getPathname() === $acceptedFile ? 'FOUND' : $acceptedFile;
             $ignoredFile  = $file->getPathname() === $ignoredFile ? 'FOUND' : $ignoredFile;
@@ -50,7 +50,7 @@ class FixerSetupTest extends TestCase
         $this->assertNotSame('FOUND', $ignoredFile);
     }
 
-    public function test_Header_IsReadFromLaunchFile()
+    public function test_HeaderMetaData_IsReachedFromRootDirectory()
     {
         $expectedHeader = <<<'HEADER'
             This file is part of Polymorphine/Dev package.
@@ -61,15 +61,10 @@ class FixerSetupTest extends TestCase
             with this source code in the file LICENSE.
             HEADER;
 
-        $rules = FixerSetup::createFor($this->packagePath('cs-fixer.php.dist'))->getRules();
+        $rules = FixerSetup::config(dirname(__DIR__))->getRules();
         $this->assertSame($expectedHeader, $rules['header_comment']['header']);
 
-        $file  = $this->packagePath('tests/Fixtures/code-samples/Fixer/given-global.php');
-        $rules = FixerSetup::createFor($file)->getRules();
-        $this->assertSame('LOL surprise comment!', $rules['header_comment']['header']);
-
-        $file  = $this->packagePath('tests/Fixtures/code-samples/Fixer/given-ExampleClass.php');
-        $rules = FixerSetup::createFor($file)->getRules();
+        $rules = FixerSetup::config(__DIR__)->getRules();
         $this->assertFalse($rules['header_comment']);
     }
 

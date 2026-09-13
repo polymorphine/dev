@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of {package.name} package.
+ * This file is part of Polymorphine/Dev package.
  *
- * (c) {author.name} <{author.email}>
+ * (c) Shudd3r <q3.shudder@gmail.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,4 +11,4 @@
 
 use Polymorphine\Dev\FixerSetup;
 
-return FixerSetup::createFor(__FILE__);
+return FixerSetup::config(getcwd());

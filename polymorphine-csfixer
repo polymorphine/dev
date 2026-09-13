@@ -10,10 +10,6 @@
  * with this source code in the file LICENSE.
  */
 
-use Polymorphine\Dev\FixerSetup;
-use Composer\XdebugHandler\XdebugHandler;
-use PhpCsFixer\Console\Application;
-
 $argv or exit('CLI script executable');
 
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
@@ -29,33 +25,25 @@ if (PHP_VERSION_ID === 80000) {
     exit(1);
 }
 
-$scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
-require_once CSFixerScript::path($scriptRoot, 'vendor/autoload.php');
+require_once (getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3)) . '/vendor/autoload.php';
 
 // Restart if xdebug is loaded, unless the environment variable PHP_CS_FIXER_ALLOW_XDEBUG is set.
-$xdebug = new XdebugHandler('PHP_CS_FIXER');
-$xdebug->check();
-unset($xdebug);
+(new Composer\XdebugHandler\XdebugHandler('PHP_CS_FIXER'))->check();
 
-$CSFixer = new CSFixerScript(new Application());
-
-// Command types that are not executed directly by `runScript` are customized sets of CLI arguments
-$commandType = $argv[1] ?? null;
-switch ($commandType) {
-    case 'fix':
-        $argv[2] = FixerSetup::path($argv[2]);
-        FixerSetup::usingTempPath($argv[2]);
-        $argv[] = '--path-mode=intersection';
-        // no break
+$fixer = new CSFixerScript();
+switch ($argv[1] ?? '') {
     case '--version':
     case 'list-sets':
-        $exitCode = $CSFixer->runScript($argv);
+        $exitCode = $fixer->runScript($argv);
         break;
-    case '--fix': // simplified fix command with predefined set of cli options
-        $exitCode = $CSFixer->fixFiles($argv);
+    case 'fix':
+        $exitCode = $fixer->fileInspection($argv);
+        break;
+    case '--fix':
+        $exitCode = $fixer->fixFiles($argv);
         break;
     default:
-        $exitCode = $CSFixer->checkFiles($argv);
+        $exitCode = $fixer->checkFiles($argv);
 }
 
 exit($exitCode);
@@ -63,18 +51,15 @@ exit($exitCode);
 
 class CSFixerScript
 {
-    private const CLI_ARGS = ['--config=cs-fixer.php.dist', '--path-mode=intersection', '--show-progress=none', 'fix'];
+    private const CONFIG   = '--config=' . __DIR__ . DIRECTORY_SEPARATOR . 'cs-fixer.php';
+    private const CLI_ARGS = [self::CONFIG, '--path-mode=intersection', '--show-progress=none', 'fix'];
 
-    public static function path(string $root, string $path): string
+    public function fileInspection(array $args): int
     {
-        return $root . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
-    }
-
-    private Application $runner;
-
-    public function __construct(Application $runner)
-    {
-        $this->runner = $runner;
+        $args[2] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $args[2]);
+        $args[3] = self::CONFIG;
+        Polymorphine\Dev\FixerSetup::usingTempPath($args[2]);
+        return $this->runScript([...$args, '--path-mode=intersection']);
     }
 
     public function checkFiles(array $args): int
@@ -94,7 +79,8 @@ class CSFixerScript
     public function runScript(array $args): int
     {
         $_SERVER['argv'] = $args;
-        $this->runner->setAutoExit(false);
-        return $this->runner->run();
+        $fixer = new PhpCsFixer\Console\Application();
+        $fixer->setAutoExit(false);
+        return $fixer->run();
     }
 }

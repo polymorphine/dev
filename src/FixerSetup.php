@@ -18,6 +18,15 @@ use SplFileInfo;
 
 final class FixerSetup
 {
+    private const HEADER = <<<'TPL'
+        This file is part of {package.name} package.
+        
+        (c) {author.name} <{author.email}>
+        
+        This source file is subject to the MIT license that is bundled
+        with this source code in the file LICENSE.
+        TPL;
+
     private static array $rules = [
         '@Symfony'                              => true,
         'align_multiline_comment'               => true,
@@ -99,19 +108,18 @@ final class FixerSetup
     }
 
     /**
-     * @param string $launchFile Pathname of a project file called by cs-fixer app for Configuration
-     *                           File should contain project header with LICENSE reference
+     * @param string $workingDir Path to root project directory
      *
      * @return Config
      *
-     * @see cs-fixer.php.dist
+     * @see cs-fixer.php
      */
-    public static function createFor(string $launchFile): Config
+    public static function config(string $workingDir): Config
     {
-        $workingDir = dirname($launchFile);
-        $testsPath  = (self::$tempPath ?: $workingDir) . self::path('/tests/');
+        $metaFile  = $workingDir . self::path('/.github/skeleton.json');
+        $testsPath = (self::$tempPath ?: $workingDir) . self::path('/tests/');
 
-        self::setHeaderFrom($launchFile);
+        self::setHeaderFrom($metaFile);
 
         self::$rules['no_extra_blank_lines']['tokens'] = [
             'break', 'continue', 'extra', 'return', 'throw', 'parenthesis_brace_block',
@@ -176,21 +184,23 @@ final class FixerSetup
             ]);
     }
 
-    private static function setHeaderFrom(string $filename): void
+    private static function setHeaderFrom(string $metaFile): void
     {
         self::$rules['header_comment'] = false;
 
-        $contents    = file_get_contents($filename) ?: '';
-        $headerStart = strpos($contents, "\n/*\n");
-        $headerEnd   = strpos($contents, "\n */\n");
-        if (!$headerStart || !$headerEnd) { return; }
+        $contents = is_file($metaFile) ? file_get_contents($metaFile) : false;
+        if (!$contents) { return; }
 
-        $header = substr($contents, $headerStart + 4, $headerEnd - $headerStart - 4);
-        if (!$header) { return; }
+        $metaData = json_decode($contents, true) ?? [];
+        if (!$metaData) { return; }
+
+        $tokenize     = fn (string $value): string => sprintf('{%s}', $value);
+        $placeholders = array_map($tokenize, array_keys($metaData));
+        if (!$placeholders) { return; }
 
         self::$rules['header_comment'] = [
             'comment_type' => 'comment',
-            'header'       => str_replace([' * ', ' *'], '', $header)
+            'header'       => str_replace($placeholders, array_values($metaData), self::HEADER)
         ];
     }
 }

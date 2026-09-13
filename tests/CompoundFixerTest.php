@@ -22,7 +22,7 @@ class CompoundFixerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $config = FixerSetup::createFor(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cs-fixer.php.dist');
+        $config = FixerSetup::config(dirname(__DIR__));
         self::$runner = Fixtures\FixerTestRunner::withConfig($config);
     }
 
