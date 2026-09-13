@@ -9,6 +9,6 @@
  * with this source code in the file LICENSE.
  */
 
-use Polymorphine\Dev\FixerFactory;
+use Polymorphine\Dev\FixerSetup;
 
-return FixerFactory::createFor(__FILE__);
+return FixerSetup::createFor(__FILE__);

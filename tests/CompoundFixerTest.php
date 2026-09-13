@@ -12,7 +12,7 @@
 namespace Polymorphine\Dev\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\Dev\FixerFactory;
+use Polymorphine\Dev\FixerSetup;
 
 
 /** @group integrated */
@@ -22,7 +22,7 @@ class CompoundFixerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $config = FixerFactory::createFor(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cs-fixer.php.dist');
+        $config = FixerSetup::createFor(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cs-fixer.php.dist');
         self::$runner = Fixtures\FixerTestRunner::withConfig($config);
     }
 

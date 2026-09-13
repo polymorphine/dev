@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -9,6 +9,4 @@
  * with this source code in the file LICENSE.
  */
 
-use Polymorphine\Dev\FixerSetup;
-
-return FixerSetup::createFor(__FILE__);
+echo 'This is only a test';

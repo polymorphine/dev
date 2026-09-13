@@ -16,7 +16,7 @@ use PhpCsFixer\Finder;
 use SplFileInfo;
 
 
-final class FixerFactory
+final class FixerSetup
 {
     private static array $rules = [
         '@Symfony'                              => true,
@@ -73,6 +73,31 @@ final class FixerFactory
         'yoda_style'                            => false
     ];
 
+    private static string $tempPath = '';
+
+    /** Utility method to normalize path separators. */
+    public static function path(string $path): string
+    {
+        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    }
+
+    /**
+     * Assume working with temporary files outside of working directory
+     * when applying path related filters.
+     *
+     * @param string $path
+     */
+    public static function usingTempPath(string $path): void
+    {
+        self::$tempPath = '';
+        $path    = self::path($path);
+        $tempDir = strpos($path, DIRECTORY_SEPARATOR . 'PHP CS Fixertemp');
+        if (!$tempDir) { return; }
+        $length = strpos($path, DIRECTORY_SEPARATOR, $tempDir + 17);
+        if (!$length) { return; }
+        self::$tempPath = substr($path, 0, $length);
+    }
+
     /**
      * @param string $launchFile Pathname of a project file called by cs-fixer app for Configuration
      *                           File should contain project header with LICENSE reference
@@ -84,7 +109,7 @@ final class FixerFactory
     public static function createFor(string $launchFile): Config
     {
         $workingDir = dirname($launchFile);
-        $testsPath  = $workingDir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+        $testsPath  = (self::$tempPath ?: $workingDir) . self::path('/tests/');
 
         self::setHeaderFrom($launchFile);
 
@@ -124,16 +149,17 @@ final class FixerFactory
         self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
         $excludeSamples = function (SplFileInfo $file) use ($testsPath) {
-            $filePath   = $file->getPath();
-            $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
+            $filePath   = $file->getPathname();
+            $samplesDir = self::path('/code-samples/');
             return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
         };
 
+        $finder = Finder::create()->in(self::$tempPath ?: $workingDir)->filter($excludeSamples);
         $config = new Config();
         return $config
             ->setRiskyAllowed(true)
             ->setRules(self::$rules)
-            ->setFinder(Finder::create()->in($workingDir)->filter($excludeSamples))
+            ->setFinder($finder)
             ->setUsingCache(false)
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),

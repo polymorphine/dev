@@ -10,16 +10,14 @@
  * with this source code in the file LICENSE.
  */
 
-namespace PhpCsFixer;
-
+use Polymorphine\Dev\FixerSetup;
 use Composer\XdebugHandler\XdebugHandler;
 use PhpCsFixer\Console\Application;
-use ErrorException;
 
-$argv or die('CLI script executable');
+$argv or exit('CLI script executable');
 
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-set_error_handler(static function(int $severity, string $message, string $file, int $line): bool {
+set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
     if ($severity & error_reporting()) {
         throw new ErrorException($message, 0, $severity, $file, $line);
     }
@@ -44,9 +42,13 @@ $CSFixer = new CSFixerScript(new Application());
 // Command types that are not executed directly by `runScript` are customized sets of CLI arguments
 $commandType = $argv[1] ?? null;
 switch ($commandType) {
+    case 'fix':
+        $argv[2] = FixerSetup::path($argv[2]);
+        FixerSetup::usingTempPath($argv[2]);
+        $argv[] = '--path-mode=intersection';
+        // no break
     case '--version':
     case 'list-sets':
-    case 'fix':
         $exitCode = $CSFixer->runScript($argv);
         break;
     case '--fix': // simplified fix command with predefined set of cli options
@@ -61,7 +63,7 @@ exit($exitCode);
 
 class CSFixerScript
 {
-    private const CLI_ARGS = ['--dry-run', '-v', '--config=cs-fixer.php.dist', '--path-mode=intersection', 'fix'];
+    private const CLI_ARGS = ['--config=cs-fixer.php.dist', '--path-mode=intersection', '--show-progress=none', 'fix'];
 
     public static function path(string $root, string $path): string
     {
@@ -79,19 +81,20 @@ class CSFixerScript
     {
         // Check either single file or entire project
         $files = count($args) > 1 ? [$args[1]] : ['src', 'tests'];
-        return $this->runScript([$args[0], ...self::CLI_ARGS, ...$files]);
+        return $this->runScript([$args[0], '--dry-run', '-v', ...self::CLI_ARGS, ...$files]);
     }
 
     public function fixFiles(array $args): int
     {
         // Fix either single file or entire project
         $files = count($args) > 2 ? [$args[2]] : ['src', 'tests'];
-        return $this->runScript([$args[0], ...array_slice(self::CLI_ARGS, 1), ...$files]);
+        return $this->runScript([$args[0], ...self::CLI_ARGS, ...$files]);
     }
 
     public function runScript(array $args): int
     {
         $_SERVER['argv'] = $args;
+        $this->runner->setAutoExit(false);
         return $this->runner->run();
     }
 }
