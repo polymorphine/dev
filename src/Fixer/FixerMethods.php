@@ -34,7 +34,7 @@ trait FixerMethods
         return $this->nearestLineBreakIdx($idx, false);
     }
 
-    private function nearestLineBreakIdx(int $idx, bool $forwardSearch = true): int
+    private function nearestLineBreakIdx(int $idx, bool $forwardSearch = true): ?int
     {
         $direction = $forwardSearch ? 1 : -1;
         do {

@@ -61,10 +61,9 @@ final class AlignedAssignmentsFixer implements FixerInterface
         $groups = [];
         $assign = 0;
         while ($assign = $this->tokens->getNextTokenOfKind($assign, ['='])) {
-            $newLine = $this->prevLineBreak($assign);
-            if (!$this->isPureAssignment($newLine, $assign)) { continue; }
-
-            $siblings = $this->findSiblings($newLine, $assign);
+            $newLine  = $this->prevLineBreak($assign);
+            $fixable  = $newLine && $this->isPureAssignment($newLine, $assign);
+            $siblings = $fixable ? $this->findSiblings($newLine, $assign) : [];
             if (!$siblings) { continue; }
 
             $groups[] = $siblings;
