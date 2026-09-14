@@ -8,22 +8,31 @@
 -->
 <ruleset name="Polymorphine" namespace="Polymorphine\Dev\Sniffer">
     <description>Custom Polymorphine Sniffs for style errors that need to be fixed manually.</description>
-    <rule ref="Sniffer.PhpDoc.TypeDefinition"/>
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg name="ignore" value="*/tests/Fixtures/code-samples/*"/>
     <arg name="tab-width" value="4"/>
+    <rule ref="Sniffer.PhpDoc.TypeDefinition"/>
+    <rule ref="Sniffer.PhpDoc.ValidTags"/>
     <rule ref="Generic.Files.LineEndings">
+        <type>error</type>
         <properties>
             <property name="eolChar" value="\n"/>
         </properties>
     </rule>
     <rule ref="Generic.Files.LineLength">
         <exclude-pattern>*/tests/*</exclude-pattern>
+        <type>error</type>
         <properties>
             <property name="lineLimit" value="120"/>
             <property name="absoluteLineLimit" value="0"/>
         </properties>
     </rule>
-    <rule ref="Squiz.Classes.ValidClassName"/>
+    <rule ref="Squiz.Classes.ValidClassName">
+        <type>error</type>
+    </rule>
     <rule ref="PSR1.Methods.CamelCapsMethodName">
         <exclude-pattern>*/tests/*</exclude-pattern>
+        <type>error</type>
     </rule>
 </ruleset>

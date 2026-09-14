@@ -18,41 +18,83 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-function runScript(PHP_CodeSniffer\Runner $runner, array $args): int
-{
-    $_SERVER['argv'] = [__FILE__, ...$args];
-    return $runner->runPHPCS();
+$scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
+require_once PhpCSScript::path($scriptRoot, 'vendor/squizlabs/php_codesniffer/autoload.php');
+
+$codeSniffer = new PhpCSScript(new PHP_CodeSniffer\Runner(), $scriptRoot === __DIR__);
+
+// Checks for $argv[1] are workarounds for PhpStorm inspection that either sends file content
+// through STDIN ($argv[1] = '-') or checks for version number ($argv[1] = '--version')
+$commandType = $argv[1] ?? null;
+switch ($commandType) {
+    case '--version':
+        $exitCode = $codeSniffer->versionCheck($argv);
+        break;
+    case '-':
+        $exitCode = $codeSniffer->fileInspection($argv);
+        break;
+    default:
+        $exitCode = $commandType ? $codeSniffer->fileCheck($argv) : $codeSniffer->projectScan();
+        $exitCode = $exitCode ?: '--- Done (OK) ---';
 }
 
-$exitCode = 0;
-if (!isset($argv[1])) {
-    $scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
-    require_once $scriptRoot . DIRECTORY_SEPARATOR . 'vendor/squizlabs/php_codesniffer/autoload.php';
-    if ($scriptRoot !== __DIR__) {
-        require_once getcwd() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+exit($exitCode);
+
+
+class PhpCSScript
+{
+    public static function path(string $root, string $path): string
+    {
+        return $root . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
     }
 
-    $standard = $scriptRoot === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
-    $args     = ['--extensions=php', '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard, '--colors'];
+    private PHP_CodeSniffer\Runner $runner;
+    private bool                   $selfCheck;
 
-    $runner = new PHP_CodeSniffer\Runner();
-    $exitCode = runScript($runner, ['--version'])
-        | runScript($runner, [...$args, 'src'])
-        | runScript($runner, [...$args, '--ignore=*/code-samples/*', 'tests']);
-    exit($exitCode);
+    public function __construct(PHP_CodeSniffer\Runner $runner, bool $selfCheck)
+    {
+        $this->runner    = $runner;
+        $this->selfCheck = $selfCheck;
+    }
+
+    public function projectScan(): int
+    {
+        $this->selfCheck || $this->includeProjectAutoload(getcwd());
+        return $this->runScript(['--version']) | $this->runScript([$this->standard(), 'src', 'tests']);
+    }
+
+    public function versionCheck(array $args): int
+    {
+        return $this->runScript($args);
+    }
+
+    public function fileInspection(array $args): int
+    {
+        // PhpStorm provides project root as working directory as a CLI option path to standard ruleset
+        $this->includeProjectAutoload(explode('=', $args[2])[1]);
+        $args[2] = $this->standard();
+        return $this->runScript($args);
+    }
+
+    public function fileCheck(array $args): int
+    {
+        $this->includeProjectAutoload(getcwd());
+        return $this->runScript([$this->standard(), $args[1]]);
+    }
+
+    private function runScript(array $args): int
+    {
+        $_SERVER['argv'] = [__FILE__, ...$args];
+        return $this->runner->runPHPCS();
+    }
+
+    private function standard(): string
+    {
+        return '--standard=' . self::path(__DIR__, $this->selfCheck ? 'phpcs.self.xml' : 'phpcs.xml');
+    }
+
+    private function includeProjectAutoload(string $projectRoot): void
+    {
+        require_once self::path($projectRoot, 'vendor/autoload.php');
+    }
 }
-
-$scriptRoot = dirname(__DIR__, 3);
-require_once $scriptRoot . '/vendor/squizlabs/php_codesniffer/autoload.php';
-
-if ($argv[1] === '-') {
-    $cwd = explode('=', $argv[2])[1];
-    require_once $cwd . '/vendor/autoload.php';
-
-    $standard = $cwd === __DIR__ ? 'phpcs.xml.dist' : 'phpcs.xml';
-    $argv[2] = '--standard=' . __DIR__ . DIRECTORY_SEPARATOR . $standard;
-}
-
-$runner   = new PHP_CodeSniffer\Runner();
-$exitCode = runScript($runner, $argv);
-exit($exitCode);
