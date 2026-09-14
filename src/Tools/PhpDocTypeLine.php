@@ -20,7 +20,7 @@ class PhpDocTypeLine
     private const REGEXP_TYPE_ONLY = '#([^,:]) .+#';
     private const REGEXP_TOP_ONLY  = '#({[^{]+?}|<[^<]+?>|\([^(]*?\): [^ |()<>{}]+)#';
     private const REGEXP_NS_TYPES  = '#(^|[^a-zA-Z])(?:[a-zA-Z0-9]*\\\\)+[a-zA-Z0-9]+#';
-    private const REGEXP_EXT_TYPES = '#(^|[^a-zA-Z])([a-zA-Z\-]+)-(int|array|' . self::UNREDUCED . ')#';
+    private const REGEXP_EXT_TYPES = '#(^|[^a-zA-Z])([a-zA-Z\-]+)-(string|int|array|' . self::UNREDUCED . ')#';
     private const REGEXP_NAMES     = '#(^|[^a-zA-Z])([a-zA-Z0-9\-_]+)#';
     private const REGEXP_ARRAY     = '#(^|[^a-zA-Z])(?:array|' . self::ITERABLES . ')<(T(?:, T)?)>#';
     private const REGEXP_ASSOC     = '#(^|[^a-zA-Z])array{(T: T(?:, T: T)*)}#';

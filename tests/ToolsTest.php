@@ -63,6 +63,7 @@ class ToolsTest extends TestCase
             ['null|non-empty-list<mixed>', 'T', '?array', ''],
             ['int<0, 100> $percent', 'T', 'int', '$percent'],
             ['some-esoteric-type-Closure(Foo): void', 'T', 'Closure', ''],
+            ['class-string $className FQN', 'T', 'string', '$className'],
             ['null|array<int, array<int, callable(array{foo: null|int, bar: \\Bar\\Baz\\F99}, int): ' .
              'array<int>>> $type: Overkill', 'T', '?array', '$type:']
         ];
