@@ -11,4 +11,4 @@
 
 use Polymorphine\Dev\FixerSetup;
 
-return FixerSetup::config(getcwd());
+return FixerSetup::config();

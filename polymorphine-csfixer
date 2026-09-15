@@ -58,21 +58,21 @@ class CSFixerScript
     {
         $args[2] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $args[2]);
         $args[3] = self::CONFIG;
-        Polymorphine\Dev\FixerSetup::usingTempPath($args[2]);
+        Polymorphine\Dev\FixerSetup::init(getcwd(), $args[2]);
         return $this->runScript([...$args, '--path-mode=intersection']);
     }
 
     public function checkFiles(array $args): int
     {
-        // Check either single file or entire project
         $files = count($args) > 1 ? [$args[1]] : ['src', 'tests'];
+        Polymorphine\Dev\FixerSetup::init(getcwd(), $files[0]);
         return $this->runScript([$args[0], '--dry-run', '-v', ...self::CLI_ARGS, ...$files]);
     }
 
     public function fixFiles(array $args): int
     {
-        // Fix either single file or entire project
         $files = count($args) > 2 ? [$args[2]] : ['src', 'tests'];
+        Polymorphine\Dev\FixerSetup::init(getcwd(), $files[0]);
         return $this->runScript([$args[0], ...self::CLI_ARGS, ...$files]);
     }
 

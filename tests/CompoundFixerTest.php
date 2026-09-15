@@ -22,14 +22,14 @@ class CompoundFixerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $config = FixerSetup::config(dirname(__DIR__));
-        self::$runner = Fixtures\FixerTestRunner::withConfig($config);
+        FixerSetup::init(dirname(__DIR__));
+        self::$runner = Fixtures\FixerTestRunner::withConfig(FixerSetup::config());
     }
 
     /** @dataProvider fileList */
     public function test_FixedFiles_MatchExpectations(string $fileExpected, string $fileGiven)
     {
-        self::assertSame(file_get_contents($fileExpected), self::$runner->fix(file_get_contents($fileGiven)));
+        $this->assertSame(file_get_contents($fileExpected), self::$runner->fix(file_get_contents($fileGiven)));
     }
 
     public static function fileList(): iterable

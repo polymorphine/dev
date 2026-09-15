@@ -20,34 +20,35 @@ class FixerSetupTest extends TestCase
 {
     public function test_ConfigInstantiation()
     {
-        $this->assertInstanceOf(ConfigInterface::class, FixerSetup::config(dirname(__DIR__)));
+        $this->assertInstanceOf(ConfigInterface::class, FixerSetup::config());
     }
 
     public function test_ConfigFinder_IgnoresTestCodeSamples()
     {
-        FixerSetup::usingTempPath('');
-        $finder = FixerSetup::config(dirname(__DIR__))->getFinder();
+        FixerSetup::init(dirname(__DIR__));
 
-        $ignoredFiles = $this->packagePath('tests/Fixtures/code-samples/');
-        foreach ($finder as $file) {
-            $this->assertFalse(strpos($file->getPathname(), $ignoredFiles));
-        }
+        $this->assertPathAccepted($this->packagePath('tests/Fixtures'));
+        $this->assertPathIgnored($this->packagePath('tests/Fixtures/code-samples'));
     }
 
     public function test_ConfigFinder_ForTempFile_IgnoresTestCodeSamples()
     {
         $tempPath = 'tests/Fixtures/PHP CS Fixertemp_folder6/';
-        FixerSetup::usingTempPath($this->packagePath($tempPath . 'SomePath/AnyFile.php'));
-        $finder = FixerSetup::config(dirname(__DIR__))->getFinder();
+        FixerSetup::init($this->packagePath('src'), $this->packagePath($tempPath . 'SomePath/AnyFile.php'));
 
-        $ignoredFile  = $this->packagePath($tempPath . 'tests/code-samples/IgnoredFile.php');
-        $acceptedFile = $this->packagePath($tempPath . 'tests/UsedFile.php');
-        foreach ($finder as $file) {
-            $acceptedFile = $file->getPathname() === $acceptedFile ? 'FOUND' : $acceptedFile;
-            $ignoredFile  = $file->getPathname() === $ignoredFile ? 'FOUND' : $ignoredFile;
-        }
-        $this->assertSame('FOUND', $acceptedFile);
-        $this->assertNotSame('FOUND', $ignoredFile);
+        $this->assertPathAccepted($this->packagePath($tempPath . 'tests/UsedFile.php'));
+        $this->assertPathIgnored($this->packagePath($tempPath . 'tests/code-samples/IgnoredFile.php'));
+    }
+
+    public function test_BinaryFilesRegisteredOnInitialization_AreFixed()
+    {
+        $binFile = $this->packagePath('polymorphine-skeleton');
+
+        FixerSetup::init(__DIR__);
+        $this->assertPathIgnored($binFile);
+
+        FixerSetup::init(dirname(__DIR__), $binFile);
+        $this->assertPathAccepted($binFile);
     }
 
     public function test_HeaderMetaData_IsReachedFromRootDirectory()
@@ -61,11 +62,35 @@ class FixerSetupTest extends TestCase
             with this source code in the file LICENSE.
             HEADER;
 
-        $rules = FixerSetup::config(dirname(__DIR__))->getRules();
+        FixerSetup::init(dirname(__DIR__));
+        $rules = FixerSetup::config()->getRules();
         $this->assertSame($expectedHeader, $rules['header_comment']['header']);
 
-        $rules = FixerSetup::config(__DIR__)->getRules();
+        FixerSetup::init(__DIR__);
+        $rules = FixerSetup::config()->getRules();
         $this->assertFalse($rules['header_comment']);
+    }
+
+    public function assertPathAccepted(string $acceptedPath): void
+    {
+        $this->assertTrue($this->isIteratedPath($acceptedPath));
+    }
+
+    public function assertPathIgnored(string $ignoredPath): void
+    {
+        $this->assertFalse($this->isIteratedPath($ignoredPath));
+    }
+
+    private function isIteratedPath(string $path): bool
+    {
+        $pathCheck = is_file($path)
+            ? fn (string $file, string $path): string => $file === $path ? 'FOUND' : $path
+            : fn (string $file, string $path): string => strpos($file, $path) === 0 ? 'FOUND' : $path;
+        foreach (FixerSetup::config()->getFinder() as $file) {
+            $path = $pathCheck($file->getPathname(), $path);
+            if ($path === 'FOUND') { return true; }
+        }
+        return false;
     }
 
     private function packagePath(string $relativePath): string

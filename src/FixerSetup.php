@@ -89,35 +89,79 @@ final class FixerSetup
         'yoda_style'                            => false
     ];
 
-    private static string $tempPath = '';
+    private static Config $config;
 
     /**
-     * Assume working with temporary files outside of working directory
-     * when applying path related filters.
+     * @param string      $rootDirectory Path to root project directory
+     * @param null|string $file          Fixed file path to adjust filtering when outside root directory
      *
-     * @param string $path
+     * @see ./polymorphine-csfixer
      */
-    public static function usingTempPath(string $path): void
+    public static function init(string $rootDirectory, ?string $file = null): void
     {
-        self::$tempPath = '';
-        $tempDir = strpos($path, DIRECTORY_SEPARATOR . 'PHP CS Fixertemp');
-        if (!$tempDir) { return; }
-        $length = strpos($path, DIRECTORY_SEPARATOR, $tempDir + 17);
-        if (!$length) { return; }
-        self::$tempPath = substr($path, 0, $length);
+        self::$config = self::configInstance($rootDirectory, $file);
     }
 
     /**
-     * @param string $rootDirectory Path to root project directory
-     *
      * @return Config
      *
-     * @see cs-fixer.php
+     * @see ./cs-fixer.php
      */
-    public static function config(string $rootDirectory): Config
+    public static function config(): Config
+    {
+        return self::$config ??= self::configInstance(getcwd());
+    }
+
+    private static function configInstance(string $rootDirectory, ?string $file = null): Config
     {
         self::$rules['header_comment'] = self::fileHeader($rootDirectory) ?: false;
+        $filesLocation = $file ? self::resolveLocation($rootDirectory, $file) : $rootDirectory;
 
+        $testsPath = $filesLocation . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+        $excludeSamples = static function (SplFileInfo $file) use ($testsPath) {
+            $filePath   = $file->getPathname();
+            $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
+            return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
+        };
+
+        $finder = Finder::create()->filter($excludeSamples)->in($filesLocation);
+        return (new Config())
+            ->setUsingCache(false)
+            ->setRiskyAllowed(true)
+            ->setFinder($finder)
+            ->registerCustomFixers(self::customFixers($testsPath))
+            ->setRules(self::$rules);
+    }
+
+    private static function fileHeader(string $rootDirectory): array
+    {
+        $metaFile = $rootDirectory . DIRECTORY_SEPARATOR . '.github' . DIRECTORY_SEPARATOR . 'skeleton.json';
+        $contents = is_file($metaFile) ? file_get_contents($metaFile) : false;
+        $metaData = $contents ? (json_decode($contents, true) ?? []) : [];
+        if (!$metaData) { return []; }
+
+        $tokenize     = static fn (string $value): string => sprintf('{%s}', $value);
+        $placeholders = array_map($tokenize, array_keys($metaData));
+        if (!$placeholders) { return []; }
+
+        return [
+            'comment_type' => 'comment',
+            'header'       => str_replace($placeholders, array_values($metaData), self::HEADER)
+        ];
+    }
+
+    private static function resolveLocation(string $rootDirectory, string $file): string
+    {
+        $inRoot  = substr($file, 0, strlen($rootDirectory)) === $rootDirectory;
+        $tempDir = $inRoot ? false : strpos($file, DIRECTORY_SEPARATOR . 'PHP CS Fixertemp');
+        if (!$tempDir) { return $rootDirectory; }
+        $length = strpos($file, DIRECTORY_SEPARATOR, $tempDir + 17);
+        if (!$length) { return $rootDirectory; }
+        return substr($file, 0, $length);
+    }
+
+    private static function customFixers(string $testsPath): array
+    {
         self::$rules['Polymorphine/double_line_before_class_definition']     = true;
         self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
         self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
@@ -148,48 +192,18 @@ final class FixerSetup
             'method_private', 'method_private_static'
         ];
 
-        $rootDirectory = self::$tempPath ?: $rootDirectory;
-        $testsPath     = $rootDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
-        $excludeSamples = static function (SplFileInfo $file) use ($testsPath) {
-            $filePath   = $file->getPathname();
-            $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
-            return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
-        };
-
-        return (new Config())
-            ->setRiskyAllowed(true)
-            ->setRules(self::$rules)
-            ->setFinder(Finder::create()->in($rootDirectory)->filter($excludeSamples))
-            ->setUsingCache(false)
-            ->registerCustomFixers([
-                new Fixer\DoubleLineBeforeClassDefinitionFixer(),
-                new Fixer\NoTrailingCommaInMultilineArrayFixer(),
-                new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
-                new Fixer\NamedConstructorsFirstStaticFixer(),
-                new Fixer\AlignedMethodChainFixer(),
-                new Fixer\AlignedAssignmentsFixer(),
-                new Fixer\AlignedArrayValuesFixer(),
-                new Fixer\AlignedTypedPropertiesFixer(),
-                new Fixer\ShortConditionsSingleLineFixer(),
-                new Fixer\DeclareStrictFirstLineFixer(),
-                new Fixer\BraceAfterMultilineParamMethodFixer()
-            ]);
-    }
-
-    private static function fileHeader(string $rootDirectory): array
-    {
-        $metaFile = $rootDirectory . DIRECTORY_SEPARATOR . '.github' . DIRECTORY_SEPARATOR . 'skeleton.json';
-        $contents = is_file($metaFile) ? file_get_contents($metaFile) : false;
-        $metaData = $contents ? (json_decode($contents, true) ?? []) : [];
-        if (!$metaData) { return []; }
-
-        $tokenize     = static fn (string $value): string => sprintf('{%s}', $value);
-        $placeholders = array_map($tokenize, array_keys($metaData));
-        if (!$placeholders) { return []; }
-
         return [
-            'comment_type' => 'comment',
-            'header'       => str_replace($placeholders, array_values($metaData), self::HEADER)
+            new Fixer\DoubleLineBeforeClassDefinitionFixer(),
+            new Fixer\NoTrailingCommaInMultilineArrayFixer(),
+            new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
+            new Fixer\NamedConstructorsFirstStaticFixer(),
+            new Fixer\AlignedMethodChainFixer(),
+            new Fixer\AlignedAssignmentsFixer(),
+            new Fixer\AlignedArrayValuesFixer(),
+            new Fixer\AlignedTypedPropertiesFixer(),
+            new Fixer\ShortConditionsSingleLineFixer(),
+            new Fixer\DeclareStrictFirstLineFixer(),
+            new Fixer\BraceAfterMultilineParamMethodFixer()
         ];
     }
 }
