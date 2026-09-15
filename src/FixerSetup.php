@@ -18,6 +18,10 @@ use SplFileInfo;
 
 final class FixerSetup
 {
+    private const BLANK_LINE_TOKENS = [
+        'break', 'continue', 'extra', 'return', 'throw',
+        'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block'
+    ];
     private const HEADER = <<<'TPL'
         This file is part of {package.name} package.
         
@@ -42,6 +46,7 @@ final class FixerSetup
         'final_internal_class'                  => true,
         'function_to_constant'                  => true,
         'global_namespace_import'               => true,
+        'header_comment'                        => false,
         'heredoc_to_nowdoc'                     => true,
         'increment_style'                       => false,
         'list_syntax'                           => ['syntax' => 'short'],
@@ -49,7 +54,7 @@ final class FixerSetup
         'method_argument_space'                 => ['on_multiline' => 'ensure_fully_multiline'],
         'modernize_types_casting'               => true,
         'multiline_comment_opening_closing'     => true,
-        'no_extra_blank_lines'                  => [],
+        'no_extra_blank_lines'                  => ['tokens' => self::BLANK_LINE_TOKENS],
         'no_homoglyph_names'                    => true,
         'no_null_property_initialization'       => true,
         'no_php4_constructor'                   => true,
@@ -84,12 +89,6 @@ final class FixerSetup
 
     private static string $tempPath = '';
 
-    /** Utility method to normalize path separators. */
-    public static function path(string $path): string
-    {
-        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
-    }
-
     /**
      * Assume working with temporary files outside of working directory
      * when applying path related filters.
@@ -99,7 +98,6 @@ final class FixerSetup
     public static function usingTempPath(string $path): void
     {
         self::$tempPath = '';
-        $path    = self::path($path);
         $tempDir = strpos($path, DIRECTORY_SEPARATOR . 'PHP CS Fixertemp');
         if (!$tempDir) { return; }
         $length = strpos($path, DIRECTORY_SEPARATOR, $tempDir + 17);
@@ -108,23 +106,27 @@ final class FixerSetup
     }
 
     /**
-     * @param string $workingDir Path to root project directory
+     * @param string $rootDirectory Path to root project directory
      *
      * @return Config
      *
      * @see cs-fixer.php
      */
-    public static function config(string $workingDir): Config
+    public static function config(string $rootDirectory): Config
     {
-        $metaFile  = $workingDir . self::path('/.github/skeleton.json');
-        $testsPath = (self::$tempPath ?: $workingDir) . self::path('/tests/');
+        self::$rules['header_comment'] = self::fileHeader($rootDirectory) ?: false;
 
-        self::setHeaderFrom($metaFile);
-
-        self::$rules['no_extra_blank_lines']['tokens'] = [
-            'break', 'continue', 'extra', 'return', 'throw', 'parenthesis_brace_block',
-            'square_brace_block', 'curly_brace_block'
-        ];
+        self::$rules['Polymorphine/double_line_before_class_definition']     = true;
+        self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
+        self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
+        self::$rules['Polymorphine/named_constructors_first_static']         = true;
+        self::$rules['Polymorphine/aligned_method_chain']                    = true;
+        self::$rules['Polymorphine/aligned_assignments']                     = true;
+        self::$rules['Polymorphine/aligned_array_values']                    = true;
+        self::$rules['Polymorphine/aligned_properties']                      = true;
+        self::$rules['Polymorphine/short_conditions_single_line']            = true;
+        self::$rules['Polymorphine/declare_strict_first_line']               = true;
+        self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
         $srcOrder = [
             'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',
@@ -144,30 +146,18 @@ final class FixerSetup
             'method_private', 'method_private_static'
         ];
 
-        self::$rules['Polymorphine/double_line_before_class_definition']     = true;
-        self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
-        self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
-        self::$rules['Polymorphine/named_constructors_first_static']         = true;
-        self::$rules['Polymorphine/aligned_method_chain']                    = true;
-        self::$rules['Polymorphine/aligned_assignments']                     = true;
-        self::$rules['Polymorphine/aligned_array_values']                    = true;
-        self::$rules['Polymorphine/aligned_properties']                      = true;
-        self::$rules['Polymorphine/short_conditions_single_line']            = true;
-        self::$rules['Polymorphine/declare_strict_first_line']               = true;
-        self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
-
-        $excludeSamples = function (SplFileInfo $file) use ($testsPath) {
+        $rootDirectory = self::$tempPath ?: $rootDirectory;
+        $testsPath     = $rootDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+        $excludeSamples = static function (SplFileInfo $file) use ($testsPath) {
             $filePath   = $file->getPathname();
-            $samplesDir = self::path('/code-samples/');
+            $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
             return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
         };
 
-        $finder = Finder::create()->in(self::$tempPath ?: $workingDir)->filter($excludeSamples);
-        $config = new Config();
-        return $config
+        return (new Config())
             ->setRiskyAllowed(true)
             ->setRules(self::$rules)
-            ->setFinder($finder)
+            ->setFinder(Finder::create()->in($rootDirectory)->filter($excludeSamples))
             ->setUsingCache(false)
             ->registerCustomFixers([
                 new Fixer\DoubleLineBeforeClassDefinitionFixer(),
@@ -184,21 +174,18 @@ final class FixerSetup
             ]);
     }
 
-    private static function setHeaderFrom(string $metaFile): void
+    private static function fileHeader(string $rootDirectory): array
     {
-        self::$rules['header_comment'] = false;
-
+        $metaFile = $rootDirectory . DIRECTORY_SEPARATOR . '.github' . DIRECTORY_SEPARATOR . 'skeleton.json';
         $contents = is_file($metaFile) ? file_get_contents($metaFile) : false;
-        if (!$contents) { return; }
+        $metaData = $contents ? (json_decode($contents, true) ?? []) : [];
+        if (!$metaData) { return []; }
 
-        $metaData = json_decode($contents, true) ?? [];
-        if (!$metaData) { return; }
-
-        $tokenize     = fn (string $value): string => sprintf('{%s}', $value);
+        $tokenize     = static fn (string $value): string => sprintf('{%s}', $value);
         $placeholders = array_map($tokenize, array_keys($metaData));
-        if (!$placeholders) { return; }
+        if (!$placeholders) { return []; }
 
-        self::$rules['header_comment'] = [
+        return [
             'comment_type' => 'comment',
             'header'       => str_replace($placeholders, array_values($metaData), self::HEADER)
         ];
