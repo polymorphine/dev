@@ -50,21 +50,23 @@ class DeclareStrictFirstLineFixer implements FixerInterface
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens[0]->getContent() === "<?php\n" && $tokens->isTokenKindFound(T_DECLARE);
+        $startsWithNewLineOenTag = in_array("<?php\n", [$tokens[0]->getContent(), $tokens[1]->getContent()], true);
+        return $startsWithNewLineOenTag && $tokens->isTokenKindFound(T_DECLARE);
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
+        $tag = $tokens[0]->isGivenKind(T_OPEN_TAG) ? 0 : 1;
         $idx = $tokens->getNextTokenOfKind(0, [[T_DECLARE]]);
         $end = $idx + 6;
 
         $isDirective = $tokens->generatePartialCode($idx, $end) === self::STRICT_TYPES;
         if (!$isDirective || !$tokens[$end + 1]->isWhitespace()) { return; }
 
-        $tokens[0] = new Token([T_OPEN_TAG, '<?php ']);
-        if ($idx === 1) { return; }
+        $tokens[$tag] = new Token([T_OPEN_TAG, '<?php ']);
+        if ($idx === $tag + 1) { return; }
 
         $tokens->clearRange($idx, $end + 1);
-        $tokens->insertAt(1, Tokens::fromCode(self::STRICT_TYPES . "\n"));
+        $tokens->insertAt($tag + 1, Tokens::fromCode(self::STRICT_TYPES . "\n"));
     }
 }
