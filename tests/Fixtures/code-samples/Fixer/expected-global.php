@@ -21,3 +21,12 @@ function doSomething($x = 3, $a = 10)
 {
     return $x + $a;
 }
+
+switch ($x) {
+    case 'command':
+        $x = 'command_value';
+        break;
+    case 'another':
+    default:
+        $x = 'default_value';
+}

@@ -17,6 +17,10 @@ declare(strict_types=1);
 abstract class ExampleClass
  implements SomeInterface {
 
+    use SuperTrait;
+
+    use DifferentTrait;
+
     const CONSTANT = 'string';
     private string $variable = '2000';
 
@@ -107,6 +111,7 @@ abstract class ExampleClass
                 'secure' => true,
                 'time' => 60,
                 'http' => true,
+
                 'domain' => 'example.com',
                 'path' => '/directory/'
             ]],

@@ -12,7 +12,6 @@
 namespace Vendor\Package\Name;
 
 use Some\Library;
-
 use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
 
 

@@ -18,9 +18,10 @@ use SplFileInfo;
 
 final class FixerSetup
 {
+    private const LINE_SEPARATION = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
     private const BLANK_LINE_TOKENS = [
-        'break', 'continue', 'extra', 'return', 'throw',
-        'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block'
+        'break', 'continue', 'extra', 'return', 'throw', 'use', 'switch', 'case', 'default', 'comma',
+        'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block', 'attribute'
     ];
     private const HEADER = <<<'TPL'
         This file is part of {package.name} package.
@@ -36,6 +37,7 @@ final class FixerSetup
         'align_multiline_comment'               => true,
         'backtick_to_shell_exec'                => true,
         'blank_line_before_statement'           => false,
+        'class_attributes_separation'           => ['elements' => self::LINE_SEPARATION],
         'combine_consecutive_issets'            => true,
         'combine_consecutive_unsets'            => true,
         'compact_nullable_type_declaration'     => true,

@@ -12,7 +12,6 @@
 namespace Vendor\Package\Name;
 
 use Some\Library;
-
 use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
 
 
@@ -23,6 +22,9 @@ use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
  */
 abstract class ExampleClass implements SomeInterface
 {
+    use SuperTrait;
+    use DifferentTrait;
+
     public const CONSTANT = 'string';
 
     /**
