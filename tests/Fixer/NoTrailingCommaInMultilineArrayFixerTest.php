@@ -31,6 +31,10 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
                 'one' => 'last',
             );
             
+            return ['foo' => 1, 'bar' => [
+                'nested',
+                'multiline',
+            ], 'baz' => 3];
             CODE;
 
         $expected = <<<'CODE'
@@ -45,6 +49,10 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
                 'one' => 'last'
             );
             
+            return ['foo' => 1, 'bar' => [
+                'nested',
+                'multiline'
+            ], 'baz' => 3];
             CODE;
 
         $this->assertFixed($code, $expected);
