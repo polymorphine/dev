@@ -1,4 +1,8 @@
+#!/usr/bin/env php
 <?php
+
+
+declare(strict_types=1);
 
 /*
  * LOL surprise comment!
@@ -19,5 +23,20 @@ echo "string with evaluated $x variable and $argv[0] variable";
 function doSomething($x=3,$a=10)
 {
     return $x+$a;
+}
+
+switch ($x) {
+
+    case 'command':
+
+        $x = 'command_value';
+        break;
+
+    case 'another':
+
+    default:
+
+        $x = 'default_value';
+
 }
 

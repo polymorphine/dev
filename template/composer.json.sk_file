@@ -49,7 +49,7 @@
     "extra": null,
     "scripts": {
         "test-cs": [
-            "php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests",
+            "{$tpl.PHP_EXEC}polymorphine-csfixer",
             "{$tpl.PHP_EXEC}polymorphine-phpcs"
         ],
         "test-php": "phpunit",

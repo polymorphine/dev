@@ -42,7 +42,7 @@ jobs:
           composer-options: --prefer-stable
           custom-cache-key: composer-${{ runner.os }}-php${{ matrix.php-versions }}-${{ hashFiles('**/composer.json') }}
       - name: "Coding standard Php-CS-Fixer checks"
-        run: vendor/bin/php-cs-fixer --dry-run -v --config=cs-fixer.php.dist --path-mode=intersection fix src tests
+        run: ${tpl.PHP_EXEC}polymorphine-csfixer
       - name: "Coding standard CodeSniffer checks"
         run: ${tpl.PHP_EXEC}polymorphine-phpcs
       - name: "Package skeleton validation"

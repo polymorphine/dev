@@ -58,13 +58,13 @@ final class AlignedAssignmentsFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $groups = [];
-        $assign = 0;
+        $groups  = [];
+        $declare = key($this->tokens->findGivenKind(T_DECLARE, 0, 2));
+        $assign  = $declare ? $declare + 6 : 1;
         while ($assign = $this->tokens->getNextTokenOfKind($assign, ['='])) {
-            $newLine = $this->prevLineBreak($assign);
-            if (!$this->isPureAssignment($newLine, $assign)) { continue; }
-
-            $siblings = $this->findSiblings($newLine, $assign);
+            $newLine  = $this->prevLineBreak($assign);
+            $fixable  = $newLine && $this->isPureAssignment($newLine, $assign);
+            $siblings = $fixable ? $this->findSiblings($newLine, $assign) : [];
             if (!$siblings) { continue; }
 
             $groups[] = $siblings;

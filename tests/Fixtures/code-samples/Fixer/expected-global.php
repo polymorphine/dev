@@ -1,4 +1,5 @@
-<?php
+#!/usr/bin/env php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Polymorphine/Dev package.
@@ -20,4 +21,13 @@ echo "string with evaluated $x variable and $argv[0] variable";
 function doSomething($x = 3, $a = 10)
 {
     return $x + $a;
+}
+
+switch ($x) {
+    case 'command':
+        $x = 'command_value';
+        break;
+    case 'another':
+    default:
+        $x = 'default_value';
 }
