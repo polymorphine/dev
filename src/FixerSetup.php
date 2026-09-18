@@ -128,7 +128,7 @@ final class FixerSetup
         return (new Config())
             ->setUsingCache(false)
             ->setRiskyAllowed(true)
-            ->setFinder($finder)
+            ->setFinder(self::isBinaryFile($file) ? $finder->name('/^[^.]+$/') : $finder)
             ->registerCustomFixers(self::customFixers($testsPath))
             ->setRules(self::$rules);
     }
@@ -158,6 +158,17 @@ final class FixerSetup
         $length = strpos($file, DIRECTORY_SEPARATOR, $tempDir + 17);
         if (!$length) { return $rootDirectory; }
         return substr($file, 0, $length);
+    }
+
+    private static function isBinaryFile(?string $file): bool
+    {
+        $possibleBinary = $file && is_file($file) && is_readable($file) && strpos(basename($file), '.') === false;
+        if (!$possibleBinary) { return false; }
+
+        $contents = fread(fopen($file, 'r'), 32);
+        $phpTag   = strpos($contents, "\n<?php");
+        $shebang  = $phpTag ? substr($contents, 0, $phpTag) : '';
+        return $shebang && substr($shebang, 0, 2) === '#!' && strpos($shebang, 'php') !== false;
     }
 
     private static function customFixers(string $testsPath): array
