@@ -19,6 +19,7 @@
  */
 $scriptRoot = getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3);
 require_once PhpCSScript::path($scriptRoot, 'vendor/squizlabs/php_codesniffer/autoload.php');
+require_once PhpCSScript::path($scriptRoot, 'vendor/autoload.php');
 
 $codeSniffer = new PhpCSScript(new PHP_CodeSniffer\Runner(), $scriptRoot === __DIR__);
 
@@ -69,15 +70,16 @@ class PhpCSScript
 
     public function fileInspection(array $args): int
     {
-        // PhpStorm provides project root as working directory as a CLI option path to standard ruleset
-        $this->includeProjectAutoload(explode('=', $args[2])[1]);
+        // PhpStorm inspection should provide project root directory instead of redundant ruleset path option,
+        // so that it could be used to locate project's Composer autoload.php file.
+        $this->selfCheck || $this->includeProjectAutoload(explode('=', $args[2])[1]);
         $args[2] = $this->standard();
         return $this->runScript($args);
     }
 
     public function fileCheck(array $args): int
     {
-        $this->includeProjectAutoload(getcwd());
+        $this->selfCheck || $this->includeProjectAutoload(getcwd());
         return $this->runScript([$this->standard(), $args[1]]);
     }
 
@@ -89,7 +91,7 @@ class PhpCSScript
 
     private function standard(): string
     {
-        return '--standard=' . self::path(__DIR__, $this->selfCheck ? 'phpcs.self.xml' : 'phpcs.xml');
+        return '--standard=' . self::path(__DIR__, 'phpcs.xml');
     }
 
     private function includeProjectAutoload(string $projectRoot): void
