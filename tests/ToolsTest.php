@@ -11,6 +11,8 @@
 
 namespace Polymorphine\Dev\Tests;
 
+use PHP_CodeSniffer\Files\LocalFile;
+use PhpCsFixer\Tokenizer\Tokens;
 use PHPUnit\Framework\TestCase;
 use Polymorphine\Dev\Tools;
 
@@ -19,30 +21,44 @@ class ToolsTest extends TestCase
 {
     public function test_DumpSourceCodeSnifferTokens()
     {
-        $testFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
-        $code     = '<?php declare(strict_types=1);';
-        Tools\SnifferTokens::dumpSourceCode($code, $testFile);
-        $this->assertTrue(file_exists($testFile));
-        unlink($testFile);
+        $directory = sys_get_temp_dir();
+        $codeFile  = tempnam($directory, 'tmp_0') . '.php';
+        $dumpFileA = tempnam($directory, 'tmp_1') . '.json';
+        $dumpFileB = tempnam($directory, 'tmp_2') . '.json';
+        $code      = '<?php declare(strict_types=1);';
+        file_put_contents($codeFile, $code);
+        Tools\SnifferTokens::dumpSourceCode($code, $dumpFileA);
+        Tools\SnifferTokens::dumpSourceFile($codeFile, $dumpFileB);
+        $this->assertSame(file_get_contents($dumpFileA), file_get_contents($dumpFileB));
+        unlink($codeFile);
+        unlink($dumpFileA);
+        unlink($dumpFileB);
     }
 
-    public function test_DumpSourceFileFixerTokens()
+    public function test_TokenizedCodeSnifferFile()
     {
-        $directory      = sys_get_temp_dir();
-        $testSourceFile = tempnam($directory, 'tmp_') . '.php';
-        $testDumpFileA  = tempnam($directory, 'tmp_1') . '.json';
-        $testDumpFileB  = tempnam($directory, 'tmp_2') . '.json';
+        $this->assertInstanceOf(LocalFile::class, Tools\SnifferTokens::tokenizedFile(__FILE__));
+    }
 
-        $code = '<?php declare(strict_types=1);';
-        file_put_contents($testSourceFile, $code);
+    public function test_DumpSourceCodeFixerTokens()
+    {
+        $directory = sys_get_temp_dir();
+        $codeFile  = tempnam($directory, 'tmp_0') . '.php';
+        $dumpFileA = tempnam($directory, 'tmp_1') . '.json';
+        $dumpFileB = tempnam($directory, 'tmp_2') . '.json';
+        $code      = '<?php declare(strict_types=1);';
+        file_put_contents($codeFile, $code);
+        Tools\FixerTokens::dumpSourceCode($code, $dumpFileA);
+        Tools\FixerTokens::dumpSourceFile($codeFile, $dumpFileB);
+        $this->assertSame(file_get_contents($dumpFileA), file_get_contents($dumpFileB));
+        unlink($codeFile);
+        unlink($dumpFileA);
+        unlink($dumpFileB);
+    }
 
-        Tools\FixerTokens::dumpSourceFile($testSourceFile, $testDumpFileA);
-        Tools\FixerTokens::dumpSourceCode($code, $testDumpFileB);
-        $this->assertTrue(file_exists($testDumpFileA));
-        $this->assertSame(file_get_contents($testDumpFileA), file_get_contents($testDumpFileB));
-        unlink($testSourceFile);
-        unlink($testDumpFileA);
-        unlink($testDumpFileB);
+    public function test_TokenizedCodeFixerFile()
+    {
+        $this->assertInstanceOf(Tokens::class, Tools\FixerTokens::tokenizedFile(__FILE__));
     }
 
     /** @dataProvider phpDocLines */
