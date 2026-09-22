@@ -23,7 +23,7 @@ use Throwable;
 final class ValidTagsSniff implements Sniff
 {
     private const TYPE_REQUIRED = ['callable', 'Closure', 'array', 'iterable', 'Traversable', 'Iterator', 'Generator'];
-    private const TYPE_TOKENS   = ['T_STRING', 'T_CALLABLE', 'T_NULLABLE', 'T_NS_SEPARATOR'];
+    private const TYPE_TOKENS   = ['T_STRING', 'T_CALLABLE', 'T_NULLABLE', 'T_NS_SEPARATOR', 'T_SELF', 'T_STATIC'];
 
     private const MSG_MISSING_PHPDOC = 'Missing phpDoc comment for original public method signature';
     private const MSG_UNEXPECTED_VAR = 'Unknown variable definition';

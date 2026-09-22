@@ -10,6 +10,11 @@ use Closure;
 interface PhpDocTagValidation
 {
     /**
+     * @return null|self Class Instance
+     */
+    public function instantiateTest(): ?self;
+
+    /**
      * @param iterable $iterable Argument description
      * @param mixed $another
      * @param Foo\Baz $foobar Should be valid

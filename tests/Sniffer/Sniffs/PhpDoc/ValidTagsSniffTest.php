@@ -33,18 +33,18 @@ class ValidTagsSniffTest extends SnifferTest
 
     public function test_TagOrderMismatch_ReportsWarning()
     {
-        $warnings = [15 => 'Sniffer.PhpDoc.ValidTags.Order'];
+        $warnings = [20 => 'Sniffer.PhpDoc.ValidTags.Order'];
         $this->assertWarningLines($warnings, 'PhpDocTagValidation.php');
     }
 
     public function test_InvalidPhpDoc_ReportsError()
     {
         $errors = [
-            15 => 'Sniffer.PhpDoc.ValidTags.Invalid',
-            26 => 'Sniffer.PhpDoc.ValidTags.Invalid',
-            21 => 'Sniffer.PhpDoc.ValidTags.TypeRequired',
-            33 => 'Sniffer.PhpDoc.ValidTags.Unexpected',
-            40 => 'Sniffer.PhpDoc.ValidTags.TypeRequired'
+            20 => 'Sniffer.PhpDoc.ValidTags.Invalid',
+            31 => 'Sniffer.PhpDoc.ValidTags.Invalid',
+            26 => 'Sniffer.PhpDoc.ValidTags.TypeRequired',
+            38 => 'Sniffer.PhpDoc.ValidTags.Unexpected',
+            45 => 'Sniffer.PhpDoc.ValidTags.TypeRequired'
         ];
         $this->assertErrorLines($errors, 'PhpDocTagValidation.php');
     }
