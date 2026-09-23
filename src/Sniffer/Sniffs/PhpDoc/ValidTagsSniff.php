@@ -14,10 +14,9 @@ namespace Polymorphine\Dev\Sniffer\Sniffs\PhpDoc;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use Polymorphine\Dev\Sniffer\Tokens;
+use Polymorphine\Dev\Sniffer\ClassInfo;
+use Polymorphine\Dev\Sniffer\ClassOriginalApi;
 use Polymorphine\Dev\Tools\PhpDocTypeLine;
-use ReflectionClass;
-use ReflectionMethod;
-use Throwable;
 
 
 final class ValidTagsSniff implements Sniff
@@ -41,19 +40,16 @@ final class ValidTagsSniff implements Sniff
     public function process(File $phpcsFile, $stackPtr): void
     {
         $this->tokens = new Tokens($phpcsFile->getTokens());
-
-        $isOrigin    = $this->tokens->isType($stackPtr, ['T_TRAIT', 'T_INTERFACE']);
-        $originalApi = $isOrigin ? [] : $this->definedMethods($this->fullClassName($stackPtr));
-
+        $originalApi = array_flip($this->originalMehtods($stackPtr));
         while ($stackPtr = $this->tokens->findNext($stackPtr, ['T_FUNCTION'])) {
-            $isInherited  = isset($originalApi[$this->tokens->content($stackPtr + 2)]);
-            $lineBreak    = $this->tokens->findPrev($stackPtr, ["\n"]);
-            $isPublic     = $this->tokens->findNext($lineBreak, ['T_PUBLIC'], $stackPtr - 2) !== null;
-            $isDocumented = $this->tokens->isType($lineBreak - 1, ['T_DOC_COMMENT_CLOSE_TAG']);
-            $endIdx       = $this->tokens->findNext($stackPtr, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
+            $lineBreak  = $this->tokens->findPrev($stackPtr, ["\n"]);
+            $isPublic   = $this->tokens->findNext($lineBreak, ['T_PUBLIC'], $stackPtr - 2) !== null;
+            $isOptional = !$isPublic || !isset($originalApi[$this->tokens->content($stackPtr + 2)]);
+            $hasDoc     = $this->tokens->isType($lineBreak - 1, ['T_DOC_COMMENT_CLOSE_TAG']);
+            $endIdx     = $this->tokens->findNext($stackPtr, ['T_SEMICOLON', 'T_OPEN_CURLY_BRACKET']);
 
-            if (!$isDocumented) {
-                if (!$isPublic || $isInherited) { continue; }
+            if (!$hasDoc) {
+                if ($isOptional) { continue; }
                 $this->tokens->findNext($stackPtr, self::TYPE_REQUIRED, $endIdx) !== null
                     ? $phpcsFile->addError(self::MSG_MISSING_PHPDOC, $stackPtr, 'RequiredAPI')
                     : $phpcsFile->addWarning(self::MSG_MISSING_PHPDOC, $stackPtr, 'MissingAPI');
@@ -62,7 +58,7 @@ final class ValidTagsSniff implements Sniff
 
             $types  = $this->typeDeclarations($stackPtr, $endIdx);
             $phpDoc = $this->tokens->findPrev($lineBreak - 1, ['T_DOC_COMMENT_OPEN_TAG']);
-            $this->validateTags($phpcsFile, $phpDoc, $lineBreak - 1, $types, $isInherited);
+            $this->validateTags($phpcsFile, $phpDoc, $lineBreak - 1, $types, $isOptional);
         }
     }
 
@@ -129,36 +125,10 @@ final class ValidTagsSniff implements Sniff
         return $idx === $start ? $this->tokens->content($idx) : $this->tokens->content($start, $idx);
     }
 
-    private function fullClassName(int $idx): string
+    private function originalMehtods(int $typeIdx): array
     {
-        $className = $this->tokens->content($idx + 2);
-        $nsBegin   = $this->tokens->findNext(0, ['T_NAMESPACE'], $idx);
-        if (!$nsBegin) { return $className; }
-
-        $nsEnd     = $this->tokens->findNext($nsBegin, ['T_SEMICOLON']);
-        $namespace = $this->tokens->content($nsBegin + 2, $nsEnd - 1);
-        return $namespace . '\\' . $className;
-    }
-
-    private function definedMethods(string $class): array
-    {
-        try {
-            $reflection = new ReflectionClass($class);
-            $interfaces = ['parent' => $reflection->getParentClass() ?: null] + $reflection->getInterfaces();
-            return array_reduce($interfaces, [$this, 'publicMethodNames'], []);
-        } catch (Throwable $e) {
-            return [];
-        }
-    }
-
-    private function publicMethodNames(array $list, ?ReflectionClass $class): array
-    {
-        if (!$class) { return $list; }
-        $methods = [];
-        foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->isFinal()) { continue; }
-            $methods[$method->getName()] = true;
-        }
-        return $list + $methods;
+        $isOrigin = $this->tokens->isType($typeIdx, ['T_TRAIT', 'T_INTERFACE']);
+        $class    = new ClassInfo($this->tokens, $typeIdx);
+        return $isOrigin ? $class->apiMethods() : (new ClassOriginalApi($class))->methodNames();
     }
 }
