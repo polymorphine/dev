@@ -40,6 +40,14 @@ class ClassInfoTest extends TestCase
         new ClassInfo($tokens, 5);
     }
 
+    public function test_ApiMethods_ReturnsListOfPublicMethods()
+    {
+        $file     = dirname(__DIR__) . '/Fixtures/code-samples/Fixer/expected-ClassOrder.php';
+        $class    = $this->classInfo(file_get_contents($file));
+        $expected = ['instance', 'doPublicStatic', '__construct', 'setUpBeforeClass', 'doPublic'];
+        $this->assertSame($expected, $class->apiMethods());
+    }
+
     public function test_ParentName_ForNotInheritedCode_ReturnsEmptyString()
     {
         $class = $this->classInfo(<<<'PHP'

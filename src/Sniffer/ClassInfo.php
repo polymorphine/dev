@@ -48,6 +48,24 @@ class ClassInfo
     }
 
     /**
+     * @return list<string> Method names
+     */
+    public function apiMethods(): array
+    {
+        $idx = $this->tokens->findNext($this->typeIdx, ['T_OPEN_CURLY_BRACKET']);
+        if (!$idx) { return []; }
+
+        $methods = [];
+        while ($idx = $this->tokens->findNext($idx, ['T_FUNCTION'])) {
+            $lineBreak = $this->tokens->findPrev($idx, ["\n"], $this->typeIdx) ?? $this->typeIdx;
+            $isPublic  = $this->tokens->findNext($lineBreak, ['T_PUBLIC'], $idx) !== null;
+            if (!$isPublic) { continue; }
+            $methods[] = $this->tokens->content($idx + 2);
+        }
+        return $methods;
+    }
+
+    /**
      * @return string Parent class FQN
      */
     public function parentName(): string
