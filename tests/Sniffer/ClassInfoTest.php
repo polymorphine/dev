@@ -144,6 +144,27 @@ class ClassInfoTest extends TestCase
         $this->assertSame(['Fizz\SomeType\Bazz', 'Vendor\PackageName\Baz', 'Foo\Baz\Contract'], $class->interfaces());
     }
 
+    public function test_ReadInheritedInterfaces()
+    {
+        $class = $this->classInfo(<<<'PHP'
+            <?php declare(strict_types=1);
+            
+            namespace Fizz;
+            
+            use Vendor\Pack\ {
+                Foo as Package,
+                Baz
+            };
+            use Foo\Baz\Contract as InterfaceTwo, Fizz\SomeType;
+            
+            
+            interface MyClass extends Package\SomeParent, Baz, InterfaceTwo {}
+        PHP);
+
+        $this->assertSame('', $class->parentName());
+        $this->assertSame(['Vendor\Pack\Foo\SomeParent', 'Vendor\Pack\Baz', 'Foo\Baz\Contract'], $class->interfaces());
+    }
+
     private function classInfo(string $content): ?ClassInfo
     {
         return ClassInfo::fromTokens(new Tokens(SnifferTokens::fromCode($content)));

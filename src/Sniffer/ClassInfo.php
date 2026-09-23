@@ -70,7 +70,7 @@ class ClassInfo
      */
     public function parentName(): string
     {
-        if ($this->tokens->isType($this->typeIdx, ['T_TRAIT'])) { return ''; }
+        if (!$this->tokens->isType($this->typeIdx, ['T_CLASS'])) { return ''; }
         $max = $this->tokens->findNext($this->typeIdx, ['T_OPEN_CURLY_BRACKET']);
         $ext = $this->tokens->findNext($this->typeIdx, ['T_EXTENDS'], $max);
         if (!$ext) { return ''; }
@@ -85,8 +85,9 @@ class ClassInfo
     public function interfaces(): array
     {
         if ($this->tokens->isType($this->typeIdx, ['T_TRAIT'])) { return []; }
-        $max  = $this->tokens->findNext($this->typeIdx, ['{']);
-        $impl = $this->tokens->findNext($this->typeIdx, ['T_IMPLEMENTS'], $max);
+        $keyword = $this->tokens->isType($this->typeIdx, ['T_INTERFACE']) ? ['T_EXTENDS'] : ['T_IMPLEMENTS'];
+        $max     = $this->tokens->findNext($this->typeIdx, ['{']);
+        $impl    = $this->tokens->findNext($this->typeIdx, $keyword, $max);
 
         $interfaces = [];
         while ($sepIdx = $this->tokens->findNext($impl, [',', '{'], $max)) {
