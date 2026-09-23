@@ -52,6 +52,8 @@ class Tokens
         $token = $this->tokens[$idx] ?? null;
         if (!$token) { return false; }
         foreach ($types as $type) {
+            $newLine = $type === "\n" && $token['content'][0] === "\n";
+            if ($newLine) { return true; }
             $value = substr($type, 0, 2) === 'T_' ? $token['type'] : $token['content'];
             if ($value === $type) { return true; }
         }
