@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tools;
+namespace Polymorphine\Dev\Tests\Fixtures\Tools;
 
 use PhpCsFixer\Tokenizer\Tokens;
 

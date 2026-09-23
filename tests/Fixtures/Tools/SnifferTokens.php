@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tools;
+namespace Polymorphine\Dev\Tests\Fixtures\Tools;
 
 use PHP_CodeSniffer\Files;
 use PHP_CodeSniffer\Runner;
@@ -18,7 +18,7 @@ use PHP_CodeSniffer\Exceptions;
 use PHP_CodeSniffer\Tokenizers\PHP;
 use PHP_CodeSniffer\Util\Tokens;
 
-require_once dirname(__DIR__, 2) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+require_once dirname(__DIR__, 3) . '/vendor/squizlabs/php_codesniffer/autoload.php';
 defined('PHP_CODESNIFFER_CBF') or define('PHP_CODESNIFFER_CBF', false);
 defined('PHP_CODESNIFFER_VERBOSITY') or define('PHP_CODESNIFFER_VERBOSITY', 0);
 
@@ -36,7 +36,7 @@ final class SnifferTokens
      */
     public static function runner(?string $configFile = null): Runner
     {
-        $configFile = $configFile ?: dirname(__DIR__, 2) . '/phpcs.xml';
+        $configFile = $configFile ?: dirname(__DIR__) . '/tests.phpcs.xml';
         $runner     = new Runner();
         $runner->config = new Config(['-q', '--standard=' . $configFile]);
         $runner->init();

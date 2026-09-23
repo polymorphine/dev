@@ -14,7 +14,7 @@ namespace Polymorphine\Dev\Tests\Sniffer;
 use PHPUnit\Framework\TestCase;
 use Polymorphine\Dev\Sniffer\ClassInfo;
 use Polymorphine\Dev\Sniffer\Tokens;
-use Polymorphine\Dev\Tools\SnifferTokens;
+use Polymorphine\Dev\Tests\Fixtures\Tools\SnifferTokens;
 use InvalidArgumentException;
 
 
