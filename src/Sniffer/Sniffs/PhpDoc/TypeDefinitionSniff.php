@@ -14,7 +14,7 @@ namespace Polymorphine\Dev\Sniffer\Sniffs\PhpDoc;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use Polymorphine\Dev\Sniffer\Tokens;
-use Polymorphine\Dev\Tools\PhpDocTypeLine;
+use Polymorphine\Dev\Sniffer\PhpDocTypeLine;
 
 
 final class TypeDefinitionSniff implements Sniff

@@ -16,7 +16,7 @@ use PHP_CodeSniffer\Files\File;
 use Polymorphine\Dev\Sniffer\Tokens;
 use Polymorphine\Dev\Sniffer\ClassInfo;
 use Polymorphine\Dev\Sniffer\ClassOriginalApi;
-use Polymorphine\Dev\Tools\PhpDocTypeLine;
+use Polymorphine\Dev\Sniffer\PhpDocTypeLine;
 
 
 final class ValidTagsSniff implements Sniff

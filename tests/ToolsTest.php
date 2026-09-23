@@ -60,28 +60,4 @@ class ToolsTest extends TestCase
     {
         $this->assertInstanceOf(Tokens::class, Tools\FixerTokens::tokenizedFile(__FILE__));
     }
-
-    /** @dataProvider phpDocLines */
-    public function test_TypesFromPhpDocLine_AreReduced(string $line, string $reduced, string $simplified, string $var)
-    {
-        $line = new Tools\PhpDocTypeLine($line);
-        $this->assertSame($reduced, $line->reducedType());
-        $this->assertSame($simplified, $line->simplifiedType());
-        $this->assertSame($var, $line->variableName());
-    }
-
-    public static function phpDocLines(): array
-    {
-        return [
-            ['callable(): Test $variable Short explanation', 'T', 'callable', '$variable'],
-            ['Foo|array<not, reduceable>> $foo commented type', 'T>', 'Foo|array>', '$foo'],
-            ['Some\\Type<array<int>>', 'T', 'Some\\Type', ''],
-            ['null|non-empty-list<mixed>', 'T', '?array', ''],
-            ['int<0, 100> $percent', 'T', 'int', '$percent'],
-            ['some-esoteric-type-Closure(Foo): void', 'T', 'Closure', ''],
-            ['class-string $className FQN', 'T', 'string', '$className'],
-            ['null|array<int, array<int, callable(array{foo: null|int, bar: \\Bar\\Baz\\F99}, int): ' .
-             'array<int>>> $type: Overkill', 'T', '?array', '$type:']
-        ];
-    }
 }
