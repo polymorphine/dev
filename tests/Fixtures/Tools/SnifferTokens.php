@@ -9,17 +9,18 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tools;
+namespace Polymorphine\Dev\Tests\Fixtures\Tools;
 
 use PHP_CodeSniffer\Files;
 use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Exceptions;
+use PHP_CodeSniffer\Tokenizers\PHP;
+use PHP_CodeSniffer\Util\Tokens;
 
-require_once dirname(__DIR__, 2) . '/vendor/squizlabs/php_codesniffer/autoload.php';
-if (!defined('PHP_CODESNIFFER_CBF')) {
-    define('PHP_CODESNIFFER_CBF', false);
-}
+require_once dirname(__DIR__, 3) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+defined('PHP_CODESNIFFER_CBF') or define('PHP_CODESNIFFER_CBF', false);
+defined('PHP_CODESNIFFER_VERBOSITY') or define('PHP_CODESNIFFER_VERBOSITY', 0);
 
 
 final class SnifferTokens
@@ -35,12 +36,35 @@ final class SnifferTokens
      */
     public static function runner(?string $configFile = null): Runner
     {
-        $configFile = $configFile ?: dirname(__DIR__, 2) . '/phpcs.xml';
+        $configFile = $configFile ?: dirname(__DIR__) . '/tests.phpcs.xml';
         $runner     = new Runner();
         $runner->config = new Config(['-q', '--standard=' . $configFile]);
         $runner->init();
 
         return $runner;
+    }
+
+    /**
+     * @param string $fileContents
+     * @param bool   $simplified   If true extended token data will be added
+     *
+     * @throws Exceptions\TokenizerException
+     *
+     * @return array<int, array<string, mixed>> Tokens
+     */
+    public static function fromCode(string $fileContents, bool $simplified = true): array
+    {
+        if ($simplified) {
+            if (!class_exists(Tokens::class)) { return []; }
+            $tokenizer = new PHP($fileContents, null);
+            return $tokenizer->getTokens();
+        }
+
+        $sourceFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
+        file_put_contents($sourceFile, $fileContents);
+        $tokens = self::tokenizedFile($sourceFile)->getTokens();
+        unlink($sourceFile);
+        return $tokens;
     }
 
     /**
@@ -67,11 +91,7 @@ final class SnifferTokens
      */
     public static function dumpSourceCode(string $sourceCode, ?string $dumpFile = null): void
     {
-        $sourceFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
-        file_put_contents($sourceFile, $sourceCode);
-
-        self::dumpSourceFile($sourceFile, $dumpFile);
-        unlink($sourceFile);
+        self::dump(self::fromCode($sourceCode, false), $dumpFile);
     }
 
     /**
@@ -82,20 +102,18 @@ final class SnifferTokens
      */
     public static function dumpSourceFile(string $sourceFile, ?string $dumpFile = null): void
     {
-        self::dump(self::tokenizedFile($sourceFile), $dumpFile);
+        self::dump(self::tokenizedFile($sourceFile)->getTokens(), $dumpFile);
     }
 
     /**
-     * @param Files\File  $tokens     Processed php code file
-     * @param null|string $tokensFile
+     * @param array<int, array<string, mixed>> $tokens     Processed php code file
+     * @param null|string                      $tokensFile
      */
-    public static function dump(Files\File $tokens, ?string $tokensFile = null): void
+    public static function dump(array $tokens, ?string $tokensFile = null): void
     {
-        $tokens = $tokens->getTokens();
         foreach ($tokens as $id => &$token) {
             $token = ['idx' => $id] + $token;
         }
-
         self::json($tokens, $tokensFile);
     }
 }

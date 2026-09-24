@@ -3,7 +3,7 @@
 namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
-class PhpDocParent
+class PhpDocParent extends PhpDocAncestor
 {
     public static function parentConstructorNoDoc(): self { return new self(); }
 

@@ -9,46 +9,18 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tests;
+namespace Polymorphine\Dev\Tests\Sniffer;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\Dev\Tools;
+use Polymorphine\Dev\Sniffer\PhpDocTypeLine;
 
 
-class ToolsTest extends TestCase
+class PhpDocTypeLineTest extends TestCase
 {
-    public function test_DumpSourceCodeSnifferTokens()
-    {
-        $testFile = tempnam(sys_get_temp_dir(), 'tmp_') . '.php';
-        $code     = '<?php declare(strict_types=1);';
-        Tools\SnifferTokens::dumpSourceCode($code, $testFile);
-        $this->assertTrue(file_exists($testFile));
-        unlink($testFile);
-    }
-
-    public function test_DumpSourceFileFixerTokens()
-    {
-        $directory      = sys_get_temp_dir();
-        $testSourceFile = tempnam($directory, 'tmp_') . '.php';
-        $testDumpFileA  = tempnam($directory, 'tmp_1') . '.json';
-        $testDumpFileB  = tempnam($directory, 'tmp_2') . '.json';
-
-        $code = '<?php declare(strict_types=1);';
-        file_put_contents($testSourceFile, $code);
-
-        Tools\FixerTokens::dumpSourceFile($testSourceFile, $testDumpFileA);
-        Tools\FixerTokens::dumpSourceCode($code, $testDumpFileB);
-        $this->assertTrue(file_exists($testDumpFileA));
-        $this->assertSame(file_get_contents($testDumpFileA), file_get_contents($testDumpFileB));
-        unlink($testSourceFile);
-        unlink($testDumpFileA);
-        unlink($testDumpFileB);
-    }
-
     /** @dataProvider phpDocLines */
     public function test_TypesFromPhpDocLine_AreReduced(string $line, string $reduced, string $simplified, string $var)
     {
-        $line = new Tools\PhpDocTypeLine($line);
+        $line = new PhpDocTypeLine($line);
         $this->assertSame($reduced, $line->reducedType());
         $this->assertSame($simplified, $line->simplifiedType());
         $this->assertSame($var, $line->variableName());

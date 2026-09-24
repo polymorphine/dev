@@ -60,25 +60,18 @@ class FixerTestRunner
         $file ??= new SplFileInfo(__FILE__);
 
         $tokens = Tokens::fromCode($sourceCode);
-
         foreach ($this->fixers as $fixer) {
             $this->applyFixer($tokens, $fixer, $file);
         }
-
         return $tokens->generateCode();
     }
 
-    private function applyFixer(Tokens $tokens, FixerInterface $fixer, SplFileInfo $file): ?string
+    private function applyFixer(Tokens $tokens, FixerInterface $fixer, SplFileInfo $file): void
     {
-        if (!$fixer->isCandidate($tokens)) { return null; }
-
+        if (!$fixer->isCandidate($tokens)) { return; }
         $fixer->fix($file, $tokens);
-
-        if (!$tokens->isChanged()) { return null; }
-
+        if (!$tokens->isChanged()) { return; }
         $tokens->clearEmptyTokens();
         $tokens->clearChanged();
-
-        return $fixer->getName();
     }
 }

@@ -3,7 +3,7 @@
 namespace Polymorphine\Dev\CodeSamples\Sniffs;
 
 
-interface PhpDocInterface
+interface PhpDocInterface extends PhpDocAnotherInterface
 {
     /**
      * Whatever - no content check

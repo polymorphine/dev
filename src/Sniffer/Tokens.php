@@ -52,6 +52,8 @@ class Tokens
         $token = $this->tokens[$idx] ?? null;
         if (!$token) { return false; }
         foreach ($types as $type) {
+            $newLine = $type === "\n" && $token['content'][0] === "\n";
+            if ($newLine) { return true; }
             $value = substr($type, 0, 2) === 'T_' ? $token['type'] : $token['content'];
             if ($value === $type) { return true; }
         }
@@ -59,26 +61,28 @@ class Tokens
     }
 
     /**
-     * @param int           $idx
+     * @param null|int      $idx
      * @param array<string> $types  T_NAME code or content strings
      * @param int           $endIdx Index where searching should stop (expected to be higher than $idx)
      *
      * @return null|int
      */
-    public function findNext(int $idx, array $types, int $endIdx = 0): ?int
+    public function findNext(?int $idx, array $types, int $endIdx = 0): ?int
     {
+        if ($idx === null) { return null; }
         return $this->scanFor($idx, $types, 1, $endIdx ? max($endIdx, $idx) : count($this->tokens));
     }
 
     /**
-     * @param int           $idx
+     * @param null|int      $idx
      * @param array<string> $types  T_NAME code or content strings
      * @param int           $endIdx Index where searching should stop (expected to be lower than $idx)
      *
      * @return null|int
      */
-    public function findPrev(int $idx, array $types, int $endIdx = 0): ?int
+    public function findPrev(?int $idx, array $types, int $endIdx = 0): ?int
     {
+        if (!$idx) { return null; }
         return $this->scanFor($idx, $types, -1, min($endIdx, $idx));
     }
 

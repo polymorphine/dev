@@ -11,7 +11,7 @@
 
 namespace Polymorphine\Dev\Tests\Fixtures;
 
-use Polymorphine\Dev\Tools\SnifferTokens;
+use Polymorphine\Dev\Tests\Fixtures\Tools\SnifferTokens;
 use PHP_CodeSniffer\Ruleset;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Files;
@@ -26,7 +26,7 @@ class SnifferTestRunner
 
     public function __construct(string $sniffClass, array $options = [])
     {
-        $runner = SnifferTokens::runner(__DIR__ . '/tests.phpcs.xml');
+        $runner = SnifferTokens::runner();
 
         $this->ruleset = $runner->ruleset;
         $this->config  = $runner->config;

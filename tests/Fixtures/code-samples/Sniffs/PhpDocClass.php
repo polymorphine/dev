@@ -27,4 +27,13 @@ class PhpDocClass extends PhpDocParent implements PhpDocInterface
         yield 1;
     }
     public function iterate(Iterator $iterator): void {}
+    public function ancestorMethod(): int
+    {
+        return 69;
+    }
+
+    public function superInterfaceMethod(): void
+    {
+        // do nothing
+    }
 }
