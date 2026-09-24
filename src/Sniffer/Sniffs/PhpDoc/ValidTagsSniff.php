@@ -14,8 +14,8 @@ namespace Polymorphine\Dev\Sniffer\Sniffs\PhpDoc;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use Polymorphine\Dev\Sniffer\Tokens;
-use Polymorphine\Dev\Sniffer\ClassInfo;
-use Polymorphine\Dev\Sniffer\ClassOriginalApi;
+use Polymorphine\Dev\Sniffer\ClassInfo\NameResolution;
+use Polymorphine\Dev\Sniffer\ClassInfo\OriginalApi;
 use Polymorphine\Dev\Sniffer\PhpDocTypeLine;
 
 
@@ -128,7 +128,7 @@ final class ValidTagsSniff implements Sniff
     private function originalMehtods(int $typeIdx): array
     {
         $isOrigin = $this->tokens->isType($typeIdx, ['T_TRAIT', 'T_INTERFACE']);
-        $class    = new ClassInfo($this->tokens, $typeIdx);
-        return $isOrigin ? $class->apiMethods() : (new ClassOriginalApi($class))->methodNames();
+        $class    = new NameResolution($this->tokens, $typeIdx);
+        return $isOrigin ? $class->apiMethods() : (new OriginalApi($class))->methodNames();
     }
 }

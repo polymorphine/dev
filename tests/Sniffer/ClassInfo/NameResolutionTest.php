@@ -9,16 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tests\Sniffer;
+namespace Polymorphine\Dev\Tests\Sniffer\ClassInfo;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\Dev\Sniffer\ClassInfo;
+use Polymorphine\Dev\Sniffer\ClassInfo\NameResolution;
 use Polymorphine\Dev\Sniffer\Tokens;
 use Polymorphine\Dev\Tests\Fixtures\Tools\SnifferTokens;
 use InvalidArgumentException;
 
 
-class ClassInfoTest extends TestCase
+class NameResolutionTest extends TestCase
 {
     public function test_ClassInfo_ForNotClassTokens_CannotBeInstantiated()
     {
@@ -37,12 +37,12 @@ class ClassInfoTest extends TestCase
             class MyClass {}
         PHP));
         $this->expectException(InvalidArgumentException::class);
-        new ClassInfo($tokens, 5);
+        new NameResolution($tokens, 5);
     }
 
     public function test_ApiMethods_ReturnsListOfPublicMethods()
     {
-        $file     = dirname(__DIR__) . '/Fixtures/code-samples/Fixer/expected-ClassOrder.php';
+        $file     = dirname(__DIR__, 2) . '/Fixtures/code-samples/Fixer/expected-ClassOrder.php';
         $class    = $this->classInfo(file_get_contents($file));
         $expected = ['instance', 'doPublicStatic', '__construct', 'setUpBeforeClass', 'doPublic'];
         $this->assertSame($expected, $class->apiMethods());
@@ -165,8 +165,8 @@ class ClassInfoTest extends TestCase
         $this->assertSame(['Vendor\Pack\Foo\SomeParent', 'Vendor\Pack\Baz', 'Foo\Baz\Contract'], $class->interfaces());
     }
 
-    private function classInfo(string $content): ?ClassInfo
+    private function classInfo(string $content): ?NameResolution
     {
-        return ClassInfo::fromTokens(new Tokens(SnifferTokens::fromCode($content)));
+        return NameResolution::fromTokens(new Tokens(SnifferTokens::fromCode($content)));
     }
 }

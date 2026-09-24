@@ -9,27 +9,28 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Sniffer;
+namespace Polymorphine\Dev\Sniffer\ClassInfo;
 
+use Polymorphine\Dev\Sniffer\Tokens;
 use PHP_CodeSniffer\Tokenizers\PHP;
 
 
-class ClassOriginalApi
+class OriginalApi
 {
-    private ClassInfo  $class;
-    private ClassFiles $files;
+    private NameResolution $class;
+    private FileLocator    $files;
 
     /**
-     * @param ClassInfo $class
+     * @param NameResolution $class
      */
-    public function __construct(ClassInfo $class)
+    public function __construct(NameResolution $class)
     {
         $this->class = $class;
-        $this->files = new ClassFiles();
+        $this->files = new FileLocator();
     }
 
     /**
-     * @return list<string>
+     * @return list<string> Method names defined by this class
      */
     public function methodNames(): array
     {
@@ -37,7 +38,7 @@ class ClassOriginalApi
         return array_values(array_diff($methods, $this->inheritedMethods()));
     }
 
-    private function inheritedMethods(?ClassInfo $ancestor = null): array
+    private function inheritedMethods(?NameResolution $ancestor = null): array
     {
         $methods = $ancestor ? $ancestor->apiMethods() : [];
         $class   = $ancestor ?: $this->class;
@@ -46,7 +47,7 @@ class ClassOriginalApi
         return $ancestor ? $methods : [...$methods, ...$this->interfaceMethods()];
     }
 
-    private function interfaceMethods(?ClassInfo $ancestor = null): array
+    private function interfaceMethods(?NameResolution $ancestor = null): array
     {
         $class   = $ancestor ?: $this->class;
         $methods = [];
@@ -57,12 +58,12 @@ class ClassOriginalApi
         return $methods;
     }
 
-    private function classInfo(string $className): ?ClassInfo
+    private function classInfo(string $className): ?NameResolution
     {
         $filename = $className ? $this->files->filename($className) : null;
         if (!$filename || !is_file($filename)) { return null; }
 
         $tokenizer = new PHP(file_get_contents($filename), null);
-        return ClassInfo::fromTokens(new Tokens($tokenizer->getTokens()));
+        return NameResolution::fromTokens(new Tokens($tokenizer->getTokens()));
     }
 }

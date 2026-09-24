@@ -9,12 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Sniffer;
+namespace Polymorphine\Dev\Sniffer\ClassInfo;
 
+use Polymorphine\Dev\Sniffer\Tokens;
 use InvalidArgumentException;
 
 
-class ClassInfo
+class NameResolution
 {
     /**
      * @return null|self Instance or null if class/interface/trait keyword cannot be found

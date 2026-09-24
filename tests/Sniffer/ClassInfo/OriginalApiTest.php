@@ -9,22 +9,22 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tests\Sniffer;
+namespace Polymorphine\Dev\Tests\Sniffer\ClassInfo;
 
 use PHPUnit\Framework\TestCase;
-use Polymorphine\Dev\Sniffer\ClassOriginalApi;
-use Polymorphine\Dev\Sniffer\ClassInfo;
+use Polymorphine\Dev\Sniffer\ClassInfo\OriginalApi;
+use Polymorphine\Dev\Sniffer\ClassInfo\NameResolution;
 use Polymorphine\Dev\Sniffer\Tokens;
 use Polymorphine\Dev\Tests\Fixtures\Tools\SnifferTokens;
 
 
-class ClassOriginalApiTest extends TestCase
+class OriginalApiTest extends TestCase
 {
     public function test_AccumulatePublicMethods()
     {
-        $file   = dirname(__DIR__) . '/Fixtures/code-samples/Sniffs/PhpDocClass.php';
+        $file   = dirname(__DIR__, 2) . '/Fixtures/code-samples/Sniffs/PhpDocClass.php';
         $tokens = new Tokens(SnifferTokens::tokenizedFile($file)->getTokens());
-        $api    = new ClassOriginalApi(ClassInfo::fromTokens($tokens));
+        $api    = new OriginalApi(NameResolution::fromTokens($tokens));
 
         $this->assertSame([
             'staticConstructor', 'originalMethodWithDoc', 'originalMethodWithoutDoc',

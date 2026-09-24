@@ -9,13 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Sniffer;
+namespace Polymorphine\Dev\Sniffer\ClassInfo;
 
 use ReflectionClass;
 use ReflectionException;
 
 
-class ClassFiles
+class FileLocator
 {
     private object $streamWrapper;
 
