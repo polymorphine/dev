@@ -52,7 +52,7 @@
             "{$tpl.PHP_EXEC}polymorphine-csfixer",
             "{$tpl.PHP_EXEC}polymorphine-phpcs"
         ],
-        "test-php": "phpunit",
+        "test-php": "{$tpl.PHP_EXEC}polymorphine-phpunit",
         "test-skeleton": "{$tpl.PHP_EXEC}polymorphine-skeleton check"
     },
     "scripts-descriptions": null,

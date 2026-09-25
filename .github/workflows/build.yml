@@ -50,7 +50,7 @@ jobs:
       - name: "Run PhpUnit tests with coverage"
         run: |
           mkdir -p .dev/logs
-          vendor/bin/phpunit --coverage-clover .dev/logs/clover.xml
+          php polymorphine-phpunit --coverage-clover .dev/logs/clover.xml
       - name: "Send coverage report to coveralls.io"
         run: |
           composer require php-coveralls/php-coveralls
@@ -100,7 +100,7 @@ jobs:
           composer-options: --prefer-stable
           custom-cache-key: composer-${{ runner.os }}-php${{ matrix.php-versions }}-${{ hashFiles('**/composer.json') }}
       - name: "Run PhpUnit tests (no coverage)"
-        run: vendor/bin/phpunit --no-coverage
+        run: php polymorphine-phpunit --no-coverage
 
   php-versions:
     name: "PHP versions"
@@ -142,4 +142,4 @@ jobs:
           composer-options: --prefer-stable
           custom-cache-key: composer-${{ runner.os }}-php${{ matrix.php-versions }}-${{ hashFiles('**/composer.json') }}
       - name: "Run PhpUnit tests (no coverage)"
-        run: vendor/bin/phpunit --no-coverage
+        run: php polymorphine-phpunit --no-coverage

@@ -31,14 +31,15 @@
     "bin": [
         "polymorphine-skeleton",
         "polymorphine-csfixer",
-        "polymorphine-phpcs"
+        "polymorphine-phpcs",
+        "polymorphine-phpunit"
     ],
     "scripts": {
         "test-cs": [
             "@php polymorphine-csfixer",
             "@php polymorphine-phpcs"
         ],
-        "test-php": "phpunit",
+        "test-php": "@php polymorphine-phpunit",
         "test-skeleton": "@php polymorphine-skeleton check"
     }
 }

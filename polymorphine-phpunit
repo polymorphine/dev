@@ -1,0 +1,69 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+use PHPUnit\TextUI\Command;
+
+$argv or exit('CLI script executable');
+
+$requiredExt = ['dom', 'filter', 'json', 'libxml', 'mbstring', 'tokenizer', 'xmlwriter'];
+$missingExt  = array_filter($requiredExt, static fn (string $ext): bool => !extension_loaded($ext));
+if ($missingExt) {
+    $message = 'PHPUnit requires the "%s" extensions, but the "%s" %s not available.' . PHP_EOL;
+    $count   = count($missingExt) === 1 ? 'extension is' : 'extensions are';
+    fwrite(STDERR, sprintf($message, implode('", "', $requiredExt), implode('", "', $missingExt), $count));
+    exit(1);
+}
+unset($requiredExt, $missingExt);
+
+if (!ini_get('date.timezone')) { ini_set('date.timezone', 'UTC'); }
+if (isset($GLOBALS['_composer_autoload_path'])) {
+    define('PHPUNIT_COMPOSER_INSTALL', $GLOBALS['_composer_autoload_path']);
+    unset($GLOBALS['_composer_autoload_path']);
+} else {
+    define('PHPUNIT_COMPOSER_INSTALL', (getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3)) . '/vendor/autoload.php');
+}
+
+$rootDir = getcwd();
+if (!is_dir($rootDir . '/vendor')) {
+    $message = 'Invalid Path. Working directory should be project root.' . PHP_EOL . 'given: `%s`' . PHP_EOL;
+    fwrite(STDERR, sprintf($message, $rootDir));
+    exit(1);
+}
+
+$configDir   = $rootDir . '/.dev/cache/phpunit.xml';
+$devTestsDir = $rootDir . str_replace(['/'], DIRECTORY_SEPARATOR, '/.dev/tests');
+$fragment    = '<env name="DEV_TESTS_DIRECTORY" value="' . $devTestsDir . '" force="true" />';
+if (!is_file($configDir) || strpos(file_get_contents($configDir, false, null, 350, 110), $fragment) === false) {
+    if (!is_dir(dirname($configDir))) {
+        mkdir(dirname($configDir), 0777, true);
+    }
+
+    $metaFile  = $rootDir . '/.github/skeleton.json';
+    $metaData  = is_file($metaFile) ? json_decode(@file_get_contents($metaFile) ?: '{}', true) : [];
+    $replace   = [$devTestsDir, $metaData['package.name'] ?? 'Project'];
+    $xmlConfig = file_get_contents(__DIR__ . '/phpunit.template.xml');
+    file_put_contents($configDir, str_replace(['{DEV_TESTS}', '{PKG_NAME}'], $replace, $xmlConfig));
+}
+
+$configIdx = array_search('--config', $_SERVER['argv'], true);
+if ($configIdx) {
+    $_SERVER['argv'][$configIdx + 1] = $configDir;
+} else {
+    $_SERVER['argv'][] = '--config';
+    $_SERVER['argv'][] = $configDir;
+}
+
+unset($rootDir, $configDir, $devTestsDir, $fragment, $metaFile, $metaData, $replace, $xmlConfig, $configIdx);
+
+require PHPUNIT_COMPOSER_INSTALL;
+
+Command::main();

@@ -2,22 +2,22 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
-    cacheResultFile=".dev/cache/.phpunit.result.cache"
+    cacheResultFile=".phpunit.result.cache"
     colors="true"
-    bootstrap="vendor/autoload.php"
+    bootstrap="../../vendor/autoload.php"
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <env name="DEV_TESTS_DIRECTORY" value=".dev/tests" force="true" />
+        <env name="DEV_TESTS_DIRECTORY" value="{DEV_TESTS}" force="true" />
     </php>
     <testsuites>
-        <testsuite name="Polymorphine/Dev tests">
-            <directory>./tests/</directory>
+        <testsuite name="{PKG_NAME} tests">
+            <directory>../../tests</directory>
         </testsuite>
     </testsuites>
     <coverage>
         <include>
-            <directory>./src/</directory>
+            <directory>../../src</directory>
         </include>
     </coverage>
 </phpunit>
