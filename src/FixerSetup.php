@@ -36,6 +36,7 @@ final class FixerSetup
         '@Symfony'                              => true,
         'align_multiline_comment'               => true,
         'backtick_to_shell_exec'                => true,
+        'blank_line_after_opening_tag'          => false,
         'blank_line_before_statement'           => false,
         'class_attributes_separation'           => ['elements' => self::LINE_SEPARATION],
         'combine_consecutive_issets'            => true,
@@ -51,6 +52,7 @@ final class FixerSetup
         'header_comment'                        => false,
         'heredoc_to_nowdoc'                     => true,
         'increment_style'                       => false,
+        'linebreak_after_opening_tag'           => false,
         'list_syntax'                           => ['syntax' => 'short'],
         'method_chaining_indentation'           => false,
         'method_argument_space'                 => ['on_multiline' => 'ensure_fully_multiline'],
@@ -182,7 +184,7 @@ final class FixerSetup
         self::$rules['Polymorphine/aligned_array_values']                    = true;
         self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/short_conditions_single_line']            = true;
-        self::$rules['Polymorphine/declare_strict_first_line']               = true;
+        self::$rules['Polymorphine/opening_tag_line_spacing']                = true;
         self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
         $srcOrder = [
@@ -213,7 +215,7 @@ final class FixerSetup
             new Fixer\AlignedArrayValuesFixer(),
             new Fixer\AlignedTypedPropertiesFixer(),
             new Fixer\ShortConditionsSingleLineFixer(),
-            new Fixer\DeclareStrictFirstLineFixer(),
+            new Fixer\OpeningTagLineSpacingFixer(),
             new Fixer\BraceAfterMultilineParamMethodFixer()
         ];
     }
