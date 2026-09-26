@@ -59,7 +59,8 @@ class CSFixerScript
     {
         $args[2] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $args[2]);
         Polymorphine\Dev\FixerSetup::init(getcwd(), $args[2]);
-        return $this->runScript([...array_slice($args, 0, 3), ...self::INSP_ARGS]);
+        $fix = $args[4] !== '--dry-run' ? [1 => '--format=udiff'] : [];
+        return $this->runScript([...array_slice($args, 0, 3), ...array_replace(self::INSP_ARGS, $fix)]);
     }
 
     public function checkFiles(array $args): int
