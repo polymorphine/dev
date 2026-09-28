@@ -12,10 +12,10 @@
 namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
-use Polymorphine\Dev\Fixer\DoubleLineBeforeClassDefinitionFixer;
+use Polymorphine\Dev\Fixer\ExtraBlankLinesFixer;
 
 
-class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
+class ExtraBlankLinesFixerTest extends FixerTest
 {
     public function test_WhitespaceBeforeClassDefinition_IsExpandedIntoTwoEmptyLines()
     {
@@ -29,11 +29,18 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
             
             final class ExampleClass
             {
-                private $self;
+                private ExampleClass $self;
+            
+            
+            
+                private int $idx;
             
                 public function __construct(ExampleClass $self)
                 {
                     $this->self = $self;
+            
+            
+                    $this->idx = 100;
                 }
             }
             
@@ -50,11 +57,15 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
              */
             final class ExampleClass
             {
-                private $self;
+                private ExampleClass $self;
+            
+                private int $idx;
             
                 public function __construct(ExampleClass $self)
                 {
                     $this->self = $self;
+            
+                    $this->idx = 100;
                 }
             }
             
@@ -67,6 +78,7 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
     {
         $code = <<<'CODE'
             <?php
+            
             
             namespace Some\Package; //comment
             interface ExampleInterface
@@ -92,13 +104,13 @@ class DoubleLineBeforeClassDefinitionFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): DoubleLineBeforeClassDefinitionFixer
+    protected function fixer(): ExtraBlankLinesFixer
     {
-        return new DoubleLineBeforeClassDefinitionFixer();
+        return new ExtraBlankLinesFixer();
     }
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/double_line_before_class_definition', 'priority' => -40];
+        return ['name' => 'Polymorphine/extra_blank_lines', 'priority' => -40];
     }
 }

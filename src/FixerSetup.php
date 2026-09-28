@@ -20,7 +20,7 @@ final class FixerSetup
 {
     private const LINE_SEPARATION = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
     private const BLANK_LINE_TOKENS = [
-        'break', 'continue', 'extra', 'return', 'throw', 'use', 'switch', 'case', 'default', 'comma',
+        'break', 'continue', 'return', 'throw', 'use', 'switch', 'case', 'default', 'comma',
         'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block', 'attribute'
     ];
     private const HEADER = <<<'TPL'
@@ -175,7 +175,7 @@ final class FixerSetup
 
     private static function customFixers(string $testsPath): array
     {
-        self::$rules['Polymorphine/double_line_before_class_definition']     = true;
+        self::$rules['Polymorphine/extra_blank_lines']                       = true;
         self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
         self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
         self::$rules['Polymorphine/named_constructors_first_static']         = true;
@@ -206,7 +206,7 @@ final class FixerSetup
         ];
 
         return [
-            new Fixer\DoubleLineBeforeClassDefinitionFixer(),
+            new Fixer\ExtraBlankLinesFixer(),
             new Fixer\NoTrailingCommaInMultilineArrayFixer(),
             new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
             new Fixer\NamedConstructorsFirstStaticFixer(),
