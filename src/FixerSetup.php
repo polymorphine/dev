@@ -38,6 +38,7 @@ final class FixerSetup
         'backtick_to_shell_exec'                => true,
         'blank_line_after_opening_tag'          => false,
         'blank_line_before_statement'           => false,
+        'braces_position'                       => false,
         'class_attributes_separation'           => ['elements' => self::LINE_SEPARATION],
         'combine_consecutive_issets'            => true,
         'combine_consecutive_unsets'            => true,
@@ -184,8 +185,8 @@ final class FixerSetup
         self::$rules['Polymorphine/aligned_array_values']                    = true;
         self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/short_conditions_single_line']            = true;
+        self::$rules['Polymorphine/braces_position']                         = true;
         self::$rules['Polymorphine/opening_tag_line_spacing']                = true;
-        self::$rules['Polymorphine/brace_after_multiline_param_method']      = true;
 
         $srcOrder = [
             'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',
@@ -215,8 +216,8 @@ final class FixerSetup
             new Fixer\AlignedArrayValuesFixer(),
             new Fixer\AlignedTypedPropertiesFixer(),
             new Fixer\ShortConditionsSingleLineFixer(),
-            new Fixer\OpeningTagLineSpacingFixer(),
-            new Fixer\BraceAfterMultilineParamMethodFixer()
+            new Fixer\BracesPositionFixer(),
+            new Fixer\OpeningTagLineSpacingFixer()
         ];
     }
 }
