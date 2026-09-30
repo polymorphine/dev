@@ -52,8 +52,7 @@ class BracesPositionFixerTest extends FixerTest
             <?php
             if ($foo) {
                 foo();
-            }
-            else {
+            } else {
                 bar();
             }
             PHP, <<<'PHP'
@@ -72,8 +71,7 @@ class BracesPositionFixerTest extends FixerTest
             <?php
             if ($foo) {
                 foo();
-            }
-            elseif ($bar) {
+            } elseif ($bar) {
                 bar();
             }
             PHP, <<<'PHP'
@@ -92,8 +90,7 @@ class BracesPositionFixerTest extends FixerTest
             <?php
             if ($foo) {
                 foo();
-            }
-            else if ($bar) {
+            } else if ($bar) {
                 bar();
             }
             PHP, <<<'PHP'
@@ -151,8 +148,7 @@ class BracesPositionFixerTest extends FixerTest
             <?php
             do {
                 foo();
-            }
-            while ($foo);
+            } while ($foo);
             PHP, <<<'PHP'
             <?php
             do
@@ -181,11 +177,9 @@ class BracesPositionFixerTest extends FixerTest
             <?php
             try {
                 foo();
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 bar();
-            }
-            finally {
+            } finally {
                 baz();
             }
             PHP, <<<'PHP'
@@ -457,8 +451,7 @@ class BracesPositionFixerTest extends FixerTest
             } elseif ($foo) {
             } elseif ($foo) {
             } elseif ($foo) {
-            }
-            elseif ($foo) {
+            } elseif ($foo) {
             } elseif ($foo) {
             }
             PHP, <<<'PHP'

@@ -35,6 +35,8 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
         T_DO, T_WHILE, T_TRY, T_CATCH, T_FINALLY, T_DECLARE
     ];
 
+    private const CONTROL_CONT_TOKENS = [T_CATCH, T_ELSE, T_ELSEIF, T_FINALLY, T_WHILE];
+
     private const EXPECTED_TOKENS = [
         T_STRING, T_NS_SEPARATOR, T_STATIC, T_CALLABLE,
         CT::T_TYPE_COLON, CT::T_NULLABLE_TYPE, CT::T_ARRAY_TYPEHINT
@@ -96,40 +98,41 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
                 $singleLine   = $tokensAnalyzer->isLambda($idx);
                 $sameLine     = $singleLine;
             } elseif ($token->isGivenKind(self::CONTROL_STR_TOKENS)) {
+                $this->fixContinuation($idx, $tokens, $tokensAnalyzer);
                 $openBraceIdx = $tokens->getNextMeaningfulToken($this->findParenthesisEnd($idx, $tokens));
                 if (!$tokens[$openBraceIdx]->equals('{')) { continue; }
             } else {
                 continue;
             }
 
-            $closeBraceIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $openBraceIdx);
+            $closeBraceIdx = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $openBraceIdx);
 
-            $openBraceLinebreak = true;
+            $openBraceEndLine = true;
             if ($singleLine || $emptyOneLine) {
-                $openBraceLinebreak = false;
-                for ($idxInBraces = $openBraceIdx + 1; $idxInBraces < $closeBraceIndex; ++$idxInBraces) {
-                    $tokenInBraces      = $tokens[$idxInBraces];
-                    $contentToken       = !$tokenInBraces->isWhitespace() && !$tokenInBraces->isComment();
-                    $allowedToken       = $contentToken && $emptyOneLine;
-                    $openBraceLinebreak = $this->hasNewLine($tokenInBraces) || $allowedToken;
-                    if ($openBraceLinebreak) { break; }
+                $openBraceEndLine = false;
+                for ($idxInBraces = $openBraceIdx + 1; $idxInBraces < $closeBraceIdx; ++$idxInBraces) {
+                    $tokenInBraces    = $tokens[$idxInBraces];
+                    $contentToken     = !$tokenInBraces->isWhitespace() && !$tokenInBraces->isComment();
+                    $allowedToken     = $contentToken && $emptyOneLine;
+                    $openBraceEndLine = $this->hasNewLine($tokenInBraces) || $allowedToken;
+                    if ($openBraceEndLine) { break; }
                 }
             }
 
-            $openBraceLinebreak && $this->addedLinebreakAfterOpenBrace($openBraceIdx, $tokens) && $closeBraceIndex++;
+            $openBraceEndLine && $this->addedLinebreakAfterOpenBrace($openBraceIdx, $tokens) && $closeBraceIdx++;
 
             $sameLine       = $sameLine || $this->dropNewLine($openBraceIdx, $tokens);
             $whitespace     = $sameLine ? ' ' : $this->lineBreakWhitespace($idx, $tokens);
-            $moveBraceToIdx = $this->moveBraceToIndex($openBraceIdx, $tokens, $sameLine ? null : $closeBraceIndex);
+            $moveBraceToIdx = $this->moveBraceToIndex($openBraceIdx, $tokens, $sameLine ? null : $closeBraceIdx);
             $openBraceIdx   = $this->moveToken($openBraceIdx, $moveBraceToIdx, $tokens);
-            $tokens->ensureWhitespaceAtIndex($openBraceIdx - 1, 1, $whitespace) && $closeBraceIndex++;
+            $tokens->ensureWhitespaceAtIndex($openBraceIdx - 1, 1, $whitespace) && $closeBraceIdx++;
 
-            $openBraceLinebreak && $prevIdx = $tokens->getPrevMeaningfulToken($closeBraceIndex);
-            if (!$openBraceLinebreak || $tokens[$prevIdx]->isGivenKind(T_OPEN_TAG)) {
+            $openBraceEndLine && $prevIdx = $tokens->getPrevMeaningfulToken($closeBraceIdx);
+            if (!$openBraceEndLine || $tokens[$prevIdx]->isGivenKind(T_OPEN_TAG)) {
                 continue;
             }
 
-            $prevIdx = $closeBraceIndex - 1;
+            $prevIdx = $closeBraceIdx - 1;
             while ($tokens->isEmptyAt($prevIdx)) {
                 --$prevIdx;
             }
@@ -310,5 +313,18 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
             }
         }
         return $move;
+    }
+
+    private function fixContinuation(int $idx, Tokens $tokens, TokensAnalyzer $analyzer): void
+    {
+        if (!$tokens[$idx]->isGivenKind(self::CONTROL_CONT_TOKENS)) { return; }
+
+        $prevIdx = $tokens->getPrevNonWhitespace($idx);
+        if (!$tokens[$prevIdx]->equals('}')) { return; }
+
+        $isWhile = $tokens[$idx]->isGivenKind(T_WHILE);
+        if ($isWhile && !$analyzer->isWhilePartOfDoWhile($idx)) { return; }
+
+        $tokens->ensureWhitespaceAtIndex($idx - 1, 1, ' ');
     }
 }
