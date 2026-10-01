@@ -101,6 +101,7 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
                 $this->fixContinuation($idx, $tokens, $tokensAnalyzer);
                 $openBraceIdx = $tokens->getNextMeaningfulToken($this->findParenthesisEnd($idx, $tokens));
                 if (!$tokens[$openBraceIdx]->equals('{')) { continue; }
+                $singleLine = $this->shortConditional($idx, $openBraceIdx, $tokens);
             } else {
                 continue;
             }
@@ -326,5 +327,55 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
         if ($isWhile && !$analyzer->isWhilePartOfDoWhile($idx)) { return; }
 
         $tokens->ensureWhitespaceAtIndex($idx - 1, 1, ' ');
+    }
+
+    private function shortConditional(int $keywordIdx, int $openBraceIdx, Tokens $tokens): bool
+    {
+        $isCondition = $tokens[$keywordIdx]->isGivenKind(T_IF)
+            && $tokens[$keywordIdx - 1]->isWhitespace()
+            && !$tokens[$keywordIdx - 2]->isGivenKind(T_ELSE);
+        if (!$isCondition) { return false; }
+
+        $closeBraceIdx = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $openBraceIdx);
+        $afterCloseIdx = $tokens->getNextMeaningfulToken($closeBraceIdx);
+        $isSingleBlock = $afterCloseIdx && $tokens[$afterCloseIdx]->isGivenKind([T_ELSE, T_ELSEIF]);
+        if ($isSingleBlock) { return false; }
+
+        $isShortCondition = $this->isShortConditional($keywordIdx, $openBraceIdx, $closeBraceIdx, $tokens);
+        if (!$isShortCondition) { return false; }
+
+        $tokens->ensureWhitespaceAtIndex($openBraceIdx + 1, 1, ' ');
+        $tokens->ensureWhitespaceAtIndex($closeBraceIdx - 1, 1, ' ');
+        return true;
+    }
+
+    private function isShortConditional(int $keywordIdx, int $openBraceIdx, int $closeBraceIdx, Tokens $tokens): bool
+    {
+        $line          = $this->getLineIndentation($keywordIdx, $tokens);
+        $commandsLimit = 2;
+        $spacesLimit   = 4;
+        $isCondition   = false;
+        for ($idx = $keywordIdx; $idx <= $closeBraceIdx; $idx++) {
+            $token = $tokens[$idx];
+            if (!$this->isShortContent($token, $isCondition)) { return false; }
+            $token->equalsAny(['(', ')']) && $isCondition = !$isCondition;
+            $line .= ($token->isWhitespace() ? ' ' : $token->getContent());
+            if ($idx <= $openBraceIdx) { continue; }
+            $token->equals(';') && $commandsLimit--;
+            $token->isWhitespace() && $spacesLimit--;
+            if (!$commandsLimit || !$spacesLimit) { return false; }
+        }
+        return strlen($line) < 80;
+    }
+
+    private function isShortContent(Token $token, bool $isCondition): bool
+    {
+        if ($token->isComment()) { return false; }
+        if ($isCondition && $this->hasNewLine($token)) { return false; }
+        $isString = $token->isGivenKind([T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]);
+        if (!$isString) { return true; }
+        $string  = $token->getContent();
+        $tooLong = strlen($string) > 20 || strpos($string, $this->newLine) !== false;
+        return !$tooLong;
     }
 }

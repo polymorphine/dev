@@ -250,11 +250,7 @@ class BracesPositionFixerTest extends FixerTest
                 public function foo()
                 {
             
-                    if (true) {
-            
-                        echo "foo";
-            
-                    }
+                    if (true) { echo "foo"; }
             
                 }
             
@@ -598,6 +594,26 @@ class BracesPositionFixerTest extends FixerTest
             }
             PHP, <<<'PHP'
             <?php if ($a) /* comment */ {}
+            PHP];
+
+        yield 'short if statement (single line)' => [<<<'PHP'
+            <?php
+                if ($variable !== CONSTANT_VALUE) { return; }
+            PHP, <<<'PHP'
+            <?php
+                if ($variable !== CONSTANT_VALUE) {
+                   return;
+                }
+            PHP];
+
+        yield 'long if statement' => [<<<'PHP'
+            <?php
+                if ($variable !== CONSTANT_VALUE) {
+                return LONG_CONTSANT_NAME_OVER_80_CHARS;
+                }
+            PHP, <<<'PHP'
+            <?php
+                if ($variable !== CONSTANT_VALUE) { return LONG_CONTSANT_NAME_OVER_80_CHARS; }
             PHP];
     }
 

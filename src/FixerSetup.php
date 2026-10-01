@@ -185,7 +185,6 @@ final class FixerSetup
         self::$rules['Polymorphine/aligned_assignments']                     = true;
         self::$rules['Polymorphine/aligned_array_values']                    = true;
         self::$rules['Polymorphine/aligned_properties']                      = true;
-        self::$rules['Polymorphine/short_conditions_single_line']            = true;
         self::$rules['Polymorphine/braces_position']                         = true;
         self::$rules['Polymorphine/opening_tag_line_spacing']                = true;
 
@@ -216,7 +215,6 @@ final class FixerSetup
             new Fixer\AlignedAssignmentsFixer(),
             new Fixer\AlignedArrayValuesFixer(),
             new Fixer\AlignedTypedPropertiesFixer(),
-            new Fixer\ShortConditionsSingleLineFixer(),
             new Fixer\BracesPositionFixer(),
             new Fixer\OpeningTagLineSpacingFixer()
         ];
