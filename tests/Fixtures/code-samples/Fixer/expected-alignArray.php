@@ -14,7 +14,7 @@ $array['key'] = [
     'longKey'         => function () { return true; },
     'veryLongKeyName' => true,
     'another'         => 'value',
-    'nested' => [
+    'nested'          => [
         'foo'    => true,
         'barBaz' => null
     ],
@@ -23,12 +23,12 @@ $array['key'] = [
 
 $goBonkers = [
     'next'      => true,
-    'call' => function () {
+    'call'      => function () {
         return ['nasty' => 'trick', 'multiline' => 'function'];
     },
     // skip line
     'lastLong'  => true,
-    'call2' => function () {
+    'call2'     => function () {
         return [
             'multiline' => 'inside',
             'last'      => 'try'
@@ -41,7 +41,7 @@ $goBonkers = [
 $x = [
     'no-params'  => ['/path/only', '/path/only', []],
     'id'         => ['/page/{#no}', '/page/4', ['no' => '4']],
-    'id+slug' => ['/page/{#no}/{$title}', '/page/576/foo-bar-45', [
+    'id+slug'    => ['/page/{#no}/{$title}', '/page/576/foo-bar-45', [
         'no'    => '576',
         'title' => 'foo-bar-45'
     ]],

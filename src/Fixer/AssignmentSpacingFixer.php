@@ -18,7 +18,7 @@ use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-final class AlignedAssignmentsFixer implements FixerInterface
+final class AssignmentSpacingFixer implements FixerInterface
 {
     use FixerMethods;
 
@@ -26,7 +26,7 @@ final class AlignedAssignmentsFixer implements FixerInterface
 
     public function getName(): string
     {
-        return 'Polymorphine/aligned_assignments';
+        return 'Polymorphine/assignment_spacing';
     }
 
     public function getDefinition(): FixerDefinitionInterface
@@ -62,10 +62,14 @@ final class AlignedAssignmentsFixer implements FixerInterface
         $declare = key($this->tokens->findGivenKind(T_DECLARE, 0, 2));
         $assign  = $declare ? $declare + 6 : 1;
         while ($assign = $this->tokens->getNextTokenOfKind($assign, ['='])) {
+            $tokens->ensureWhitespaceAtIndex($assign + 1, 0, ' ');
             $newLine  = $this->prevLineBreak($assign);
             $fixable  = $newLine && $this->isPureAssignment($newLine, $assign);
             $siblings = $fixable ? $this->findSiblings($newLine, $assign) : [];
-            if (!$siblings) { continue; }
+            if (!$siblings) {
+                $tokens->ensureWhitespaceAtIndex($assign - 1, 1, ' ');
+                continue;
+            }
 
             $groups[] = $siblings;
             $assign = $this->lastSiblingIdx($siblings);

@@ -12,13 +12,36 @@
 namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
-use Polymorphine\Dev\Fixer\AlignedAssignmentsFixer;
+use Polymorphine\Dev\Fixer\AssignmentSpacingFixer;
 use PhpCsFixer\Fixer\FixerInterface;
 
 
-class AlignedAssignmentsFixerTest extends FixerTest
+class AssignmentSpacingFixerTest extends FixerTest
 {
-    public function test_VariableAssignments_AreAligned()
+    public function test_NotGrouppedAssignmentOperators_AreSpacedWithSingleSpace()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x['foo']=10;
+            $bool                =  true;
+            $another[]     ='string';
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            $x['foo'] = 10;
+            $bool = true;
+            $another[] = 'string';
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
+    public function test_MisalignedVariableAssignments_AreAligned()
     {
         $code = <<<'CODE'
             <?php
@@ -39,6 +62,43 @@ class AlignedAssignmentsFixerTest extends FixerTest
             CODE;
 
         $this->assertFixed($code, $expected);
+    }
+
+    public function test_AlignedVariableAssignments_InWrongPosition_AreMoved()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x          = 10;
+            $bool       = true;
+            $another    = 'string';
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            $x       = 10;
+            $bool    = true;
+            $another = 'string';
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
+    public function test_AlignedVariableAssignments_RemainUnchanged()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x       = 10;
+            $bool    = true;
+            $another = 'string';
+            
+            CODE;
+
+        $this->assertUnchanged($code);
     }
 
     public function test_MixedKindVariableAssignments_AreAlignedSeparately()
@@ -94,11 +154,11 @@ class AlignedAssignmentsFixerTest extends FixerTest
 
     protected function fixer(): FixerInterface
     {
-        return new AlignedAssignmentsFixer();
+        return new AssignmentSpacingFixer();
     }
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/aligned_assignments', 'priority' => -40];
+        return ['name' => 'Polymorphine/assignment_spacing', 'priority' => -40];
     }
 }

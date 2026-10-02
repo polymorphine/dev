@@ -46,8 +46,9 @@ trait FixerMethods
 
     private function indentationPointLength(int $newLine, int $assign): int
     {
-        $code = $this->tokens->generatePartialCode($newLine, $assign - 1);
-        return $this->codeLength($code);
+        $end  = $this->tokens->getPrevMeaningfulToken($assign);
+        $code = $this->tokens->generatePartialCode($newLine, $end);
+        return $this->codeLength($code) + 1;
     }
 
     private function codeLength(string $code): int

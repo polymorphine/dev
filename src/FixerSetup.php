@@ -18,7 +18,8 @@ use SplFileInfo;
 
 final class FixerSetup
 {
-    private const LINE_SEPARATION = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
+    private const OPERATOR_SPACING = ['=>' => 'align_single_space_minimal_by_scope', '=' => null];
+    private const LINE_SEPARATION  = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
     private const BLANK_LINE_TOKENS = [
         'break', 'continue', 'return', 'throw', 'use', 'switch', 'case', 'default', 'comma',
         'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block', 'attribute'
@@ -36,6 +37,7 @@ final class FixerSetup
         '@Symfony'                                => true,
         'align_multiline_comment'                 => true,
         'backtick_to_shell_exec'                  => true,
+        'binary_operator_spaces'                  => ['operators' => self::OPERATOR_SPACING],
         'blank_line_after_opening_tag'            => false,
         'blank_line_before_statement'             => false,
         'braces_position'                         => false,
@@ -45,6 +47,7 @@ final class FixerSetup
         'compact_nullable_type_declaration'       => true,
         'concat_space'                            => ['spacing' => 'one'],
         'control_structure_continuation_position' => false,
+        'declare_strict_types'                    => false,
         'echo_tag_syntax'                         => false,
         'explicit_indirect_variable'              => true,
         'explicit_string_variable'                => false,
@@ -177,15 +180,14 @@ final class FixerSetup
 
     private static function customFixers(string $testsPath): array
     {
+        self::$rules['Polymorphine/aligned_method_chain']                    = true;
+        self::$rules['Polymorphine/aligned_properties']                      = true;
+        self::$rules['Polymorphine/assignment_spacing']                      = true;
+        self::$rules['Polymorphine/braces_position']                         = true;
         self::$rules['Polymorphine/extra_blank_lines']                       = true;
-        self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
         self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
         self::$rules['Polymorphine/named_constructors_first_static']         = true;
-        self::$rules['Polymorphine/aligned_method_chain']                    = true;
-        self::$rules['Polymorphine/aligned_assignments']                     = true;
-        self::$rules['Polymorphine/aligned_array_values']                    = true;
-        self::$rules['Polymorphine/aligned_properties']                      = true;
-        self::$rules['Polymorphine/braces_position']                         = true;
+        self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
         self::$rules['Polymorphine/opening_tag_line_spacing']                = true;
 
         $srcOrder = [
@@ -207,15 +209,14 @@ final class FixerSetup
         ];
 
         return [
+            new Fixer\AlignedMethodChainFixer(),
+            new Fixer\AlignedTypedPropertiesFixer(),
+            new Fixer\AssignmentSpacingFixer(),
+            new Fixer\BracesPositionFixer(),
             new Fixer\ExtraBlankLinesFixer(),
-            new Fixer\NoTrailingCommaInMultilineArrayFixer(),
             new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
             new Fixer\NamedConstructorsFirstStaticFixer(),
-            new Fixer\AlignedMethodChainFixer(),
-            new Fixer\AlignedAssignmentsFixer(),
-            new Fixer\AlignedArrayValuesFixer(),
-            new Fixer\AlignedTypedPropertiesFixer(),
-            new Fixer\BracesPositionFixer(),
+            new Fixer\NoTrailingCommaInMultilineArrayFixer(),
             new Fixer\OpeningTagLineSpacingFixer()
         ];
     }
