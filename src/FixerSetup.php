@@ -18,8 +18,8 @@ use SplFileInfo;
 
 final class FixerSetup
 {
-    private const OPERATOR_SPACING = ['=>' => 'align_single_space_minimal_by_scope', '=' => null];
-    private const LINE_SEPARATION  = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
+    private const OPERATOR_SPACING  = ['=>' => 'align_single_space_minimal_by_scope', '=' => null];
+    private const LINE_SEPARATION   = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
     private const BLANK_LINE_TOKENS = [
         'break', 'continue', 'return', 'throw', 'use', 'switch', 'case', 'default', 'comma',
         'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block', 'attribute'
@@ -122,13 +122,11 @@ final class FixerSetup
     private static function configInstance(string $rootDirectory, ?string $file = null): Config
     {
         self::$rules['header_comment'] = self::fileHeader($rootDirectory) ?: false;
-        $filesLocation = $file ? self::resolveLocation($rootDirectory, $file) : $rootDirectory;
-
-        $testsPath = $filesLocation . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
+        $filesLocation  = $file ? self::resolveLocation($rootDirectory, $file) : $rootDirectory;
+        $testsPath      = $filesLocation . self::path('/tests/');
         $excludeSamples = static function (SplFileInfo $file) use ($testsPath) {
-            $filePath   = $file->getPathname();
-            $samplesDir = DIRECTORY_SEPARATOR . 'code-samples' . DIRECTORY_SEPARATOR;
-            return strpos($filePath, $testsPath) !== 0 || strpos($filePath, $samplesDir) === false;
+            $filePath = $file->getPathname();
+            return strpos($filePath, $testsPath) !== 0 || strpos($filePath, self::path('/code-samples/')) === false;
         };
 
         $finder = Finder::create()->filter($excludeSamples)->in($filesLocation);
@@ -142,7 +140,7 @@ final class FixerSetup
 
     private static function fileHeader(string $rootDirectory): array
     {
-        $metaFile = $rootDirectory . DIRECTORY_SEPARATOR . '.github' . DIRECTORY_SEPARATOR . 'skeleton.json';
+        $metaFile = $rootDirectory . self::path('/.github/skeleton.json');
         $contents = is_file($metaFile) ? file_get_contents($metaFile) : false;
         $metaData = $contents ? (json_decode($contents, true) ?? []) : [];
         if (!$metaData) { return []; }
@@ -160,11 +158,9 @@ final class FixerSetup
     private static function resolveLocation(string $rootDirectory, string $file): string
     {
         $inRoot  = substr($file, 0, strlen($rootDirectory)) === $rootDirectory;
-        $tempDir = $inRoot ? false : strpos($file, DIRECTORY_SEPARATOR . 'PHP CS Fixertemp');
-        if (!$tempDir) { return $rootDirectory; }
-        $length = strpos($file, DIRECTORY_SEPARATOR, $tempDir + 17);
-        if (!$length) { return $rootDirectory; }
-        return substr($file, 0, $length);
+        $tempDir = $inRoot ? false : strpos($file, self::path('/PHP CS Fixertemp'));
+        $length  = $tempDir ? strpos($file, DIRECTORY_SEPARATOR, $tempDir + 17) : null;
+        return $length ? substr($file, 0, $length) : $rootDirectory;
     }
 
     private static function isBinaryFile(?string $file): bool
@@ -219,5 +215,10 @@ final class FixerSetup
             new Fixer\NoTrailingCommaInMultilineArrayFixer(),
             new Fixer\OpeningTagLineSpacingFixer()
         ];
+    }
+
+    private static function path(string $path): string
+    {
+        return DIRECTORY_SEPARATOR === '/' ? $path : str_replace(['/'], DIRECTORY_SEPARATOR, $path);
     }
 }

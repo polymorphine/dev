@@ -24,7 +24,9 @@ class AssignmentSpacingFixerTest extends FixerTest
             <?php
             
             $x['foo']=10;
-            $bool                =  true;
+            $bool                =       [
+                'foo', 'bar', 'baz'
+            ];
             $another[]     ='string';
             
             CODE;
@@ -33,7 +35,9 @@ class AssignmentSpacingFixerTest extends FixerTest
             <?php
             
             $x['foo'] = 10;
-            $bool = true;
+            $bool = [
+                'foo', 'bar', 'baz'
+            ];
             $another[] = 'string';
             
             CODE;
@@ -136,7 +140,7 @@ class AssignmentSpacingFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    public function test_MultilineAssignment_IsNotAligned()
+    public function test_MultilineAssignment_IsAlignedToPreceedingSibling()
     {
         $code = <<<'CODE'
             <?php
@@ -149,7 +153,18 @@ class AssignmentSpacingFixerTest extends FixerTest
             
             CODE;
 
-        $this->assertUnchanged($code);
+        $expected = <<<'CODE'
+            <?php
+            
+            $x    = 10;
+            $func = function (int $val) {
+                return $val + 1;
+            };
+            $another = 'string';
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
     }
 
     protected function fixer(): FixerInterface

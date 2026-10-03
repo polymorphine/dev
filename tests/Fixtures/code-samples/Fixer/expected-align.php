@@ -27,7 +27,7 @@ $arr['long key value'] = 'value';
 $array['third']        = 5;
 $arr[22] = 1;
 $val = true;
-$x = $next
+$x   = $next
     ? 1
     : 0;
 $another = 10;
@@ -52,7 +52,7 @@ class Some
         Some::$fooBar = 20;
         $var[]     = function () { return 'Hello World!'; };
         $another[] = null;
-        $here['leave'] = 'super';
+        $here['leave']     = 'super';
         $here['something'] = function () {
             return 'Hello World!';
         };
