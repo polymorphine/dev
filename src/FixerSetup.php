@@ -125,8 +125,7 @@ final class FixerSetup
         $filesLocation  = $file ? self::resolveLocation($rootDirectory, $file) : $rootDirectory;
         $testsPath      = $filesLocation . self::path('/tests/');
         $excludeSamples = static function (SplFileInfo $file) use ($testsPath) {
-            $filePath = $file->getPathname();
-            return strpos($filePath, $testsPath) !== 0 || strpos($filePath, self::path('/code-samples/')) === false;
+            return strpos($file->getPathname(), $testsPath . self::path('Fixtures/code-samples/')) !== 0;
         };
 
         $finder = Finder::create()->filter($excludeSamples)->in($filesLocation);

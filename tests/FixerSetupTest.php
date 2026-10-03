@@ -36,8 +36,8 @@ class FixerSetupTest extends TestCase
         $tempPath = 'tests/Fixtures/PHP CS Fixertemp_folder6/';
         FixerSetup::init($this->packagePath('src'), $this->packagePath($tempPath . 'SomePath/AnyFile.php'));
 
-        $this->assertPathAccepted($this->packagePath($tempPath . 'tests/UsedFile.php'));
-        $this->assertPathIgnored($this->packagePath($tempPath . 'tests/code-samples/IgnoredFile.php'));
+        $this->assertPathAccepted($this->packagePath($tempPath . 'tests/Fixtures/UsedFile.php'));
+        $this->assertPathIgnored($this->packagePath($tempPath . 'tests/Fixtures/code-samples/IgnoredFile.php'));
     }
 
     public function test_BinaryFilesRegisteredOnInitialization_AreFixed()
