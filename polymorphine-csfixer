@@ -51,15 +51,16 @@ exit($exitCode);
 
 class CSFixerScript
 {
-    private const CONFIG   = '--config=' . __DIR__ . DIRECTORY_SEPARATOR . 'cs-fixer.php';
-    private const CLI_ARGS = [self::CONFIG, '--path-mode=intersection', '--show-progress=none', 'fix'];
+    private const CONFIG    = '--config=' . __DIR__ . DIRECTORY_SEPARATOR . 'cs-fixer.php';
+    private const CLI_ARGS  = [self::CONFIG, '--path-mode=intersection', '--show-progress=none', 'fix'];
+    private const INSP_ARGS = [self::CONFIG, '--dry-run', '--diff', '--format=xml', '-vv', '--path-mode=intersection'];
 
     public function fileInspection(array $args): int
     {
         $args[2] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $args[2]);
-        $args[3] = self::CONFIG;
         Polymorphine\Dev\FixerSetup::init(getcwd(), $args[2]);
-        return $this->runScript([...$args, '--path-mode=intersection']);
+        $fix = $args[4] !== '--dry-run' ? [1 => '--format=udiff'] : [];
+        return $this->runScript([...array_slice($args, 0, 3), ...array_replace(self::INSP_ARGS, $fix)]);
     }
 
     public function checkFiles(array $args): int

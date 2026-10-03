@@ -12,11 +12,11 @@
 namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
-use Polymorphine\Dev\Fixer\DeclareStrictFirstLineFixer;
+use Polymorphine\Dev\Fixer\OpeningTagLineSpacingFixer;
 use PhpCsFixer\Fixer\FixerInterface;
 
 
-class DeclareStrictFirstLineFixerTest extends FixerTest
+class OpeningTagLineSpacingFixerTest extends FixerTest
 {
     public function test_FileWithoutDeclare_IsUnchanged()
     {
@@ -78,7 +78,7 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
     public function test_DeclareNotInFirstLine_IsMovedWIthFollowingWhitespace()
     {
         $code = <<<'CODE'
-            <?php
+            <?php echo 'First line, huh?';
             
             /* Comment */
             declare(strict_types=1);
@@ -90,6 +90,8 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
         $expected = <<<'CODE'
             <?php declare(strict_types=1);
             
+            echo 'First line, huh?';
+            
             /* Comment */
             echo 'declare';
             
@@ -100,11 +102,11 @@ class DeclareStrictFirstLineFixerTest extends FixerTest
 
     protected function fixer(): FixerInterface
     {
-        return new DeclareStrictFirstLineFixer();
+        return new OpeningTagLineSpacingFixer();
     }
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/declare_strict_first_line', 'priority' => -39];
+        return ['name' => 'Polymorphine/opening_tag_line_spacing', 'priority' => -39];
     }
 }
