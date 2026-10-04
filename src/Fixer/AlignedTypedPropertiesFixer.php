@@ -76,7 +76,7 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
                 $group = [];
             }
 
-            $group[] = $this->alignIndex($next->idx);
+            $group[$next->idx] = $this->alignIndex($next->idx);
             $prev = $next;
         }
 
@@ -107,9 +107,9 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
         return new Sequence($this->tokens, $end, $tokenIds);
     }
 
-    private function alignIndex(int $idx): array
+    private function alignIndex(int $idx): int
     {
         $start = $this->tokens->getPrevTokenOfKind($idx, [[T_PRIVATE], [T_PROTECTED], [T_PUBLIC]]);
-        return [$idx, $this->indentationPointLength($start + 2, $idx - 1)];
+        return $this->indentationPointLength($start + 2, $idx - 1);
     }
 }

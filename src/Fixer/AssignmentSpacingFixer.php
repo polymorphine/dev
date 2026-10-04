@@ -68,7 +68,7 @@ final class AssignmentSpacingFixer implements FixerInterface
                 continue;
             }
             $groups[] = $siblings;
-            $assign = $this->lastSiblingIdx($siblings);
+            $assign = array_key_last($siblings);
         }
 
         foreach ($groups as $siblings) {
@@ -82,32 +82,31 @@ final class AssignmentSpacingFixer implements FixerInterface
         $matchPossible = $lineStart && $this->isSingleLine($assign) && $this->isPureAssignment($lineStart, $assign);
         if (!$matchPossible) { return []; }
 
-        $siblings  = [];
+        $siblings  = [$assign => $this->indentationPointLength($lineStart, $assign)];
         $signature = $this->getTokenSignature($lineStart, $assign);
-
-        $idx = $assign;
-        while ($sibling = $this->nextSibling($idx, $signature)) {
-            $siblings[] = $sibling;
-            $idx = $sibling[0];
-            if (!$this->isSingleLine($idx)) { break; }
+        while ($sibling = $this->nextSiblingIdx($assign, $signature)) {
+            [$newLine, $assign] = $sibling;
+            $siblings[$assign] = $this->indentationPointLength($newLine, $assign);
+            if (!$this->isSingleLine($assign)) { break; }
         }
 
-        return $siblings ? [[$assign, $this->indentationPointLength($lineStart, $assign)], ...$siblings] : [];
+        return count($siblings) > 1 ? $siblings : [];
     }
 
-    private function nextSibling(int $idx, array $signature): ?array
+    private function nextSiblingIdx(int $idx, array $signature): ?array
     {
         $newLine = $this->nextLineBreak($idx);
         if (!$newLine || !$this->isNextLine($newLine)) { return null; }
 
-        $assign = $this->tokens->getNextTokenOfKind($newLine, ['=']);
-        if (!$assign) { return null; }
-        if (!$this->isPureAssignment($newLine, $assign)) { return null; }
+        $assign    = $this->tokens->getNextTokenOfKind($newLine, ['=']);
+        $isSibling = $assign && $this->isSibling($newLine, $assign, $signature);
+        return $isSibling ? [$newLine, $assign] : null;
+    }
 
-        $candidateSignature = $this->getTokenSignature($newLine, $assign);
-        if ($candidateSignature !== $signature) { return null; }
-
-        return [$assign, $this->indentationPointLength($newLine, $assign)];
+    private function isSibling(int $newLine, int $assign, array $signature): bool
+    {
+        return $this->isPureAssignment($newLine, $assign)
+            && $this->getTokenSignature($newLine, $assign) === $signature;
     }
 
     private function getTokenSignature(int $idx, int $assign): array
@@ -139,12 +138,7 @@ final class AssignmentSpacingFixer implements FixerInterface
     private function validAssignType(int $newLine): bool
     {
         $token = $this->tokens[$newLine + 1];
-
-        if ($token->isGivenKind(T_STRING)) {
-            return $this->isStaticAssign($newLine);
-        }
-
-        return $token->isGivenKind(self::TYPES);
+        return $token->isGivenKind(T_STRING) ? $this->isStaticAssign($newLine) : $token->isGivenKind(self::TYPES);
     }
 
     private function isStaticAssign(int $newLine): bool

@@ -61,7 +61,7 @@ final class ArrayContext
             if ($this->isMultilineValue($lineEnd)) { continue; }
 
             $lineStart = $this->prevLineBreak($idx);
-            $group[] = [$idx, $this->indentationPointLength($lineStart, $idx)];
+            $group[$idx] = $this->indentationPointLength($lineStart, $idx);
         }
         if (count($group) < 2) { return; }
         $this->fixGroupIndentation($group);

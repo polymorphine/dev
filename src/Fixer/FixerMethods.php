@@ -44,11 +44,11 @@ trait FixerMethods
         return $idx;
     }
 
-    private function indentationPointLength(int $newLine, int $assign): int
+    private function indentationPointLength(int $newLine, int $operator, bool $align = true): int
     {
-        $end  = $this->tokens->getPrevMeaningfulToken($assign);
+        $end  = $align ? $this->tokens->getPrevMeaningfulToken($operator) : $operator - 1;
         $code = $this->tokens->generatePartialCode($newLine, $end);
-        return $this->codeLength($code) + 1;
+        return $this->codeLength($code) + ($align ? 1 : 0);
     }
 
     private function codeLength(string $code): int
@@ -63,25 +63,9 @@ trait FixerMethods
 
     private function fixGroupIndentation(array $group): void
     {
-        $maxLength = $this->findMaxLength($group);
-        foreach ($group as [$idx, $length]) {
-            $this->tokens[$idx - 1] = $this->indentationToken($maxLength - $length + 1);
+        $maxLength = max($group);
+        foreach ($group as $assign => $length) {
+            $this->tokens->ensureWhitespaceAtIndex($assign - 1, 1, str_repeat(' ', $maxLength - $length + 1));
         }
-    }
-
-    private function findMaxLength(array $group): int
-    {
-        $maxLength = 0;
-        foreach ($group as [$idx, $length]) {
-            if ($length <= $maxLength) { continue; }
-            $maxLength = $length;
-        }
-        return $maxLength;
-    }
-
-    private function lastSiblingIdx(array $group): int
-    {
-        $last = array_pop($group);
-        return $last[0];
     }
 }

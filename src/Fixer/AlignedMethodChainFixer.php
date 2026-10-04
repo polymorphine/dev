@@ -65,40 +65,25 @@ final class AlignedMethodChainFixer implements FixerInterface
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = $tokens;
-
-        $idx = 0;
-        while ($idx = $this->findNextChain($idx)) {
-            $this->alignChain($idx, $this->indentationLength($idx));
+        while ($idx = $this->findNextChain($idx ?? 0)) {
+            $this->alignChain($idx, $this->indentationPointLength($this->prevLineBreak($idx), $idx, false));
         }
     }
 
-    private function findNextChain(int $search): ?int
+    private function findNextChain(int $opIdx): ?int
     {
-        $idx = $this->tokens->getNextTokenOfKind($search, [[T_OBJECT_OPERATOR]]);
+        $idx = $this->tokens->getNextTokenOfKind($opIdx, [[T_OBJECT_OPERATOR]]);
         if (!$idx) { return null; }
 
-        if ($this->tokens[$idx - 1]->isWhitespace() || !$this->isStartOfMultilineChain($idx)) {
-            return $this->findNextChain($idx);
-        }
-
-        return $idx;
+        $methodChainPossible = !$this->tokens[$idx - 1]->isWhitespace() && $this->isStartOfMultilineChain($idx);
+        return $methodChainPossible ? $idx : $this->findNextChain($idx);
     }
 
-    private function isStartOfMultilineChain(int $idx): bool
+    private function isStartOfMultilineChain(int $opIdx): bool
     {
-        $next = $this->tokens[$idx + 2]->getContent() === '(' ? $this->findClosing($idx + 2) + 1 : $idx + 2;
-        if ($this->tokens[$next]->isWhitespace() && $this->tokens[$next + 1]->isGivenKind(T_OBJECT_OPERATOR)) {
-            return true;
-        }
-
-        return $this->tokens[$next]->isGivenKind(T_OBJECT_OPERATOR) && $this->isStartOfMultilineChain($next);
-    }
-
-    private function indentationLength(int $idx): int
-    {
-        $lineBreak = $this->prevLineBreak($idx);
-        $code      = $this->tokens->generatePartialCode($lineBreak, $idx - 1);
-        return $this->codeLength($code);
+        $idx = $this->tokens[$opIdx + 2]->getContent() === '(' ? $this->findClosing($opIdx + 2) + 1 : $opIdx + 2;
+        return $this->tokens[$idx]->isWhitespace() && $this->tokens[$idx + 1]->isGivenKind(T_OBJECT_OPERATOR)
+            || $this->tokens[$idx]->isGivenKind(T_OBJECT_OPERATOR) && $this->isStartOfMultilineChain($idx);
     }
 
     private function alignChain(int $idx, int $indent): void
@@ -108,14 +93,9 @@ final class AlignedMethodChainFixer implements FixerInterface
 
         $replace = $this->tokens[$next]->isWhitespace() && $this->tokens[$next + 1]->isGivenKind(T_OBJECT_OPERATOR);
         $insert  = !$replace && $this->tokens[$next]->isGivenKind(T_OBJECT_OPERATOR);
-
         if (!$replace && !$insert) { return; }
 
-        if ($replace) {
-            $this->tokens[$next] = $this->indentationToken($indent, 1);
-        } else {
-            $this->tokens->insertAt($next, $this->indentationToken($indent, 1));
-        }
+        $this->tokens->ensureWhitespaceAtIndex($next, 0, "\n" . str_repeat(' ', $indent));
 
         $idx = $this->tokens->getNextTokenOfKind($next, [[T_OBJECT_OPERATOR]]);
         if ($idx) { $this->alignChain($idx, $indent); }
