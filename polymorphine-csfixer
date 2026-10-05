@@ -52,7 +52,7 @@ exit($exitCode);
 class CSFixerScript
 {
     private const CONFIG    = '--config=' . __DIR__ . DIRECTORY_SEPARATOR . 'cs-fixer.php';
-    private const CLI_ARGS  = [self::CONFIG, '--path-mode=intersection', '--show-progress=none', 'fix'];
+    private const CLI_ARGS  = [self::CONFIG, '-v', '--path-mode=intersection', '--show-progress=none', 'fix'];
     private const INSP_ARGS = [self::CONFIG, '--dry-run', '--diff', '--format=xml', '-vv', '--path-mode=intersection'];
 
     public function fileInspection(array $args): int
@@ -67,7 +67,7 @@ class CSFixerScript
     {
         $files = count($args) > 1 ? [$args[1]] : ['src', 'tests'];
         Polymorphine\Dev\FixerSetup::init(getcwd(), $files[0]);
-        return $this->runScript([$args[0], '--dry-run', '-v', ...self::CLI_ARGS, ...$files]);
+        return $this->runScript([$args[0], '--dry-run', ...self::CLI_ARGS, ...$files]);
     }
 
     public function fixFiles(array $args): int
