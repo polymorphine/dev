@@ -18,7 +18,6 @@ use SplFileInfo;
 
 final class FixerSetup
 {
-    private const OPERATOR_SPACING  = ['=>' => 'align_single_space_minimal_by_scope', '=' => null];
     private const LINE_SEPARATION   = ['method' => 'one', 'trait_import' => 'none', 'case' => 'none'];
     private const BLANK_LINE_TOKENS = [
         'break', 'continue', 'return', 'throw', 'use', 'switch', 'case', 'default', 'comma',
@@ -37,7 +36,7 @@ final class FixerSetup
         '@Symfony'                                => true,
         'align_multiline_comment'                 => true,
         'backtick_to_shell_exec'                  => true,
-        'binary_operator_spaces'                  => ['operators' => self::OPERATOR_SPACING],
+        'binary_operator_spaces'                  => ['operators' => ['=>' => null, '=' => null]],
         'blank_line_after_opening_tag'            => false,
         'blank_line_before_statement'             => false,
         'braces_position'                         => false,
@@ -175,6 +174,7 @@ final class FixerSetup
 
     private static function customFixers(string $testsPath): array
     {
+        self::$rules['Polymorphine/aligned_array_values']                    = true;
         self::$rules['Polymorphine/aligned_method_chain']                    = true;
         self::$rules['Polymorphine/aligned_properties']                      = true;
         self::$rules['Polymorphine/assignment_spacing']                      = true;
@@ -204,6 +204,7 @@ final class FixerSetup
         ];
 
         return [
+            new Fixer\AlignedArrayValuesFixer(),
             new Fixer\AlignedMethodChainFixer(),
             new Fixer\AlignedTypedPropertiesFixer(),
             new Fixer\AssignmentSpacingFixer(),

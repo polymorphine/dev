@@ -58,19 +58,12 @@ final class ArrayContext
             }
             $lineEnd = $this->nextLineBreak($idx);
             if ($this->isMultipleAssign($idx, $lineEnd)) { return; }
-            if ($this->isMultilineValue($lineEnd)) { continue; }
 
             $lineStart = $this->prevLineBreak($idx);
             $group[$idx] = $this->indentationPointLength($lineStart, $idx);
         }
         if (count($group) < 2) { return; }
         $this->fixGroupIndentation($group);
-    }
-
-    private function isMultilineValue(int $lineEnd): bool
-    {
-        $isComma = $this->tokens[$lineEnd - 1]->getContent() === ',';
-        return !$isComma && !$this->tokens[$lineEnd + 1]->isGivenKind(CT::T_ARRAY_SQUARE_BRACE_CLOSE);
     }
 
     private function isMultipleAssign(int $firstArrow, int $lineEnd): bool

@@ -50,7 +50,7 @@ class OpeningTagLineSpacingFixer implements FixerInterface
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_DECLARE);
+        return $tokens->isMonolithicPhp() && !$tokens->isTokenKindFound(T_OPEN_TAG_WITH_ECHO);
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
