@@ -58,17 +58,17 @@ final class AssignmentSpacingFixer implements FixerInterface
     {
         $this->tokens = $tokens;
 
-        $groups  = [];
-        $declare = key($this->tokens->findGivenKind(T_DECLARE, 0, 2));
-        $assign  = $declare ? $declare + 6 : 1;
-        while ($assign = $this->tokens->getNextTokenOfKind($assign, ['='])) {
-            $tokens->ensureWhitespaceAtIndex($assign + 1, 0, ' ');
-            if (!$siblings = $this->findSiblings($assign)) {
-                $tokens->ensureWhitespaceAtIndex($assign - 1, 1, ' ');
+        $groups = [];
+        $idx    = 1;
+        while ($idx = $this->tokens->getNextTokenOfKind($idx, ['='])) {
+            if ($this->isDeclareClause($idx)) { continue; }
+            $tokens->ensureWhitespaceAtIndex($idx + 1, 0, ' ');
+            if (!$siblings = $this->findSiblings($idx)) {
+                $tokens->ensureWhitespaceAtIndex($idx - 1, 1, ' ');
                 continue;
             }
             $groups[] = $siblings;
-            $assign = array_key_last($siblings);
+            $idx = array_key_last($siblings);
         }
 
         foreach ($groups as $siblings) {
@@ -145,5 +145,11 @@ final class AssignmentSpacingFixer implements FixerInterface
     {
         $operator = $this->tokens[$newLine + 2]->isGivenKind(T_PAAMAYIM_NEKUDOTAYIM);
         return $operator && $this->tokens[$newLine + 3]->isGivenKind(T_VARIABLE);
+    }
+
+    private function isDeclareClause(int $opIdx): bool
+    {
+        $prev = $this->meaningfulToken($opIdx, -3);
+        return $prev && $this->tokens[$prev]->isGivenKind(T_DECLARE);
     }
 }

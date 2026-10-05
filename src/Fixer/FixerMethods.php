@@ -68,4 +68,14 @@ trait FixerMethods
             $this->tokens->ensureWhitespaceAtIndex($assign - 1, 1, str_repeat(' ', $maxLength - $length + 1));
         }
     }
+
+    private function meaningfulToken(int $idx, int $offset): ?int
+    {
+        $nextIdx = $offset > 0 ? [$this->tokens, 'getNextMeaningfulToken'] : [$this->tokens, 'getPrevMeaningfulToken'];
+        $offset  = abs($offset);
+        while ($offset-- && $idx) {
+            $idx = $nextIdx($idx);
+        }
+        return $idx;
+    }
 }
