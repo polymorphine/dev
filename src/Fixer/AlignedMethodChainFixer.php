@@ -14,7 +14,6 @@ namespace Polymorphine\Dev\Fixer;
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
-use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
@@ -120,34 +119,28 @@ final class AlignedMethodChainFixer implements FixerInterface
     private function findClosing(int $idx): ?int
     {
         $parenthesis = $this->tokens->getNextTokenOfKind($idx, ['(', ')']);
-
-        if ($this->tokens[$parenthesis]->getContent() === '(') {
-            $nestedEnd = $this->findClosing($parenthesis);
-            return $this->findClosing($nestedEnd);
-        }
-
-        return $parenthesis;
+        return $this->tokens[$parenthesis]->getContent() === '('
+            ? $this->findClosing($this->findClosing($parenthesis))
+            : $parenthesis;
     }
 
     private function indentMultilineParam(int $idx, int $end, int $indent): void
     {
         $minLevel = $this->codeLength($this->tokens[$idx]->getContent());
-
-        $diff = $indent - $minLevel;
+        $diff     = $indent - $minLevel;
         if (!$diff) { return; }
 
         while ($idx < $end) {
-            $this->tokens[$idx] = $this->fixIndent($diff, $this->tokens[$idx]);
+            $this->tokens->ensureWhitespaceAtIndex($idx, 0, $this->whitespace($diff, $idx));
             $idx = $this->nextLineBreak($idx);
         }
     }
 
-    private function fixIndent(int $length, Token $token): Token
+    private function whitespace(int $length, int $idx): string
     {
-        $code       = $token->getContent();
-        $lineBreaks = substr_count($code, "\n");
-
+        $code   = $this->tokens[$idx]->getContent();
+        $lines  = substr_count($code, "\n");
         $indent = $this->codeLength($code) + $length;
-        return $this->indentationToken($indent, $lineBreaks);
+        return str_repeat("\n", $lines) . str_repeat(' ', $indent);
     }
 }

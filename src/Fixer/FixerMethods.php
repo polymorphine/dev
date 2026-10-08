@@ -11,7 +11,6 @@
 
 namespace Polymorphine\Dev\Fixer;
 
-use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 
 
@@ -54,11 +53,6 @@ trait FixerMethods
     private function codeLength(string $code): int
     {
         return mb_strlen(ltrim($code, "\n"));
-    }
-
-    private function indentationToken(int $length, int $lineBreaks = 0): Token
-    {
-        return new Token([T_WHITESPACE, str_repeat("\n", $lineBreaks) . str_repeat(' ', $length)]);
     }
 
     private function fixGroupIndentation(array $group): void
