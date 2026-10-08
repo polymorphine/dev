@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
@@ -26,7 +25,7 @@ final class NoTrailingCommaInMultilineArrayFixer implements FixerInterface
         return 'Polymorphine/no_trailing_comma_after_multiline_array';
     }
 
-    public function getDefinition(): FixerDefinitionInterface
+    public function getDefinition(): FixerDefinition
     {
         return new FixerDefinition('Removes trailing comma from multiline arrays.', []);
     }

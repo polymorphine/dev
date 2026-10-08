@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
@@ -27,7 +26,7 @@ final class AlignedMethodChainFixer implements FixerInterface
         return 'Polymorphine/aligned_method_chain';
     }
 
-    public function getDefinition(): FixerDefinitionInterface
+    public function getDefinition(): FixerDefinition
     {
         return new FixerDefinition('Multiline chain method calls should be aligned to first arrow operator.', []);
     }

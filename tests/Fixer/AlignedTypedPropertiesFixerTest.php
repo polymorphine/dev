@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
 use Polymorphine\Dev\Fixer\AlignedTypedPropertiesFixer;
-use PhpCsFixer\Fixer\FixerInterface;
 
 
 class AlignedTypedPropertiesFixerTest extends FixerTest
@@ -91,7 +90,7 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): FixerInterface
+    protected function fixer(): AlignedTypedPropertiesFixer
     {
         return new AlignedTypedPropertiesFixer();
     }

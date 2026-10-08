@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
@@ -26,7 +25,7 @@ final class ExtraBlankLinesFixer implements FixerInterface
         return 'Polymorphine/extra_blank_lines';
     }
 
-    public function getDefinition(): FixerDefinitionInterface
+    public function getDefinition(): FixerDefinition
     {
         return new FixerDefinition('Adds second line break before class definition.', []);
     }

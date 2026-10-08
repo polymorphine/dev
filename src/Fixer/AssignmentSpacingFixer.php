@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
@@ -29,7 +28,7 @@ final class AssignmentSpacingFixer implements FixerInterface
         return 'Polymorphine/assignment_spacing';
     }
 
-    public function getDefinition(): FixerDefinitionInterface
+    public function getDefinition(): FixerDefinition
     {
         return new FixerDefinition('Aligns equal operator for consecutive assignments of similar type.', []);
     }

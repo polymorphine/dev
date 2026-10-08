@@ -11,7 +11,6 @@
 
 namespace Polymorphine\Dev\Tests\Fixer;
 
-use PhpCsFixer\Fixer\FixerInterface;
 use Polymorphine\Dev\Tests\FixerTest;
 use Polymorphine\Dev\Fixer\MultiOrderedClassElementsFixer;
 
@@ -164,7 +163,7 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): FixerInterface
+    protected function fixer(): MultiOrderedClassElementsFixer
     {
         $srcOrder = [
             'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',

@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
 use Polymorphine\Dev\Fixer\OpeningTagLineSpacingFixer;
-use PhpCsFixer\Fixer\FixerInterface;
 
 
 class OpeningTagLineSpacingFixerTest extends FixerTest
@@ -100,7 +99,7 @@ class OpeningTagLineSpacingFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): FixerInterface
+    protected function fixer(): OpeningTagLineSpacingFixer
     {
         return new OpeningTagLineSpacingFixer();
     }

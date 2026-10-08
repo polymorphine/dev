@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
 use Polymorphine\Dev\Fixer\AssignmentSpacingFixer;
-use PhpCsFixer\Fixer\FixerInterface;
 
 
 class AssignmentSpacingFixerTest extends FixerTest
@@ -167,7 +166,7 @@ class AssignmentSpacingFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): FixerInterface
+    protected function fixer(): AssignmentSpacingFixer
     {
         return new AssignmentSpacingFixer();
     }

@@ -14,7 +14,6 @@ namespace Polymorphine\Dev\Fixer;
 use PhpCsFixer\Fixer\WhitespacesAwareFixerInterface;
 use PhpCsFixer\WhitespacesFixerConfig;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\TokensAnalyzer;
@@ -49,7 +48,7 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
         return 'Polymorphine/braces_position';
     }
 
-    public function getDefinition(): FixerDefinitionInterface
+    public function getDefinition(): FixerDefinition
     {
         return new FixerDefinition('Braces must be placed as configured', []);
     }

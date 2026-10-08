@@ -11,10 +11,9 @@
 
 namespace Polymorphine\Dev\Tests\Fixer;
 
-use PhpCsFixer\Fixer\FixerInterface;
-use PhpCsFixer\WhitespacesFixerConfig;
 use Polymorphine\Dev\Tests\FixerTest;
 use Polymorphine\Dev\Fixer\BracesPositionFixer;
+use PhpCsFixer\WhitespacesFixerConfig;
 
 
 /**
@@ -617,7 +616,7 @@ class BracesPositionFixerTest extends FixerTest
             PHP];
     }
 
-    protected function fixer(): FixerInterface
+    protected function fixer(): BracesPositionFixer
     {
         $fixer = new BracesPositionFixer();
         $fixer->setWhitespacesConfig(new WhitespacesFixerConfig());

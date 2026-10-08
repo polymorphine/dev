@@ -13,7 +13,6 @@ namespace Polymorphine\Dev\Tests\Fixer;
 
 use Polymorphine\Dev\Tests\FixerTest;
 use Polymorphine\Dev\Fixer\AlignedArrayValuesFixer;
-use PhpCsFixer\Fixer\FixerInterface;
 
 
 class AlignedArrayValuesFixerTest extends FixerTest
@@ -91,7 +90,7 @@ class AlignedArrayValuesFixerTest extends FixerTest
         $this->assertUnchanged($code);
     }
 
-    protected function fixer(): FixerInterface
+    protected function fixer(): AlignedArrayValuesFixer
     {
         return new AlignedArrayValuesFixer();
     }
