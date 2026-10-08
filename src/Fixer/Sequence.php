@@ -18,18 +18,21 @@ final class Sequence
 {
     use FixerMethods;
 
-    public int   $idx;
-    public array $tokenIds;
+    public int $endIdx;
+
+    private array $tokenIds;
 
     /**
-     * @param Tokens     $tokens
-     * @param int        $idx      First element in the sequence
-     * @param array<int> $tokenIds Ordered list of meaningful tokens
+     * Token sequence from line start until $endIdx.
+     *
+     * @param Tokens    $tokens
+     * @param int       $endIdx
+     * @param list<int> $tokenIds
      */
-    public function __construct(Tokens $tokens, int $idx, array $tokenIds = [])
+    public function __construct(Tokens $tokens, int $endIdx, array $tokenIds = [])
     {
         $this->tokens   = $tokens;
-        $this->idx      = $idx;
+        $this->endIdx   = $endIdx;
         $this->tokenIds = $tokenIds;
     }
 
@@ -43,11 +46,8 @@ final class Sequence
      */
     public function sameGroup(Sequence $sequence): bool
     {
-        $idx = $this->prevLineBreak($sequence->idx);
-        if (!$this->isNextLine($idx)) { return false; }
-        if ($idx !== $this->nextLineBreak($this->idx)) { return false; }
-
-        return $this->match($sequence);
+        $idx = $this->prevLineBreak($sequence->endIdx);
+        return $this->isNextLine($idx) && $this->nextLineBreak($this->endIdx) === $idx && $this->match($sequence);
     }
 
     /**
@@ -57,7 +57,7 @@ final class Sequence
      *
      * @return bool
      */
-    public function match(Sequence $sequence): bool
+    private function match(Sequence $sequence): bool
     {
         return $this->tokenIds === $sequence->tokenIds;
     }

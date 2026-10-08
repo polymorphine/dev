@@ -68,23 +68,16 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
         $groups = [];
         $group  = [];
         $prev   = new Sequence($this->tokens, $idx);
-        while ($next = $this->nextSequence($prev->idx)) {
-            if (!$prev->sameGroup($next)) {
-                if (count($group) > 1) {
-                    $groups[] = $group;
-                }
+        while ($sequence = $this->nextSequence($prev->endIdx)) {
+            if (!$prev->sameGroup($sequence)) {
+                count($group) > 1 && $groups[] = $group;
                 $group = [];
             }
 
-            $group[$next->idx] = $this->alignIndex($next->idx);
-            $prev = $next;
+            $group[$sequence->endIdx] = $this->alignIndex($sequence->endIdx);
+            $prev = $sequence;
         }
-
-        if (count($group) > 1) {
-            $groups[] = $group;
-        }
-
-        return $groups;
+        return count($group) > 1 ? [...$groups, $group] : $groups;
     }
 
     private function nextSequence(int $idx): ?Sequence
