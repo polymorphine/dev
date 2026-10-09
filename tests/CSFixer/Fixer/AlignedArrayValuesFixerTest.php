@@ -1,0 +1,102 @@
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Polymorphine\Dev\Tests\CSFixer\Fixer;
+
+use Polymorphine\Dev\Tests\CSFixer\FixerTest;
+use Polymorphine\Dev\CSFixer\Fixer\AlignedArrayValuesFixer;
+
+
+class AlignedArrayValuesFixerTest extends FixerTest
+{
+    public function test_NonAssociativeArrays_AreNotChanged()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a', 'abc',
+                'def'
+            ];
+            
+            CODE;
+
+        $this->assertUnchanged($code);
+    }
+
+    public function test_SingleLineArrays_AreNotChanged()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = ['a' => 10, 'abc' => 20];
+            
+            CODE;
+
+        $this->assertUnchanged($code);
+    }
+
+    public function test_MultilineArrays_AreAligned()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a' => 10,
+                'abc' => ['foo' => $x, 'bar' => $y],
+                'foo-bar' => 12,
+                'baz' => ['one' => 1]
+            ];
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a'       => 10,
+                'abc'     => ['foo' => $x, 'bar' => $y],
+                'foo-bar' => 12,
+                'baz'     => ['one' => 1]
+            ];
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
+    public function test_NotExclusivelyMultilineArrays_AreNotChanged()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a' => ['foo' => $x, 'bar' => $y],
+                'abc' => $x, 'bar' => $y,
+                'foo-bar' => 12,
+                'baz' => ['one' => 1]
+            ];
+            
+            CODE;
+
+        $this->assertUnchanged($code);
+    }
+
+    protected function fixer(): AlignedArrayValuesFixer
+    {
+        return new AlignedArrayValuesFixer();
+    }
+
+    protected function properties(): array
+    {
+        return ['name' => 'Polymorphine/aligned_array_values', 'priority' => -40];
+    }
+}

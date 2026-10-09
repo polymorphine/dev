@@ -10,6 +10,10 @@
  * with this source code in the file LICENSE.
  */
 
+use Composer\XdebugHandler\XdebugHandler;
+use Polymorphine\Dev\CSFixer\FixerSetup;
+use PhpCsFixer\Console\Application;
+
 $argv or exit('CLI script executable');
 
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
@@ -28,7 +32,7 @@ if (PHP_VERSION_ID === 80000) {
 require_once (getcwd() === __DIR__ ? __DIR__ : dirname(__DIR__, 3)) . '/vendor/autoload.php';
 
 // Restart if xdebug is loaded, unless the environment variable PHP_CS_FIXER_ALLOW_XDEBUG is set.
-(new Composer\XdebugHandler\XdebugHandler('PHP_CS_FIXER'))->check();
+(new XdebugHandler('PHP_CS_FIXER'))->check();
 
 $fixer = new CSFixerScript();
 switch ($argv[1] ?? '') {
@@ -58,7 +62,7 @@ class CSFixerScript
     public function fileInspection(array $args): int
     {
         $args[2] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $args[2]);
-        Polymorphine\Dev\FixerSetup::init(getcwd(), $args[2]);
+        FixerSetup::init(getcwd(), $args[2]);
         $fix = $args[4] !== '--dry-run' ? [1 => '--format=udiff'] : [];
         return $this->runScript([...array_slice($args, 0, 3), ...array_replace(self::INSP_ARGS, $fix)]);
     }
@@ -66,21 +70,21 @@ class CSFixerScript
     public function checkFiles(array $args): int
     {
         $files = count($args) > 1 ? [$args[1]] : ['src', 'tests'];
-        Polymorphine\Dev\FixerSetup::init(getcwd(), $files[0]);
+        FixerSetup::init(getcwd(), $files[0]);
         return $this->runScript([$args[0], '--dry-run', ...self::CLI_ARGS, ...$files]);
     }
 
     public function fixFiles(array $args): int
     {
         $files = count($args) > 2 ? [$args[2]] : ['src', 'tests'];
-        Polymorphine\Dev\FixerSetup::init(getcwd(), $files[0]);
+        FixerSetup::init(getcwd(), $files[0]);
         return $this->runScript([$args[0], ...self::CLI_ARGS, ...$files]);
     }
 
     public function runScript(array $args): int
     {
         $_SERVER['argv'] = $args;
-        $fixer = new PhpCsFixer\Console\Application();
+        $fixer = new Application();
         $fixer->setAutoExit(false);
         return $fixer->run();
     }

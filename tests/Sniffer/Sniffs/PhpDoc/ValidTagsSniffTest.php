@@ -11,7 +11,7 @@
 
 namespace Polymorphine\Dev\Tests\Sniffer\Sniffs\PhpDoc;
 
-use Polymorphine\Dev\Tests\SnifferTest;
+use Polymorphine\Dev\Tests\Sniffer\SnifferTest;
 use Polymorphine\Dev\Sniffer\Sniffs\PhpDoc\ValidTagsSniff;
 
 
