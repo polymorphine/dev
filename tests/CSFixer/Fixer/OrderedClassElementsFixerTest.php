@@ -12,10 +12,10 @@
 namespace Polymorphine\Dev\Tests\CSFixer\Fixer;
 
 use Polymorphine\Dev\Tests\CSFixer\FixerTest;
-use Polymorphine\Dev\CSFixer\Fixer\MultiOrderedClassElementsFixer;
+use Polymorphine\Dev\CSFixer\Fixer\OrderedClassElementsFixer;
 
 
-class MultiOrderedClassElementsFixerTest extends FixerTest
+class OrderedClassElementsFixerTest extends FixerTest
 {
     public function test_ClassWithoutTestName_IsOrderedWithSrcConfig()
     {
@@ -163,7 +163,7 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): MultiOrderedClassElementsFixer
+    protected function fixer(): OrderedClassElementsFixer
     {
         $srcOrder = [
             'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',
@@ -183,11 +183,11 @@ class MultiOrderedClassElementsFixerTest extends FixerTest
             'method_private', 'method_private_static'
         ];
 
-        return new MultiOrderedClassElementsFixer(dirname(__DIR__, 2), $srcOrder, $testOrder);
+        return new OrderedClassElementsFixer(dirname(__DIR__, 2), $srcOrder, $testOrder);
     }
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/multi_ordered_class_elements', 'priority' => 65];
+        return ['name' => 'Polymorphine/ordered_class_elements', 'priority' => 65];
     }
 }

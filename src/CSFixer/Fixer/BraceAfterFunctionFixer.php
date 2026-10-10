@@ -22,7 +22,7 @@ final class BraceAfterFunctionFixer implements FixerInterface
 {
     public function getName(): string
     {
-        return 'Polymorphine/brace_after_method';
+        return 'Polymorphine/brace_after_function';
     }
 
     public function getDefinition(): FixerDefinition

@@ -174,16 +174,16 @@ final class FixerSetup
 
     private static function customFixers(string $testsPath): array
     {
-        self::$rules['Polymorphine/aligned_array_values']                    = true;
-        self::$rules['Polymorphine/aligned_method_chain']                    = true;
-        self::$rules['Polymorphine/aligned_properties']                      = true;
-        self::$rules['Polymorphine/assignment_spacing']                      = true;
-        self::$rules['Polymorphine/braces_position']                         = true;
-        self::$rules['Polymorphine/extra_blank_lines']                       = true;
-        self::$rules['Polymorphine/multi_ordered_class_elements']            = true;
-        self::$rules['Polymorphine/named_constructors_first_static']         = true;
-        self::$rules['Polymorphine/no_trailing_comma_after_multiline_array'] = true;
-        self::$rules['Polymorphine/opening_tag_line_spacing']                = true;
+        self::$rules['Polymorphine/aligned_array_values']      = true;
+        self::$rules['Polymorphine/aligned_method_chain']      = true;
+        self::$rules['Polymorphine/aligned_typed_properties']  = true;
+        self::$rules['Polymorphine/assignment_spacing']        = true;
+        self::$rules['Polymorphine/braces_position']           = true;
+        self::$rules['Polymorphine/extra_blank_lines']         = true;
+        self::$rules['Polymorphine/ordered_class_elements']    = true;
+        self::$rules['Polymorphine/static_constructors_first'] = true;
+        self::$rules['Polymorphine/no_comma_multiline_array']  = true;
+        self::$rules['Polymorphine/opening_tag_line_spacing']  = true;
 
         $srcOrder = [
             'use_trait', 'case', 'constant_public', 'constant_protected', 'constant_private',
@@ -210,10 +210,10 @@ final class FixerSetup
             new Fixer\AssignmentSpacingFixer(),
             new Fixer\BracesPositionFixer(),
             new Fixer\ExtraBlankLinesFixer(),
-            new Fixer\MultiOrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
-            new Fixer\NamedConstructorsFirstStaticFixer(),
-            new Fixer\NoTrailingCommaInMultilineArrayFixer(),
-            new Fixer\OpeningTagLineSpacingFixer()
+            new Fixer\OrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),
+            new Fixer\NoCommaMultilineArrayFixer(),
+            new Fixer\OpeningTagLineSpacingFixer(),
+            new Fixer\StaticConstructorsFirstFixer()
         ];
     }
 

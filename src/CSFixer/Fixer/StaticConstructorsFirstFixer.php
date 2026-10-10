@@ -17,7 +17,7 @@ use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-final class NamedConstructorsFirstStaticFixer implements FixerInterface
+final class StaticConstructorsFirstFixer implements FixerInterface
 {
     private Tokens $tokens;
     private array  $classTypes;
@@ -25,7 +25,7 @@ final class NamedConstructorsFirstStaticFixer implements FixerInterface
 
     public function getName(): string
     {
-        return 'Polymorphine/named_constructors_first_static';
+        return 'Polymorphine/static_constructors_first';
     }
 
     public function getDefinition(): FixerDefinition

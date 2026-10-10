@@ -25,7 +25,7 @@ final class AlignedTypedPropertiesFixer implements FixerInterface
 
     public function getName(): string
     {
-        return 'Polymorphine/aligned_properties';
+        return 'Polymorphine/aligned_typed_properties';
     }
 
     public function getDefinition(): FixerDefinition

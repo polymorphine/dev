@@ -12,10 +12,10 @@
 namespace Polymorphine\Dev\Tests\CSFixer\Fixer;
 
 use Polymorphine\Dev\Tests\CSFixer\FixerTest;
-use Polymorphine\Dev\CSFixer\Fixer\NoTrailingCommaInMultilineArrayFixer;
+use Polymorphine\Dev\CSFixer\Fixer\NoCommaMultilineArrayFixer;
 
 
-class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
+class NoCommaMultilineArrayFixerTest extends FixerTest
 {
     public function test_TrailingComma_IsRemovedFromMultilineArray()
     {
@@ -58,13 +58,13 @@ class NoTrailingCommaInMultilineArrayFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): NoTrailingCommaInMultilineArrayFixer
+    protected function fixer(): NoCommaMultilineArrayFixer
     {
-        return new NoTrailingCommaInMultilineArrayFixer();
+        return new NoCommaMultilineArrayFixer();
     }
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/no_trailing_comma_after_multiline_array', 'priority' => -40];
+        return ['name' => 'Polymorphine/no_comma_multiline_array', 'priority' => -40];
     }
 }

@@ -18,11 +18,11 @@ use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
 
 
-final class NoTrailingCommaInMultilineArrayFixer implements FixerInterface
+final class NoCommaMultilineArrayFixer implements FixerInterface
 {
     public function getName(): string
     {
-        return 'Polymorphine/no_trailing_comma_after_multiline_array';
+        return 'Polymorphine/no_comma_multiline_array';
     }
 
     public function getDefinition(): FixerDefinition

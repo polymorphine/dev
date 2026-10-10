@@ -12,17 +12,17 @@
 namespace Polymorphine\Dev\CSFixer\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
-use PhpCsFixer\Fixer\ClassNotation\OrderedClassElementsFixer;
+use PhpCsFixer\Fixer\ClassNotation\OrderedClassElementsFixer as ScopedOrderFixer;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
-class MultiOrderedClassElementsFixer implements FixerInterface
+class OrderedClassElementsFixer implements FixerInterface
 {
-    private string                    $testPath;
-    private OrderedClassElementsFixer $srcFixer;
-    private OrderedClassElementsFixer $testFixer;
+    private string           $testPath;
+    private ScopedOrderFixer $srcFixer;
+    private ScopedOrderFixer $testFixer;
 
     /**
      * @param string        $testPath
@@ -32,8 +32,8 @@ class MultiOrderedClassElementsFixer implements FixerInterface
     public function __construct(string $testPath, array $srcOrder, array $testOrder)
     {
         $this->testPath  = $testPath;
-        $this->srcFixer  = new OrderedClassElementsFixer();
-        $this->testFixer = new OrderedClassElementsFixer();
+        $this->srcFixer  = new ScopedOrderFixer();
+        $this->testFixer = new ScopedOrderFixer();
 
         $this->srcFixer->configure(['order' => $srcOrder, 'sort_algorithm' => 'none']);
         $this->testFixer->configure(['order' => $testOrder, 'sort_algorithm' => 'none']);
@@ -41,7 +41,7 @@ class MultiOrderedClassElementsFixer implements FixerInterface
 
     public function getName(): string
     {
-        return 'Polymorphine/multi_ordered_class_elements';
+        return 'Polymorphine/ordered_class_elements';
     }
 
     public function getDefinition(): FixerDefinitionInterface
@@ -61,9 +61,8 @@ class MultiOrderedClassElementsFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        strpos($file->getPathname(), $this->testPath) === 0 && $this->isTestClass($tokens)
-            ? $this->testFixer->fix($file, $tokens)
-            : $this->srcFixer->fix($file, $tokens);
+        $fixer = $this->isTestClass($file, $tokens) ? $this->testFixer : $this->srcFixer;
+        $fixer->fix($file, $tokens);
     }
 
     public function getPriority(): int
@@ -76,8 +75,10 @@ class MultiOrderedClassElementsFixer implements FixerInterface
         return $this->srcFixer->supports($file);
     }
 
-    private function isTestClass(Tokens $tokens): bool
+    private function isTestClass(SplFileInfo $file, Tokens $tokens): bool
     {
+        $isTestPath = strpos($file->getPathname(), $this->testPath) === 0;
+        if (!$isTestPath) { return false; }
         $classIdx = $tokens->getNextTokenOfKind(0, [[T_CLASS]]);
         if (!$classIdx) { return false; }
 

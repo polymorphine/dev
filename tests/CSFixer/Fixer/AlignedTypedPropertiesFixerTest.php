@@ -97,6 +97,6 @@ class AlignedTypedPropertiesFixerTest extends FixerTest
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/aligned_properties', 'priority' => -39];
+        return ['name' => 'Polymorphine/aligned_typed_properties', 'priority' => -39];
     }
 }

@@ -12,10 +12,10 @@
 namespace Polymorphine\Dev\Tests\CSFixer\Fixer;
 
 use Polymorphine\Dev\Tests\CSFixer\FixerTest;
-use Polymorphine\Dev\CSFixer\Fixer\NamedConstructorsFirstStaticFixer;
+use Polymorphine\Dev\CSFixer\Fixer\StaticConstructorsFirstFixer;
 
 
-class NamedConstructorsFirstStaticFixerTest extends FixerTest
+class StaticConstructorsFirstFixerTest extends FixerTest
 {
     public function test_StaticConstructors_AreMovedToBeFirstStaticMethods()
     {
@@ -245,13 +245,13 @@ class NamedConstructorsFirstStaticFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
-    protected function fixer(): NamedConstructorsFirstStaticFixer
+    protected function fixer(): StaticConstructorsFirstFixer
     {
-        return new NamedConstructorsFirstStaticFixer();
+        return new StaticConstructorsFirstFixer();
     }
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/named_constructors_first_static', 'priority' => -40];
+        return ['name' => 'Polymorphine/static_constructors_first', 'priority' => -40];
     }
 }

@@ -112,6 +112,6 @@ class BraceAfterFunctionFixerTest extends FixerTest
 
     protected function properties(): array
     {
-        return ['name' => 'Polymorphine/brace_after_method', 'priority' => -40];
+        return ['name' => 'Polymorphine/brace_after_function', 'priority' => -40];
     }
 }
