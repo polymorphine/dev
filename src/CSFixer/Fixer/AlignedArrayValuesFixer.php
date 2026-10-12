@@ -24,9 +24,6 @@ final class AlignedArrayValuesFixer implements FixerInterface
 {
     use FixerMethods;
 
-    private array $groups = [];
-    private array $group  = [];
-
     public function getName(): string
     {
         return 'Polymorphine/aligned_array_values';
