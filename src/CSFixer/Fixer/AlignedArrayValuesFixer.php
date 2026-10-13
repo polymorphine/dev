@@ -14,7 +14,6 @@ namespace Polymorphine\Dev\CSFixer\Fixer;
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
-use Polymorphine\Dev\CSFixer\Tokens\ArrayContext;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
@@ -59,15 +58,41 @@ final class AlignedArrayValuesFixer implements FixerInterface
         $this->tokens = $tokens;
 
         $idx = 0;
-        while ($array = $this->findArrayContext($idx)) {
-            $array->alignIndentation();
-            $idx = $array->lastTokenIdx();
+        while ($idx = $this->tokens->getNextTokenOfKind($idx, [[CT::T_ARRAY_BRACKET_OPEN]])) {
+            $this->alignIndentation($idx);
+            $idx = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_BRACKET, $idx);
         }
     }
 
-    private function findArrayContext(int $idx): ?ArrayContext
+    private function alignIndentation(int $idx): void
     {
-        $start = $this->tokens->getNextTokenOfKind($idx, [[CT::T_ARRAY_BRACKET_OPEN]]);
-        return $start ? new ArrayContext($this->tokens, $start) : null;
+        $tokenTypes = [[CT::T_ARRAY_BRACKET_OPEN], [T_DOUBLE_ARROW], [CT::T_ARRAY_BRACKET_CLOSE]];
+        $group      = [];
+        while ($idx = $this->tokens->getNextTokenOfKind($idx, $tokenTypes)) {
+            $type = $this->tokens[$idx]->getId();
+            if ($type === CT::T_ARRAY_BRACKET_CLOSE) { break; }
+            if ($type === CT::T_ARRAY_BRACKET_OPEN) {
+                $this->alignIndentation($idx);
+                $idx = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_BRACKET, $idx);
+                continue;
+            }
+            $lineEnd = $this->nextLineBreak($idx);
+            if ($this->isMultipleAssign($idx, $lineEnd)) { return; }
+
+            $lineStart = $this->prevLineBreak($idx);
+            $group[$idx] = $this->indentationPointLength($lineStart, $idx);
+        }
+        if (count($group) < 2) { return; }
+        $this->fixGroupIndentation($group);
+    }
+
+    private function isMultipleAssign(int $firstArrow, int $lineEnd): bool
+    {
+        $last = $this->tokens->getPrevTokenOfKind($lineEnd, [[T_DOUBLE_ARROW], [CT::T_ARRAY_BRACKET_CLOSE]]);
+        if ($this->tokens[$last]->isGivenKind(CT::T_ARRAY_BRACKET_CLOSE)) {
+            $continueFrom = $this->tokens->findBlockStart(Tokens::BLOCK_TYPE_ARRAY_BRACKET, $last);
+            return $continueFrom < $firstArrow || $this->isMultipleAssign($firstArrow, $continueFrom);
+        }
+        return $firstArrow !== $last;
     }
 }
