@@ -47,7 +47,7 @@ final class NoCommaMultilineArrayFixer implements FixerInterface
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAnyTokenKindsFound([T_ARRAY, CT::T_ARRAY_SQUARE_BRACE_OPEN]);
+        return $tokens->isAnyTokenKindsFound([T_ARRAY, CT::T_ARRAY_BRACKET_OPEN]);
     }
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
@@ -60,7 +60,7 @@ final class NoCommaMultilineArrayFixer implements FixerInterface
 
     private function isMultilineArray(Tokens $tokens, int $idx): bool
     {
-        $isArray = $tokens[$idx]->isGivenKind([T_ARRAY, CT::T_ARRAY_SQUARE_BRACE_OPEN]);
+        $isArray = $tokens[$idx]->isGivenKind([T_ARRAY, CT::T_ARRAY_BRACKET_OPEN]);
         if (!$isArray) { return false; }
 
         $openBrace = $tokens[$idx]->isGivenKind(T_ARRAY) ? $tokens->getNextMeaningfulToken($idx) : $idx;
@@ -90,9 +90,9 @@ final class NoCommaMultilineArrayFixer implements FixerInterface
 
         if ($tokens[$startIdx]->isGivenKind(T_ARRAY)) {
             $startIdx = $tokens->getNextTokenOfKind($startIdx, ['(']);
-            $endIdx   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $startIdx);
+            $endIdx   = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS, $startIdx);
         } else {
-            $endIdx = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $startIdx);
+            $endIdx = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_BRACKET, $startIdx);
         }
 
         $beforeEndIdx   = $tokens->getPrevMeaningfulToken($endIdx);

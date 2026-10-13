@@ -36,7 +36,7 @@ final class ArrayContext
      */
     public function lastTokenIdx(): int
     {
-        return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $this->start);
+        return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_BRACKET, $this->start);
     }
 
     /**
@@ -44,13 +44,13 @@ final class ArrayContext
      */
     public function alignIndentation(): void
     {
-        $tokenTypes = [[CT::T_ARRAY_SQUARE_BRACE_OPEN], [T_DOUBLE_ARROW], [CT::T_ARRAY_SQUARE_BRACE_CLOSE]];
+        $tokenTypes = [[CT::T_ARRAY_BRACKET_OPEN], [T_DOUBLE_ARROW], [CT::T_ARRAY_BRACKET_CLOSE]];
         $group      = [];
         $idx        = $this->start;
         while ($idx = $this->tokens->getNextTokenOfKind($idx, $tokenTypes)) {
             $type = $this->tokens[$idx]->getId();
-            if ($type === CT::T_ARRAY_SQUARE_BRACE_CLOSE) { break; }
-            if ($type === CT::T_ARRAY_SQUARE_BRACE_OPEN) {
+            if ($type === CT::T_ARRAY_BRACKET_CLOSE) { break; }
+            if ($type === CT::T_ARRAY_BRACKET_OPEN) {
                 $array = new self($this->tokens, $idx);
                 $array->alignIndentation();
                 $idx = $array->lastTokenIdx();
@@ -68,9 +68,9 @@ final class ArrayContext
 
     private function isMultipleAssign(int $firstArrow, int $lineEnd): bool
     {
-        $last = $this->tokens->getPrevTokenOfKind($lineEnd, [[T_DOUBLE_ARROW], [CT::T_ARRAY_SQUARE_BRACE_CLOSE]]);
-        if ($this->tokens[$last]->isGivenKind(CT::T_ARRAY_SQUARE_BRACE_CLOSE)) {
-            $continueFrom = $this->tokens->findBlockStart(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $last);
+        $last = $this->tokens->getPrevTokenOfKind($lineEnd, [[T_DOUBLE_ARROW], [CT::T_ARRAY_BRACKET_CLOSE]]);
+        if ($this->tokens[$last]->isGivenKind(CT::T_ARRAY_BRACKET_CLOSE)) {
+            $continueFrom = $this->tokens->findBlockStart(Tokens::BLOCK_TYPE_ARRAY_BRACKET, $last);
             return $continueFrom < $firstArrow || $this->isMultipleAssign($firstArrow, $continueFrom);
         }
 

@@ -67,7 +67,7 @@ final class AlignedArrayValuesFixer implements FixerInterface
 
     private function findArrayContext(int $idx): ?ArrayContext
     {
-        $start = $this->tokens->getNextTokenOfKind($idx, [[CT::T_ARRAY_SQUARE_BRACE_OPEN]]);
+        $start = $this->tokens->getNextTokenOfKind($idx, [[CT::T_ARRAY_BRACKET_OPEN]]);
         return $start ? new ArrayContext($this->tokens, $start) : null;
     }
 }

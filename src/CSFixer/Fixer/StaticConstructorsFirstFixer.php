@@ -135,7 +135,7 @@ final class StaticConstructorsFirstFixer implements FixerInterface
     private function extractMethod(int $idx): array
     {
         $beginBlock = $this->tokens->getNextTokenOfKind($idx, ['{']);
-        $endBlock   = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $beginBlock);
+        $endBlock   = $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $beginBlock);
 
         $methodTokens = [];
         while ($idx <= $endBlock) {
@@ -166,6 +166,6 @@ final class StaticConstructorsFirstFixer implements FixerInterface
     private function classBodyEnd(int $classIdx): int
     {
         $classBody = $this->tokens->getNextTokenOfKind($classIdx, ['{']);
-        return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $classBody);
+        return $this->tokens->findBlockEnd(Tokens::BLOCK_TYPE_BRACE, $classBody);
     }
 }
