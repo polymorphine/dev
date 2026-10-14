@@ -46,6 +46,7 @@ final class Sequence
      */
     public function sameGroup(Sequence $sequence): bool
     {
+        if (!$this->tokenIds) { return false; }
         $idx = $this->prevLineBreak($sequence->endIdx);
         return $this->isNextLine($idx) && $this->nextLineBreak($this->endIdx) === $idx && $this->match($sequence);
     }

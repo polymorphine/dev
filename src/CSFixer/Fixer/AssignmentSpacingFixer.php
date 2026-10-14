@@ -12,8 +12,9 @@
 namespace Polymorphine\Dev\CSFixer\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
-use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
+use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
+use Polymorphine\Dev\CSFixer\Tokens\Sequence;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
@@ -57,56 +58,48 @@ final class AssignmentSpacingFixer implements FixerInterface
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = $tokens;
+        foreach ($this->findGroups(0) as $group) {
+            $this->fixGroupIndentation($group);
+        }
+    }
 
+    private function findGroups(int $idx): array
+    {
         $groups = [];
-        $idx    = 1;
-        while ($idx = $this->tokens->getNextTokenOfKind($idx, ['='])) {
-            if ($this->isDeclareClause($idx)) { continue; }
-            $tokens->ensureWhitespaceAtIndex($idx + 1, 0, ' ');
-            if (!$siblings = $this->findSiblings($idx)) {
-                $tokens->ensureWhitespaceAtIndex($idx - 1, 1, ' ');
-                continue;
+        $group  = [];
+        $prev   = new Sequence($this->tokens, $idx);
+        while ($sequence = $this->nextSequence($prev->endIdx)) {
+            if (!$prev->sameGroup($sequence)) {
+                count($group) > 1 && $groups[] = $group;
+                $group = [];
             }
-            $groups[] = $siblings;
-            $idx = array_key_last($siblings);
-        }
 
-        foreach ($groups as $siblings) {
-            $this->fixGroupIndentation($siblings);
+            $group[$sequence->endIdx] = $this->alignIndex($sequence->endIdx);
+            $prev = $sequence;
         }
+        return count($group) > 1 ? [...$groups, $group] : $groups;
     }
 
-    private function findSiblings(int $assign): array
+    private function nextSequence(int $idx): ?Sequence
     {
+        $assign = $this->tokens->getNextTokenOfKind($idx, ['=']);
+        if (!$assign) { return null; }
+        if ($this->isDeclareClause($assign)) {
+            return $this->nextSequence($assign);
+        }
+        $this->tokens->ensureWhitespaceAtIndex($assign + 1, 0, ' ');
+
         $lineStart     = $this->prevLineBreak($assign);
-        $matchPossible = $lineStart && $this->isSingleLine($assign) && $this->isPureAssignment($lineStart, $assign);
-        if (!$matchPossible) { return []; }
+        $matchPossible = $lineStart && $this->isPureAssignment($lineStart, $assign);
+        $this->tokens->ensureWhitespaceAtIndex($assign - 1, 1, ' ');
+        if (!$matchPossible) { return $this->nextSequence($assign); }
 
-        $siblings  = [$assign => $this->indentationPointLength($lineStart, $assign)];
-        $signature = $this->getTokenSignature($lineStart, $assign);
-        while ($sibling = $this->nextSiblingIdx($assign, $signature)) {
-            [$newLine, $assign] = $sibling;
-            $siblings[$assign] = $this->indentationPointLength($newLine, $assign);
-            if (!$this->isSingleLine($assign)) { break; }
-        }
-
-        return count($siblings) > 1 ? $siblings : [];
+        return new Sequence($this->tokens, $assign, $this->getTokenSignature($lineStart, $assign));
     }
 
-    private function nextSiblingIdx(int $idx, array $signature): ?array
+    private function alignIndex(int $idx): int
     {
-        $newLine = $this->nextLineBreak($idx);
-        if (!$newLine || !$this->isNextLine($newLine)) { return null; }
-
-        $assign    = $this->tokens->getNextTokenOfKind($newLine, ['=']);
-        $isSibling = $assign && $this->isSibling($newLine, $assign, $signature);
-        return $isSibling ? [$newLine, $assign] : null;
-    }
-
-    private function isSibling(int $newLine, int $assign, array $signature): bool
-    {
-        return $this->isPureAssignment($newLine, $assign)
-            && $this->getTokenSignature($newLine, $assign) === $signature;
+        return $this->indentationPointLength($this->prevLineBreak($idx), $idx - 1);
     }
 
     private function getTokenSignature(int $idx, int $assign): array
@@ -116,12 +109,6 @@ final class AssignmentSpacingFixer implements FixerInterface
             $signature[] = $this->tokens[$idx]->getId();
         }
         return $signature;
-    }
-
-    private function isSingleLine(int $assign): bool
-    {
-        $endLine = $this->nextLineBreak($assign);
-        return !$endLine || $this->tokens[$endLine - 1]->getContent() === ';';
     }
 
     private function isPureAssignment(int $newLine, int $assign): bool
