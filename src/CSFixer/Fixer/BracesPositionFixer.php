@@ -93,9 +93,10 @@ final class BracesPositionFixer implements WhitespacesAwareFixerInterface
                 $emptyOneLine = $tokensAnalyzer->isAnonymousClass($idx);
                 $sameLine     = $emptyOneLine;
             } elseif ($token->isGivenKind(T_FUNCTION)) {
-                $openBraceIdx = $tokens->getNextTokenOfKind($idx, ['{']);
-                $singleLine   = $tokensAnalyzer->isLambda($idx);
-                $sameLine     = $singleLine;
+                $openBraceIdx = $tokens->getNextTokenOfKind($idx, ['{', ';']);
+                if (!$tokens[$openBraceIdx]->equals('{')) { continue; }
+                $singleLine = $tokensAnalyzer->isLambda($idx);
+                $sameLine   = $singleLine;
             } elseif ($token->isGivenKind(self::CONTROL_STR_TOKENS)) {
                 $this->fixContinuation($idx, $tokens, $tokensAnalyzer);
                 $openBraceIdx = $tokens->getNextMeaningfulToken($this->findParenthesisEnd($idx, $tokens));

@@ -241,9 +241,9 @@ class BracesPositionFixerTest extends FixerTest
             };
             PHP];
 
-        yield 'with blank lines inside braces' => [<<<'PHP'
+        yield 'with blank lines inside braces and no-brace function' => [<<<'PHP'
             <?php
-            class Foo
+            abstract class Foo
             {
             
                 public function foo()
@@ -253,10 +253,11 @@ class BracesPositionFixerTest extends FixerTest
             
                 }
             
+                abstract public function bar(Type $arg): void;
             }
             PHP, <<<'PHP'
             <?php
-            class Foo {
+            abstract class Foo {
             
                 public function foo() {
             
@@ -269,6 +270,7 @@ class BracesPositionFixerTest extends FixerTest
             
                 }
             
+                abstract public function bar(Type $arg): void;
             }
             PHP];
 
