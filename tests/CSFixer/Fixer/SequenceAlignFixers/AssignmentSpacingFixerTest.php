@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tests\CSFixer\Fixer;
+namespace Polymorphine\Dev\Tests\CSFixer\Fixer\SequenceAlignFixers;
 
 use Polymorphine\Dev\Tests\CSFixer\FixerTest;
-use Polymorphine\Dev\CSFixer\Fixer\AssignmentSpacingFixer;
+use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\AssignmentSpacingFixer;
 
 
 class AssignmentSpacingFixerTest extends FixerTest

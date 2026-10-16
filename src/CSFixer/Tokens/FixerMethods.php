@@ -16,24 +16,24 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 trait FixerMethods
 {
-    private Tokens $tokens;
+    protected Tokens $tokens;
 
-    private function isNextLine(int $idx): bool
+    protected function isNextLine(int $idx): bool
     {
         return substr_count($this->tokens[$idx]->getContent(), "\n") === 1;
     }
 
-    private function nextLineBreak(int $idx): ?int
+    protected function nextLineBreak(int $idx): ?int
     {
         return $this->nearestLineBreakIdx($idx);
     }
 
-    private function prevLineBreak(int $idx): ?int
+    protected function prevLineBreak(int $idx): ?int
     {
         return $this->nearestLineBreakIdx($idx, false);
     }
 
-    private function nearestLineBreakIdx(int $idx, bool $forwardSearch = true): ?int
+    protected function nearestLineBreakIdx(int $idx, bool $forwardSearch = true): ?int
     {
         $direction = $forwardSearch ? 1 : -1;
         do {
@@ -43,19 +43,19 @@ trait FixerMethods
         return $idx;
     }
 
-    private function indentationPointLength(int $newLine, int $operator, bool $align = true): int
+    protected function indentationPointLength(int $newLine, int $operator, bool $align = true): int
     {
         $end  = $align ? $this->tokens->getPrevMeaningfulToken($operator) : $operator - 1;
         $code = $this->tokens->generatePartialCode($newLine, $end);
         return $this->codeLength($code) + ($align ? 1 : 0);
     }
 
-    private function codeLength(string $code): int
+    protected function codeLength(string $code): int
     {
         return mb_strlen(ltrim($code, "\n"));
     }
 
-    private function fixGroupIndentation(array $group): void
+    protected function fixGroupIndentation(array $group): void
     {
         $maxLength = max($group);
         foreach ($group as $assign => $length) {
@@ -63,7 +63,7 @@ trait FixerMethods
         }
     }
 
-    private function meaningfulToken(int $idx, int $offset): ?int
+    protected function meaningfulToken(int $idx, int $offset): ?int
     {
         $nextIdx = $offset > 0 ? [$this->tokens, 'getNextMeaningfulToken'] : [$this->tokens, 'getPrevMeaningfulToken'];
         $offset  = abs($offset);

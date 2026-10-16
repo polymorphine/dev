@@ -9,8 +9,9 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\CSFixer\Tokens;
+namespace Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers;
 
+use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
 use PhpCsFixer\Tokenizer\Tokens;
 
 
@@ -46,7 +47,7 @@ final class Sequence
      */
     public function sameGroup(Sequence $sequence): bool
     {
-        if (!$this->tokenIds) { return false; }
+        if (!$this->tokenIds || !$sequence->tokenIds) { return false; }
         $idx = $this->prevLineBreak($sequence->endIdx);
         return $this->isNextLine($idx) && $this->nextLineBreak($this->endIdx) === $idx && $this->match($sequence);
     }

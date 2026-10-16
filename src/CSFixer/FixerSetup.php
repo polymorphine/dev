@@ -206,8 +206,8 @@ final class FixerSetup
         return [
             new Fixer\AlignedArrayValuesFixer(),
             new Fixer\AlignedMethodChainFixer(),
-            new Fixer\AlignedTypedPropertiesFixer(),
-            new Fixer\AssignmentSpacingFixer(),
+            new Fixer\SequenceAlignFixers\AlignedTypedPropertiesFixer(),
+            new Fixer\SequenceAlignFixers\AssignmentSpacingFixer(),
             new Fixer\BracesPositionFixer(),
             new Fixer\ExtraBlankLinesFixer(),
             new Fixer\OrderedClassElementsFixer($testsPath, $srcOrder, $testOrder),

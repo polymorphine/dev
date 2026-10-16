@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Polymorphine\Dev\Tests\CSFixer\Fixer;
+namespace Polymorphine\Dev\Tests\CSFixer\Fixer\SequenceAlignFixers;
 
 use Polymorphine\Dev\Tests\CSFixer\FixerTest;
-use Polymorphine\Dev\CSFixer\Fixer\AlignedTypedPropertiesFixer;
+use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\AlignedTypedPropertiesFixer;
 
 
 class AlignedTypedPropertiesFixerTest extends FixerTest

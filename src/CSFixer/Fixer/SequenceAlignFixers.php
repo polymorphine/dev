@@ -1,0 +1,81 @@
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Polymorphine/Dev package.
+ *
+ * (c) Shudd3r <q3.shudder@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Polymorphine\Dev\CSFixer\Fixer;
+
+use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\Tokenizer\Tokens;
+use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\Sequence;
+use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
+use SplFileInfo;
+
+
+abstract class SequenceAlignFixers implements FixerInterface
+{
+    use FixerMethods;
+
+    protected string $name;
+    protected string $definition;
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDefinition(): FixerDefinition
+    {
+        return new FixerDefinition($this->definition, []);
+    }
+
+    public function isRisky(): bool
+    {
+        return false;
+    }
+
+    public function supports(SplFileInfo $file): bool
+    {
+        return true;
+    }
+
+    abstract public function getPriority(): int;
+
+    abstract public function isCandidate(Tokens $tokens): bool;
+
+    public function fix(SplFileInfo $file, Tokens $tokens): void
+    {
+        $this->tokens = $tokens;
+        foreach ($this->findGroups() as $group) {
+            count($group) > 1 && $this->fixGroupIndentation($group);
+        }
+    }
+
+    protected function findGroups(): array
+    {
+        $groups = [];
+        $group  = [];
+        $prev   = new Sequence($this->tokens, 0);
+        while ($sequence = $this->nextSequence($prev->endIdx)) {
+            if (!$prev->sameGroup($sequence)) {
+                $groups[] = $group;
+                $group = [];
+            }
+
+            $group[$sequence->endIdx] = $this->alignIndex($sequence->endIdx);
+            $prev = $sequence;
+        }
+        return [...$groups, $group];
+    }
+
+    abstract protected function nextSequence(int $idx): ?Sequence;
+
+    abstract protected function alignIndex(int $idx): int;
+}
