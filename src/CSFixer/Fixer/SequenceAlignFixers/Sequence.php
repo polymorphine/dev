@@ -53,6 +53,15 @@ final class Sequence
     }
 
     /**
+     * @return int Code line length up to sequence ending token
+     */
+    public function length(): int
+    {
+        $start = $this->prevLineBreak($this->endIdx);
+        return $start ? $this->indentationPointLength($start, $this->endIdx - 1) : 0;
+    }
+
+    /**
      * Compares two sequences for same meaningful tokens.
      *
      * @param Sequence $sequence

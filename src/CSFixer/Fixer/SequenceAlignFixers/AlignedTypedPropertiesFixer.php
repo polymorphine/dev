@@ -40,12 +40,6 @@ final class AlignedTypedPropertiesFixer extends SequenceAlignFixers
         return new Sequence($this->tokens, $end, $signature);
     }
 
-    protected function alignIndex(int $idx): int
-    {
-        $start = $this->tokens->getPrevTokenOfKind($idx, [[T_PRIVATE], [T_PROTECTED], [T_PUBLIC]]);
-        return $start ? $this->indentationPointLength($start + 2, $idx - 1) : 0;
-    }
-
     private function tokenSignature(int $idx, int $end): array
     {
         $tokenIds[] = $this->tokens[$idx]->getId();

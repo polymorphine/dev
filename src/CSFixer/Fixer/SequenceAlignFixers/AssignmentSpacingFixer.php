@@ -48,12 +48,6 @@ final class AssignmentSpacingFixer extends SequenceAlignFixers
         return new Sequence($this->tokens, $assign, $signature);
     }
 
-    protected function alignIndex(int $idx): int
-    {
-        $start = $this->prevLineBreak($idx);
-        return $start ? $this->indentationPointLength($this->prevLineBreak($idx), $idx - 1) : 0;
-    }
-
     private function tokenSignature(int $idx, int $assign): array
     {
         $signature = [];

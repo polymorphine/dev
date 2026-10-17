@@ -13,9 +13,9 @@ namespace Polymorphine\Dev\CSFixer\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use PhpCsFixer\Tokenizer\Tokens;
-use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\Sequence;
 use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
+use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\Sequence;
+use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
@@ -69,13 +69,11 @@ abstract class SequenceAlignFixers implements FixerInterface
                 $group = [];
             }
 
-            $group[$sequence->endIdx] = $this->alignIndex($sequence->endIdx);
+            $group[$sequence->endIdx] = $sequence->length();
             $prev = $sequence;
         }
         return [...$groups, $group];
     }
 
     abstract protected function nextSequence(int $idx): ?Sequence;
-
-    abstract protected function alignIndex(int $idx): int;
 }
