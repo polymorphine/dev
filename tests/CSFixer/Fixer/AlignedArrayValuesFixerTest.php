@@ -73,6 +73,41 @@ class AlignedArrayValuesFixerTest extends FixerTest
         $this->assertFixed($code, $expected);
     }
 
+    public function test_NestedMultilineArrays_AreAligned()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a' => 10,
+                'abc' => [
+                    'foooooooo' => $x,
+                    'bar' => $y
+                ],
+                'foo-bar' => 12,
+                'baz' => ['one' => 1]
+            ];
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            $x = [
+                'a'       => 10,
+                'abc'     => [
+                    'foooooooo' => $x,
+                    'bar'       => $y
+                ],
+                'foo-bar' => 12,
+                'baz'     => ['one' => 1]
+            ];
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
     public function test_NotExclusivelyMultilineArrays_AreNotChanged()
     {
         $code = <<<'CODE'
