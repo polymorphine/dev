@@ -11,26 +11,24 @@
 
 namespace Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers;
 
-use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
-use PhpCsFixer\Tokenizer\Tokens;
+use Polymorphine\Dev\CSFixer\AlignTokens;
 
 
 final class Sequence
 {
-    use FixerMethods;
-
     public int $endIdx;
 
-    private array $tokenIds;
+    private AlignTokens $tokens;
+    private array       $tokenIds;
 
     /**
      * Token sequence from line start until $endIdx.
      *
-     * @param Tokens    $tokens
-     * @param int       $endIdx
-     * @param list<int> $tokenIds
+     * @param AlignTokens $tokens
+     * @param int         $endIdx
+     * @param list<int>   $tokenIds
      */
-    public function __construct(Tokens $tokens, int $endIdx, array $tokenIds = [])
+    public function __construct(AlignTokens $tokens, int $endIdx, array $tokenIds = [])
     {
         $this->tokens   = $tokens;
         $this->endIdx   = $endIdx;
@@ -48,8 +46,10 @@ final class Sequence
     public function sameGroup(Sequence $sequence): bool
     {
         if (!$this->tokenIds || !$sequence->tokenIds) { return false; }
-        $idx = $this->prevLineBreak($sequence->endIdx);
-        return $this->isNextLine($idx) && $this->nextLineBreak($this->endIdx) === $idx && $this->match($sequence);
+        $idx = $this->tokens->prevLineBreak($sequence->endIdx);
+        return $this->isNextLine($idx)
+            && $this->tokens->nextLineBreak($this->endIdx) === $idx
+            && $this->match($sequence);
     }
 
     /**
@@ -57,17 +57,14 @@ final class Sequence
      */
     public function length(): int
     {
-        $start = $this->prevLineBreak($this->endIdx);
-        return $start ? $this->indentationPointLength($start, $this->endIdx - 1) : 0;
+        return $this->tokens->alignColumn($this->endIdx - 1);
     }
 
-    /**
-     * Compares two sequences for same meaningful tokens.
-     *
-     * @param Sequence $sequence
-     *
-     * @return bool
-     */
+    private function isNextLine(int $idx): bool
+    {
+        return substr_count($this->tokens[$idx]->getContent(), "\n") === 1;
+    }
+
     private function match(Sequence $sequence): bool
     {
         return $this->tokenIds === $sequence->tokenIds;

@@ -32,10 +32,10 @@ final class AlignedTypedPropertiesFixer extends SequenceAlignFixers
 
     protected function nextSequence(int $idx): ?Sequence
     {
-        $idx = $this->tokens->getNextTokenOfKind($idx, [[T_PRIVATE], [T_PROTECTED], [T_PUBLIC]]);
+        $idx = $this->tokens->nextTokenOfKind($idx, [T_PRIVATE, T_PROTECTED, T_PUBLIC]);
         if (!$idx) { return null; }
 
-        $end       = $this->tokens->getNextTokenOfKind($idx, [[T_VARIABLE], [T_FUNCTION], [T_CONST]]);
+        $end       = $this->tokens->nextTokenOfKind($idx, [T_VARIABLE, T_FUNCTION, T_CONST]);
         $signature = $this->tokens[$end]->isGivenKind(T_VARIABLE) ? $this->tokenSignature($idx, $end) : [];
         return new Sequence($this->tokens, $end, $signature);
     }
@@ -43,7 +43,7 @@ final class AlignedTypedPropertiesFixer extends SequenceAlignFixers
     private function tokenSignature(int $idx, int $end): array
     {
         $tokenIds[] = $this->tokens[$idx]->getId();
-        while ($idx = $this->tokens->getNextMeaningfulToken($idx)) {
+        while ($idx = $this->tokens->meaningfulToken($idx, 1)) {
             if ($idx === $end) { return []; }
             if (!$this->tokens[$idx]->isGivenKind(T_STATIC)) { break; }
             $tokenIds[] = $this->tokens[$idx]->getId();

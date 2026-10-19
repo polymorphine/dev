@@ -13,18 +13,18 @@ namespace Polymorphine\Dev\CSFixer\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
-use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
 use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\Sequence;
+use Polymorphine\Dev\CSFixer\AlignTokens;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
 abstract class SequenceAlignFixers implements FixerInterface
 {
-    use FixerMethods;
-
     protected string $name;
     protected string $definition;
+
+    protected AlignTokens $tokens;
 
     public function getName(): string
     {
@@ -52,9 +52,9 @@ abstract class SequenceAlignFixers implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        $this->tokens = $tokens;
+        $this->tokens = new AlignTokens($tokens);
         foreach ($this->findGroups() as $group) {
-            count($group) > 1 && $this->fixGroupIndentation($group);
+            count($group) > 1 && $this->tokens->fixGroupIndentation($group);
         }
     }
 

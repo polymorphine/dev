@@ -12,15 +12,15 @@
 namespace Polymorphine\Dev\CSFixer\Fixer;
 
 use PhpCsFixer\Fixer\FixerInterface;
-use Polymorphine\Dev\CSFixer\Tokens\FixerMethods;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
+use Polymorphine\Dev\CSFixer\AlignTokens;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
 
 
 final class AlignedMethodChainFixer implements FixerInterface
 {
-    use FixerMethods;
+    private AlignTokens $tokens;
 
     public function getName(): string
     {
@@ -63,15 +63,15 @@ final class AlignedMethodChainFixer implements FixerInterface
 
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        $this->tokens = $tokens;
+        $this->tokens = new AlignTokens($tokens);
         while ($idx = $this->findNextChain($idx ?? 0)) {
-            $this->alignChain($idx, $this->indentationPointLength($this->prevLineBreak($idx), $idx, false));
+            $this->alignChain($idx, $this->tokens->alignColumn($idx, true));
         }
     }
 
     private function findNextChain(int $opIdx): ?int
     {
-        $idx = $this->tokens->getNextTokenOfKind($opIdx, [[T_OBJECT_OPERATOR]]);
+        $idx = $this->tokens->nextTokenOfKind($opIdx, [T_OBJECT_OPERATOR]);
         if (!$idx) { return null; }
 
         $methodChainPossible = !$this->tokens[$idx - 1]->isWhitespace() && $this->isStartOfMultilineChain($idx);
@@ -94,9 +94,9 @@ final class AlignedMethodChainFixer implements FixerInterface
         $insert  = !$replace && $this->tokens[$next]->isGivenKind(T_OBJECT_OPERATOR);
         if (!$replace && !$insert) { return; }
 
-        $this->tokens->ensureWhitespaceAtIndex($next, 0, "\n" . str_repeat(' ', $indent));
+        $this->tokens->whitespaceAfter($next - 1, "\n" . str_repeat(' ', $indent));
 
-        $idx = $this->tokens->getNextTokenOfKind($next, [[T_OBJECT_OPERATOR]]);
+        $idx = $this->tokens->nextTokenOfKind($next, [T_OBJECT_OPERATOR]);
         if ($idx) { $this->alignChain($idx, $indent); }
     }
 
@@ -107,7 +107,7 @@ final class AlignedMethodChainFixer implements FixerInterface
         }
 
         $next    = $this->findClosing($idx) + 1;
-        $newLine = $this->nextLineBreak($idx);
+        $newLine = $this->tokens->nextLineBreak($idx);
 
         if ($newLine < $next) {
             $this->indentMultilineParam($newLine, $next, $indent + 4);
@@ -118,7 +118,7 @@ final class AlignedMethodChainFixer implements FixerInterface
 
     private function findClosing(int $idx): ?int
     {
-        $parenthesis = $this->tokens->getNextTokenOfKind($idx, ['(', ')']);
+        $parenthesis = $this->tokens->nextTokenOfKind($idx, ['(', ')']);
         return $this->tokens[$parenthesis]->getContent() === '('
             ? $this->findClosing($this->findClosing($parenthesis))
             : $parenthesis;
@@ -126,21 +126,14 @@ final class AlignedMethodChainFixer implements FixerInterface
 
     private function indentMultilineParam(int $idx, int $end, int $indent): void
     {
-        $minLevel = $this->codeLength($this->tokens[$idx]->getContent());
+        $minLevel = mb_strlen(ltrim($this->tokens[$idx]->getContent(), "\n"));
         $diff     = $indent - $minLevel;
         if (!$diff) { return; }
 
         while ($idx < $end) {
-            $this->tokens->ensureWhitespaceAtIndex($idx, 0, $this->whitespace($diff, $idx));
-            $idx = $this->nextLineBreak($idx);
+            $whitespace = $this->tokens[$idx]->getContent() . str_repeat(' ', $diff);
+            $this->tokens->whitespaceAfter($idx - 1, $whitespace);
+            $idx = $this->tokens->nextLineBreak($idx);
         }
-    }
-
-    private function whitespace(int $length, int $idx): string
-    {
-        $code   = $this->tokens[$idx]->getContent();
-        $lines  = substr_count($code, "\n");
-        $indent = $this->codeLength($code) + $length;
-        return str_repeat("\n", $lines) . str_repeat(' ', $indent);
     }
 }

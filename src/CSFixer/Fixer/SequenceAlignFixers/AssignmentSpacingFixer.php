@@ -34,14 +34,14 @@ final class AssignmentSpacingFixer extends SequenceAlignFixers
 
     protected function nextSequence(int $idx): ?Sequence
     {
-        $assign = $this->tokens->getNextTokenOfKind($idx, ['=']);
+        $assign = $this->tokens->nextTokenOfKind($idx, ['=']);
         if (!$assign) { return null; }
         if (!$this->isDeclareClause($assign)) {
-            $this->tokens->ensureWhitespaceAtIndex($assign + 1, 0, ' ');
-            $this->tokens->ensureWhitespaceAtIndex($assign - 1, 1, ' ');
+            $this->tokens->whitespaceAfter($assign);
+            $this->tokens->whitespaceBefore($assign);
         }
 
-        $lineStart     = $this->isDeclareClause($assign) ? null : $this->prevLineBreak($assign);
+        $lineStart     = $this->isDeclareClause($assign) ? null : $this->tokens->prevLineBreak($assign);
         $matchPossible = $lineStart && $this->isPureAssignment($lineStart, $assign);
         $signature     = $matchPossible ? $this->tokenSignature($lineStart, $assign) : [];
 
@@ -82,7 +82,7 @@ final class AssignmentSpacingFixer extends SequenceAlignFixers
 
     private function isDeclareClause(int $opIdx): bool
     {
-        $prev = $this->meaningfulToken($opIdx, -3);
+        $prev = $this->tokens->meaningfulToken($opIdx, -3);
         return $prev && $this->tokens[$prev]->isGivenKind(T_DECLARE);
     }
 }
