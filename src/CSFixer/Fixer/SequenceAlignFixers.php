@@ -17,6 +17,7 @@ use Polymorphine\Dev\CSFixer\Fixer\SequenceAlignFixers\Sequence;
 use Polymorphine\Dev\CSFixer\AlignTokens;
 use PhpCsFixer\Tokenizer\Tokens;
 use SplFileInfo;
+use Generator;
 
 
 abstract class SequenceAlignFixers implements FixerInterface
@@ -58,21 +59,20 @@ abstract class SequenceAlignFixers implements FixerInterface
         }
     }
 
-    protected function groups(): array
+    protected function groups(): Generator
     {
-        $groups = [];
-        $group  = [];
-        $prev   = new Sequence($this->tokens, 0);
+        $group = [];
+        $prev  = new Sequence($this->tokens, 0);
         while ($sequence = $this->nextSequence($prev->endIdx)) {
             if (!$prev->sameGroup($sequence)) {
-                $groups[] = $group;
+                yield $group;
                 $group = [];
             }
 
             $group[$sequence->endIdx] = $sequence->length();
             $prev = $sequence;
         }
-        return [...$groups, $group];
+        yield $group;
     }
 
     abstract protected function nextSequence(int $idx): ?Sequence;
