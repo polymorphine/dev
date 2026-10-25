@@ -17,10 +17,13 @@ use Polymorphine\Dev\CSFixer\AlignTokens;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\CT;
 use SplFileInfo;
+use Generator;
 
 
 final class AlignedArrayValuesFixer implements FixerInterface
 {
+    private const BRACKET_TOKENS = [CT::T_ARRAY_BRACKET_OPEN, T_DOUBLE_ARROW, CT::T_ARRAY_BRACKET_CLOSE];
+
     private AlignTokens $tokens;
 
     public function getName(): string
@@ -56,33 +59,30 @@ final class AlignedArrayValuesFixer implements FixerInterface
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = new AlignTokens($tokens);
-
-        $idx = 0;
-        while ($idx = $this->tokens->nextTokenOfKind($idx, [CT::T_ARRAY_BRACKET_OPEN])) {
-            $this->alignIndentation($idx);
-            $idx = $this->tokens->bracketEnd($idx);
+        foreach ($this->groups() as $group) {
+            count($group) > 1 && $this->tokens->align($group);
         }
     }
 
-    private function alignIndentation(int $idx): void
+    private function groups(): Generator
     {
-        $tokenTypes = [CT::T_ARRAY_BRACKET_OPEN, T_DOUBLE_ARROW, CT::T_ARRAY_BRACKET_CLOSE];
-        $group      = [];
-        while ($idx = $this->tokens->nextTokenOfKind($idx, $tokenTypes)) {
+        $stack = [];
+        $group = [];
+        while ($idx = $this->tokens->nextTokenOfKind($idx ?? 0, self::BRACKET_TOKENS)) {
             $type = $this->tokens[$idx]->getId();
-            if ($type === CT::T_ARRAY_BRACKET_CLOSE) { break; }
-            if ($type === CT::T_ARRAY_BRACKET_OPEN) {
-                $this->alignIndentation($idx);
-                $idx = $this->tokens->bracketEnd($idx);
-                continue;
+            if ($type === CT::T_ARRAY_BRACKET_CLOSE) {
+                yield $group;
+                $group = array_pop($stack) ?? [];
+            } elseif ($type === CT::T_ARRAY_BRACKET_OPEN) {
+                $stack[] = $group;
+                $group = [];
+            } elseif ($this->isMultipleAssign($idx, $this->tokens->nextLineBreak($idx))) {
+                $idx   = $this->endGroupIdx(array_key_first($group) ?? $idx);
+                $group = array_pop($stack) ?? [];
+            } else {
+                $group[$idx] = $this->tokens->alignColumn($idx);
             }
-            $lineEnd = $this->tokens->nextLineBreak($idx);
-            if ($this->isMultipleAssign($idx, $lineEnd)) { return; }
-
-            $group[$idx] = $this->tokens->alignColumn($idx);
         }
-        if (count($group) < 2) { return; }
-        $this->tokens->align($group);
     }
 
     private function isMultipleAssign(int $firstArrow, int $lineEnd): bool
@@ -93,5 +93,10 @@ final class AlignedArrayValuesFixer implements FixerInterface
             return $continueFrom < $firstArrow || $this->isMultipleAssign($firstArrow, $continueFrom);
         }
         return $firstArrow !== $last;
+    }
+
+    private function endGroupIdx(int $idx): int
+    {
+        return $this->tokens->bracketEnd($this->tokens->prevTokenOfKind($idx, [CT::T_ARRAY_BRACKET_OPEN]));
     }
 }
