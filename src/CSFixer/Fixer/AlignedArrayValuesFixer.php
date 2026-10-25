@@ -82,7 +82,7 @@ final class AlignedArrayValuesFixer implements FixerInterface
             $group[$idx] = $this->tokens->alignColumn($idx);
         }
         if (count($group) < 2) { return; }
-        $this->tokens->fixGroupIndentation($group);
+        $this->tokens->align($group);
     }
 
     private function isMultipleAssign(int $firstArrow, int $lineEnd): bool

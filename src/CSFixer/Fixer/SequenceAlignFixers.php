@@ -53,12 +53,12 @@ abstract class SequenceAlignFixers implements FixerInterface
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokens = new AlignTokens($tokens);
-        foreach ($this->findGroups() as $group) {
-            count($group) > 1 && $this->tokens->fixGroupIndentation($group);
+        foreach ($this->groups() as $group) {
+            count($group) > 1 && $this->tokens->align($group);
         }
     }
 
-    protected function findGroups(): array
+    protected function groups(): array
     {
         $groups = [];
         $group  = [];

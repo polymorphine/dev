@@ -67,7 +67,7 @@ class AlignTokens extends SplFixedArray
      *
      * @return void
      */
-    public function fixGroupIndentation(array $group): void
+    public function align(array $group): void
     {
         $maxLength = max($group);
         foreach ($group as $assign => $length) {
