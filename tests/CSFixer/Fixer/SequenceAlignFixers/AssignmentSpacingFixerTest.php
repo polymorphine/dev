@@ -20,7 +20,7 @@ class AssignmentSpacingFixerTest extends FixerTest
     public function test_NotGrouppedAssignmentOperators_AreSpacedWithSingleSpace()
     {
         $code = <<<'CODE'
-            <?php
+            <?php declare(strict_types = 1);
             
             $x['foo']=10;
             $bool                =       [
@@ -31,7 +31,7 @@ class AssignmentSpacingFixerTest extends FixerTest
             CODE;
 
         $expected = <<<'CODE'
-            <?php
+            <?php declare(strict_types=1);
             
             $x['foo'] = 10;
             $bool = [

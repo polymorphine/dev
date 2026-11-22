@@ -55,7 +55,7 @@ abstract class SequenceAlignFixers implements FixerInterface
     {
         $this->tokens = new AlignTokens($tokens);
         foreach ($this->groups() as $group) {
-            count($group) > 1 && $this->tokens->align($group);
+            $group && $this->tokens->align($group);
         }
     }
 

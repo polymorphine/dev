@@ -36,12 +36,16 @@ final class AssignmentSpacingFixer extends SequenceAlignFixers
     {
         $assign = $this->tokens->nextTokenOfKind($idx, ['=']);
         if (!$assign) { return null; }
-        if (!$this->isDeclareClause($assign)) {
-            $this->tokens->whitespaceAfter($assign);
-            $this->tokens->whitespaceBefore($assign);
+        if ($this->isDeclareClause($assign)) {
+            $this->tokens->whitespaceBefore($assign, '');
+            $this->tokens->whitespaceAfter($assign, '');
+            return $this->nextSequence($assign);
         }
 
-        $lineStart     = $this->isDeclareClause($assign) ? null : $this->tokens->prevLineBreak($assign);
+        !$this->tokens[$assign - 1]->isWhitespace() && $this->tokens->whitespaceBefore($assign) && $assign++;
+        $this->tokens->whitespaceAfter($assign);
+
+        $lineStart     = $this->tokens->prevLineBreak($assign);
         $matchPossible = $lineStart && $this->isPureAssignment($lineStart, $assign);
         $signature     = $matchPossible ? $this->tokenSignature($lineStart, $assign) : [];
 
