@@ -77,9 +77,11 @@ final class AlignedArrayValuesFixer implements FixerInterface
                 $stack[] = $group;
                 $group = [];
             } elseif ($this->isMultipleAssign($idx, $this->tokens->nextLineBreak($idx))) {
-                $idx   = $this->endGroupIdx(array_key_first($group) ?? $idx);
+                $idx   = $this->fixLocalGroupOperators(array_key_first($group) ?? $idx);
                 $group = array_pop($stack) ?? [];
             } else {
+                !$this->tokens[$idx - 1]->isWhitespace() && $this->tokens->whitespaceBefore($idx) && $idx++;
+                $this->tokens->whitespaceAfter($idx);
                 $group[$idx] = $this->tokens->alignColumn($idx);
             }
         }
@@ -95,8 +97,14 @@ final class AlignedArrayValuesFixer implements FixerInterface
         return $firstArrow !== $last;
     }
 
-    private function endGroupIdx(int $idx): int
+    private function fixLocalGroupOperators(int $idx): int
     {
-        return $this->tokens->bracketEnd($this->tokens->prevTokenOfKind($idx, [CT::T_ARRAY_BRACKET_OPEN]));
+        $end = $this->tokens->bracketEnd($this->tokens->prevTokenOfKind($idx, [CT::T_ARRAY_BRACKET_OPEN]));
+        while ($idx < $end) {
+            $this->tokens->whitespaceAfter($idx) && $end++;
+            $this->tokens->whitespaceBefore($idx) && $end++;
+            $idx = $this->tokens->nextTokenOfKind($idx + 1, [T_DOUBLE_ARROW]) ?? $end;
+        }
+        return $end;
     }
 }

@@ -44,14 +44,45 @@ class AlignedArrayValuesFixerTest extends FixerTest
         $this->assertUnchanged($code);
     }
 
+    public function test_ArrowOperatorSpacing_IsFixed()
+    {
+        $code = <<<'CODE'
+            <?php
+            
+            $x = ['a'=> 10, 'abc' =>20, 'c'=>30];
+            
+            $y = [
+                'a'=>10,
+                'b' => 20,
+                'c' =>30
+            ];
+            
+            CODE;
+
+        $expected = <<<'CODE'
+            <?php
+            
+            $x = ['a' => 10, 'abc' => 20, 'c' => 30];
+            
+            $y = [
+                'a' => 10,
+                'b' => 20,
+                'c' => 30
+            ];
+            
+            CODE;
+
+        $this->assertFixed($code, $expected);
+    }
+
     public function test_MultilineArrays_AreAligned()
     {
         $code = <<<'CODE'
             <?php
             
             $x = [
-                'a' => 10,
-                'abc' => ['foo' => $x, 'bar' => $y],
+                'a'=> 10,
+                'abc' => ['foo' =>$x, 'bar' => $y],
                 'foo-bar' => 12,
                 'baz' => ['one' => 1]
             ];
@@ -84,7 +115,7 @@ class AlignedArrayValuesFixerTest extends FixerTest
                     'foooooooo' => $x,
                     'bar' => $y
                 ],
-                'foo-bar' => 12,
+                'foo-bar'=> 12,
                 'baz' => ['one' => 1]
             ];
             
