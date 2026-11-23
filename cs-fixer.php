@@ -9,6 +9,6 @@
  * with this source code in the file LICENSE.
  */
 
-use Polymorphine\Dev\FixerSetup;
+use Polymorphine\Dev\CSFixer\FixerSetup;
 
 return FixerSetup::config();
